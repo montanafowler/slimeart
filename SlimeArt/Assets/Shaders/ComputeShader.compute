@@ -1,4 +1,4 @@
-// Each #kernel tells which function to compile; you can have many kernels
+﻿// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
 
 // Create a RenderTexture with enableRandomWrite flag and set it
@@ -26,6 +26,6 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     }
 
 
-if(pixelWidth)
+
 
 }
