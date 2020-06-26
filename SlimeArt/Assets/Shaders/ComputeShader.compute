@@ -1,14 +1,31 @@
-﻿// Each #kernel tells which function to compile; you can have many kernels
+// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 RWTexture2D<float4> Result;
+RWStructuredBuffer<float> buffer;
+float pixelWidth;
+float pixelHeight;
+
 
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     // TODO: insert actual code here!
 
-    Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+  if (id.x % 20 > 10 && id.y % 20 > 10) {
+  //  if (id.x <= 512/2.0 && id.x >= (512/2.0 - 5.0) && id.y <= 512/2.0 && id.y >= (512/2.0 - 5.0)) {
+//if (id.x < pixelWidth/2 && id.x > pixelWidth/2 - 10 && id.y < pixelWidth/2 && id.y > pixelWidth/2 - 10) {
+      Result[id.xy] = float4(buffer[0], buffer[1],  buffer[2], 1.0);
+  //  Result[id.xy] = float4(10.0, 0.0, 0.0, 1.0);
+
+
+    } else {
+      Result[id.xy] = float4(0.0, 0.0, 0.0, 1.0);
+    }
+
+
+if(pixelWidth)
+
 }
