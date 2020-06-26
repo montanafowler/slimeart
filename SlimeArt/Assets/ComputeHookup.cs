@@ -17,6 +17,9 @@ public class ComputeHookup : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        //hello world
+
         // kernel is the compute shader (initial spark)
         // result will have the thing to blur in it
         int computeKernel = compute.FindKernel("CSMain");
