@@ -114,3 +114,21 @@ Cmd: compileComputeKernel
   error: 2 plat 4 at ComputeShader.compute(177): 'abs': no matching 1 parameter intrinsic function; Possible intrinsic functions are: abs(float|half|double|min10float|min16float|int|uint|min12int|min16int|min16uint)
   error: 2 plat 4 at ComputeShader.compute(177): invalid subscript 'z'
   api=4 insize=7899 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=8012 outsize=8014 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(81): implicit truncation of vector type
+  error: 1 plat 4 at ComputeShader.compute(130): implicit truncation of vector type
+  error: 1 plat 4 at ComputeShader.compute(132): implicit truncation of vector type
+  error: 1 plat 4 at ComputeShader.compute(139): implicit truncation of vector type
+  error: 2 plat 4 at ComputeShader.compute(177): 'abs': no matching 1 parameter intrinsic function; Possible intrinsic functions are: abs(float|half|double|min10float|min16float|int|uint|min12int|min16int|min16uint)
+  error: 2 plat 4 at ComputeShader.compute(177): invalid subscript 'z'
+  api=4 insize=8014 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=8038 outsize=8040 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(81): implicit truncation of vector type
+  error: 1 plat 4 at ComputeShader.compute(130): implicit truncation of vector type
+  error: 1 plat 4 at ComputeShader.compute(132): implicit truncation of vector type
+  error: 1 plat 4 at ComputeShader.compute(139): implicit truncation of vector type
+  api=4 insize=8040 outsize=5565 ok=1

@@ -17,7 +17,7 @@ float half_sense_spread; // default = 15-30 degrees
 float sense_distance; // in world-space units; default = about 1/100 of the world 'cube' size
 float turn_angle; // default = 15 degrees
 float move_distance; // in world-space units; default = about 1/5--1/3 of sense_distance
-float deposit_value; // should be called agent deposit // 0 for data-driven fitting, >0 for self-reinforcing behavior
+float agent_deposit; // 0 for data-driven fitting, >0 for self-reinforcing behavior
 int world_width; //
 int world_height; // grid dimensions - note that the particle positions are also stored in the grid coordinates, but continuous
 int world_depth; //
@@ -172,7 +172,7 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
     //particles_weights[idx] = particle_weight;
 
     // Update deposit and trace grids
-    tex_deposit[uint2(x, y)] += deposit_value; // NOT ATOMIC! // the trace is not blurred, trace is not food, but agents also leave deposit
+    tex_deposit[uint2(x, y)] += agent_deposit; // NOT ATOMIC! // the trace is not blurred, trace is not food, but agents also leave deposit
     tex_trace[uint2(x, y)] += float4(0.0,0.0,0.0,1.0);//float4(distance_scaling_factor, abs(center_axis.x), abs(center_axis.y), abs(center_axis.z)); // NOT ATOMIC!
     //float4(distance_scaling_factor/*actualtrace*/, abs(center_axis.x), abs(center_axis.y), abs(center_axis.z)/*direction of agents*/); // NOT ATOMIC!
 
