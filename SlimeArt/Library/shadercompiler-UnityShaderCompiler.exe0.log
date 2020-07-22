@@ -1,2 +1,116 @@
 Base path: 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data', plugins path 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data/PlaybackEngines'
 Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=1199 outsize=1198 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=1198 outsize=659 ok=1
+Cmd: preprocessCompute
+  insize=1271 outsize=1270 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=1270 outsize=659 ok=1
+Cmd: preprocessCompute
+  insize=1268 outsize=1267 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=1267 outsize=635 ok=1
+Cmd: preprocessCompute
+  insize=1268 outsize=1267 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=1267 outsize=635 ok=1
+Cmd: preprocessCompute
+  insize=6122 outsize=6121 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at ComputeShader.compute(80): unrecognized identifier 'idx'
+  error: 2 plat 4 at ComputeShader.compute(80): unrecognized identifier 'unit'
+  api=4 insize=6121 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=7004 outsize=7003 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at ComputeShader.compute(92): unrecognized identifier 'idx'
+  error: 2 plat 4 at ComputeShader.compute(92): unrecognized identifier 'unit'
+  api=4 insize=7003 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=6888 outsize=6887 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at ComputeShader.compute(78): 'cross': no matching 2 parameter intrinsic function; Possible intrinsic functions are: cross(float3|half3|min10float3|min16float3, float3|half3|min10float3|min16float3)
+  api=4 insize=6887 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=6903 outsize=6902 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at ComputeShader.compute(78): 'cross': no matching 2 parameter intrinsic function; Possible intrinsic functions are: cross(float3|half3|min10float3|min16float3, float3|half3|min10float3|min16float3)
+  api=4 insize=6902 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=7379 outsize=7381 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at ComputeShader.compute(80): syntax error: unexpected token ')'
+  error: 2 plat 4 at ComputeShader.compute(94): unrecognized identifier 'idx'
+  error: 2 plat 4 at ComputeShader.compute(94): unrecognized identifier 'unit'
+  api=4 insize=7381 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=7722 outsize=7724 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at ComputeShader.compute(80): syntax error: unexpected token ')'
+  error: 2 plat 4 at ComputeShader.compute(94): unrecognized identifier 'idx'
+  error: 2 plat 4 at ComputeShader.compute(94): unrecognized identifier 'unit'
+  api=4 insize=7724 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=7869 outsize=7871 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at ComputeShader.compute(80): syntax error: unexpected token ')'
+  error: 2 plat 4 at ComputeShader.compute(101): undeclared identifier 'th'
+  api=4 insize=7871 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=7872 outsize=7874 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at ComputeShader.compute(80): syntax error: unexpected token ')'
+  error: 2 plat 4 at ComputeShader.compute(120): cannot implicitly convert from 'float2' to 'float3'
+  api=4 insize=7874 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=7872 outsize=7874 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at ComputeShader.compute(80): syntax error: unexpected token ')'
+  error: 2 plat 4 at ComputeShader.compute(129): cannot implicitly convert from 'int2' to 'int3'
+  api=4 insize=7874 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=7872 outsize=7874 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at ComputeShader.compute(80): syntax error: unexpected token ')'
+  error: 1 plat 4 at ComputeShader.compute(130): implicit truncation of vector type
+  error: 1 plat 4 at ComputeShader.compute(132): implicit truncation of vector type
+  error: 2 plat 4 at ComputeShader.compute(138): syntax error: unexpected token 'float2'
+  error: 2 plat 4 at ComputeShader.compute(139): incorrect number of arguments to numeric-type constructor
+  error: 2 plat 4 at ComputeShader.compute(139): undeclared identifier 'sense_offset'
+  api=4 insize=7874 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=7872 outsize=7874 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at ComputeShader.compute(79): 'cross': no matching 2 parameter intrinsic function; Possible intrinsic functions are: cross(float3|half3|min10float3|min16float3, float3|half3|min10float3|min16float3)
+  api=4 insize=7874 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=7894 outsize=7896 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(81): implicit truncation of vector type
+  error: 1 plat 4 at ComputeShader.compute(130): implicit truncation of vector type
+  error: 1 plat 4 at ComputeShader.compute(132): implicit truncation of vector type
+  error: 2 plat 4 at ComputeShader.compute(138): syntax error: unexpected token 'float2'
+  error: 2 plat 4 at ComputeShader.compute(139): incorrect number of arguments to numeric-type constructor
+  error: 2 plat 4 at ComputeShader.compute(139): undeclared identifier 'sense_offset'
+  api=4 insize=7896 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=7895 outsize=7897 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(81): implicit truncation of vector type
+  error: 1 plat 4 at ComputeShader.compute(130): implicit truncation of vector type
+  error: 1 plat 4 at ComputeShader.compute(132): implicit truncation of vector type
+  error: 1 plat 4 at ComputeShader.compute(139): implicit truncation of vector type
+  error: 2 plat 4 at ComputeShader.compute(173): undeclared identifier 'particles_weights'
+  api=4 insize=7897 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=7897 outsize=7899 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(81): implicit truncation of vector type
+  error: 1 plat 4 at ComputeShader.compute(130): implicit truncation of vector type
+  error: 1 plat 4 at ComputeShader.compute(132): implicit truncation of vector type
+  error: 1 plat 4 at ComputeShader.compute(139): implicit truncation of vector type
+  error: 2 plat 4 at ComputeShader.compute(177): 'abs': no matching 1 parameter intrinsic function; Possible intrinsic functions are: abs(float|half|double|min10float|min16float|int|uint|min12int|min16int|min16uint)
+  error: 2 plat 4 at ComputeShader.compute(177): invalid subscript 'z'
+  api=4 insize=7899 outsize=0 ok=0

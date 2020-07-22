@@ -30,7 +30,7 @@ struct RNG {
     #define BAD_W 0x464fffffU
     #define BAD_Z 0x9068ffffU
     uint m_w;
-	uint m_z;
+	  uint m_z;
 
     void set_seed(uint seed1, uint seed2)
 	{
