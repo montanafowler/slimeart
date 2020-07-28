@@ -35,6 +35,7 @@ public class ComputeHookup : MonoBehaviour
 
     public int pixelWidth;
     public int pixelHeight;
+    public const float PI = 3.1415926535897931f;
 
     //public Camera camera;
     // Start is called before the first frame update
@@ -48,24 +49,52 @@ public class ComputeHookup : MonoBehaviour
         
         // dealing with the aspect ratio
         pixelHeight = 512;
-        pixelWidth = (int)(Camera.main.aspect * pixelHeight);
+        pixelWidth = 512;//(int)(Camera.main.aspect * pixelHeight);
 
         result = initializeRenderTexture();
 
+        // random seeding of arrays
+        float[] xParticlePositions = new float[512 * 512];
+        float[] yParticlePositions = new float[512 * 512];
+        float[] thetaParticles = new float[512 * 512];
+        float[] weightsParticles = new float[512 * 512];
+        int index = 0;
+        for (int i = 0; i < 512; i++) {
+            for (int j = 0; j < 512; j++) {
+                xParticlePositions[index] = Random.Range(0.0f, 512.0f);// i / (512.0f);
+                yParticlePositions[index] = Random.Range(0.0f, 512.0f);// j / (512.0f);
+                thetaParticles[i] = Random.Range(0.0f, 2.0f * PI);
+                if (i > 500)
+                    Debug.Log(xParticlePositions[index]);
+                index++;
+            }
+            /* if (i < 512 * 512 / 3) {
+                 xParticlePositions[i] = Random.Range(0.0f, 1.0f) * pixelWidth;
+                 yParticlePositions[i] = Random.Range(0.0f, 1.0f) * pixelHeight;
+                 thetaParticles[i] = Random.Range(0.0f, 2.0f * PI);
+                 if (Random.Range(0.0f, 1.0f) < 0.25f) {
+
+                 }
+                 weightsParticles[i] = 1.0f;
+             } else {
+                 xParticlePositions[i] = -1.0f;
+                 yParticlePositions[i] = -1.0f;
+                 thetaParticles[i] = -1.0f;
+                 weightsParticles[i] = -1.0f;
+             }*/
+            
+        }
+        
         // x particle positions
-        float[] xParticlePositions = { 0.0f, 1.0f, 2.0f };
         particles_x = initializeComputeBuffer(xParticlePositions, "particles_x", computeKernel);
 
         // y particle positions
-        float[] yParticlePositions = { 0.0f, 1.0f, 2.0f };
         particles_y = initializeComputeBuffer(yParticlePositions, "particles_y", computeKernel);
 
         // particles theta
-        float[] thetaParticles = { 0.0f, 1.0f, 2.0f };
         particles_theta = initializeComputeBuffer(thetaParticles, "particles_theta", computeKernel);
 
         // particle weights
-        float[] weightsParticles = { 0.0f, 1.0f, 2.0f };
         particles_weights = initializeComputeBuffer(weightsParticles, "particle_weights", computeKernel);
 
         // deposit texture for propegate shader
@@ -94,7 +123,7 @@ public class ComputeHookup : MonoBehaviour
         
         // dispatch the texture
         compute.Dispatch(computeKernel, 512 / 8, 512 / 8, 1);
-        //mat.mainTexture = result;
+        mat.mainTexture = result;
 
         //decay kernel
         int decayKernel = decay.FindKernel("CSMain");
@@ -123,7 +152,7 @@ public class ComputeHookup : MonoBehaviour
         float h = Camera.main.pixelWidth;
        // Debug.Log(h);
 
-        mat.mainTexture = deposit_out;
+        //mat.mainTexture = deposit_out;
     }
 
     ComputeBuffer initializeComputeBuffer(float[] arr, string shaderBufferName, int computeKernel) {

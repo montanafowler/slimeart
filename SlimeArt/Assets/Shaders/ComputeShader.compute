@@ -10,7 +10,7 @@ RWStructuredBuffer<float> particles_x; //x positons of every particle normalized
 RWStructuredBuffer<float> particles_y; // y positions of every particle normalized
 RWStructuredBuffer<float> particles_theta; // direction of movement for every particle
 RWStructuredBuffer<float> particle_weights; // how strong a deposit
-RWTexture2D<float4> tex_deposit;
+RWTexture2D<float> tex_deposit;
 RWTexture2D<float4> tex_trace;
 
 float half_sense_spread; // default = 15-30 degrees
@@ -90,16 +90,19 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
     //uint group_idx = group_id.x + group_id.y * 10 + group_id.z * 100;
     //uint idx = thread_index + 1000 * group_idx;
 
-    uint idx = id.x + id.y * 8; // not sure if this is right 7/3/20
+    uint idx = id.x + id.y * pixelWidth; // not sure if this is right 7/3/20
 
     // Fetch current particle state
-    float x = particles_x[idx];
-    float y = particles_y[idx];
+    float x = particles_x[idx];// *pixelWidth;
+    float y = particles_y[idx];// *pixelHeight;
     float theta = particles_theta[idx];
     float particle_weight = particle_weights[idx];
     bool is_data = (theta < -1.0); // FLAG IF TRUE PUT THE GALIXY IN THE DEPOSIT // RANDOMLY WRITE DOTS SO I ESTABLISH THE COMMUNICATION BETWEEN THE TWO SHADERS
 
-    // If data, then just write out deposit and exit
+    Result[id.xy] = float4(0.0, 0.0, 0.0, 1.0);//float4(id.x / 512.0, id.y / 512.0, 0.3, 1.0);
+    Result[uint2(x, y)] = float4(x / 512.0, y / 512.0, 0.3, 1.0);
+
+    /*// If data, then just write out deposit and exit
     if (is_data) {
         tex_deposit[uint2(x, y)] += 10.0 * particle_weight; // NOT ATOMIC! (not sure what particle weight is... maybe parameter?)
         return;
@@ -173,22 +176,78 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
 
     // Update deposit and trace grids
     tex_deposit[uint2(x, y)] += agent_deposit; // NOT ATOMIC! // the trace is not blurred, trace is not food, but agents also leave deposit
-    tex_trace[uint2(x, y)] += float4(0.0,0.0,0.0,1.0);//float4(distance_scaling_factor, abs(center_axis.x), abs(center_axis.y), abs(center_axis.z)); // NOT ATOMIC!
-    //float4(distance_scaling_factor/*actualtrace*/, abs(center_axis.x), abs(center_axis.y), abs(center_axis.z)/*direction of agents*/); // NOT ATOMIC!
+    tex_trace[uint2(x, y)] += float4(distance_scaling_factor, abs(center_axis.x), abs(center_axis.y), 1.0); // NOT ATOMIC!
+    //float4(distance_scaling_factor/*actualtrace, abs(center_axis.x), abs(center_axis.y), abs(center_axis.z)/*direction of agents); // NOT ATOMIC!
 
 
   if (id.x % 20 > 10 && id.y % 20 > 10) {
-  //  if (id.x <= 512/2.0 && id.x >= (512/2.0 - 5.0) && id.y <= 512/2.0 && id.y >= (512/2.0 - 5.0)) {
-//if (id.x < pixelWidth/2 && id.x > pixelWidth/2 - 10 && id.y < pixelWidth/2 && id.y > pixelWidth/2 - 10) {
-      Result[id.xy] = float4(particles_x[0], particles_x[1],   particles_x[2], 1.0);
-  //  Result[id.xy] = float4(10.0, 0.0, 0.0, 1.0);
-
-
+    //  if (id.x <= 512/2.0 && id.x >= (512/2.0 - 5.0) && id.y <= 512/2.0 && id.y >= (512/2.0 - 5.0)) {
+    //if (id.x < pixelWidth/2 && id.x > pixelWidth/2 - 10 && id.y < pixelWidth/2 && id.y > pixelWidth/2 - 10) {
+      //Result[id.xy] = float4(particles_x[0], particles_x[1],   particles_x[2], 1.0);
+    //Result[id.xy] = float4(10.0, 0.0, 0.0, 1.0);
     } else {
-      Result[id.xy] = float4(0.0, 0.0, 0.0, 1.0);
+      //Result[id.xy] = float4(0.0, 0.0, 0.0, 1.0);
+    }
+    float test = 0.0;
+    if (id.x < 1.0) test = 1.0;
+  //  Result[id.xy] = float4(idx/(512.0*512.0), (idx-1)/(512.0*512.0), 0.0, 1.0);
+  //  Result[id.xy] = float4(id.x/512.0, id.y/512.0, 0.0, 1.0);
+    Result[id.xy] = float4(id.x/512.0, id.y/512.0, 0.3, 1.0);
+    Result[uint2(x,y)] = float4(0.0, 0.0, 0.0, 1.0);
+    */
+    //if(x > 0.0) 
+      //  Result[uint2(500, 500)] = float4(0.0, 0.0, 0.0, 1.0);
+   
+    //if(x > 0.0 && y > 0.0) {
+      //Result[uint2(x,y)] = float4(1.0, 1.0, 1.0, 1.0);
+    //} else {
+      //Result[uint2(x,y)] = float4(1.0, 0.0, 0.0, 1.0);
+    //}
+
+  /*  if(id.x < 512/6) {
+      Result[id.xy] = float4(0.0,0.0,0.0,1.0);
+    } else if(id.x < 512/6*2) {
+      Result[id.xy] = float4(1.0,0.4,0.0,1.0);
+    } else if(id.x < 512/6*3) {
+      Result[id.xy] = float4(1.0,1.0,0.0,1.0);
+    } else if(id.x < 512/6*4) {
+      Result[id.xy] = float4(0.0,1.0,0.0,1.0);
+    } else if(id.x < 512/6*5) {
+      Result[id.xy] = float4(0.0,0.0,1.0,1.0);
+    } else if(id.x < 512/6*6) {
+      Result[id.xy] = float4(1.0,0.0,1.0,1.0);
     }
 
+  if(x < 512/6 && y < 512/6) {
+    Result[id.xy] = float4(1.0,0.0,0.0,1.0);
+  } else if(x < 512/6*2 && y < 512/6*2) {
+    Result[id.xy] = float4(1.0,0.4,0.0,1.0);
+  } else if(x < 512/6*3 && y < 512/6*3) {
+    Result[id.xy] = float4(1.0,1.0,0.0,1.0);
+  } else if(x < 512/6*4 && y < 512/6*4) {
+    Result[id.xy] = float4(0.0,1.0,0.0,1.0);
+  } else if(x < 512/6*5 && y < 512/6*5) {
+    Result[id.xy] = float4(0.0,0.0,1.0,1.0);
+  } else if(x < 512/6*6 && y < 512/6*6) {
+    Result[id.xy] = float4(1.0,0.0,1.0,1.0);
+  }
 
+    if(idx < 512*512/6) {
+      Result[id.xy] = float4(1.0,0.0,0.0,1.0);
+    } else if(idx < 512*512/6*2) {
+      Result[id.xy] = float4(1.0,0.4,0.0,1.0);
+    } else if(idx < 512*512/6*3) {
+      Result[id.xy] = float4(1.0,1.0,0.0,1.0);
+    } else if(idx < 512*512/6*4) {
+      Result[id.xy] = float4(0.0,1.0,0.0,1.0);
+    } else if(idx < 512*512/6*5) {
+      Result[id.xy] = float4(0.0,0.0,1.0,1.0);
+    } else if(idx < 512*512) {
+      Result[id.xy] = float4(1.0,0.0,1.0,1.0);
+    }
+    if(id.x < 512 && id.x > (512-512/6) && id.y < 512 && id.y > (512-512/6)) {
+      Result[id.xy] = float4(1.0,1.0,1.0,1.0);
+    }
 
-
+*/
 }
