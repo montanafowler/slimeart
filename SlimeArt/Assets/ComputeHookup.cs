@@ -64,8 +64,8 @@ public class ComputeHookup : MonoBehaviour
                 xParticlePositions[index] = Random.Range(0.0f, 512.0f);// i / (512.0f);
                 yParticlePositions[index] = Random.Range(0.0f, 512.0f);// j / (512.0f);
                 thetaParticles[i] = Random.Range(0.0f, 2.0f * PI);
-                if (i > 500)
-                    Debug.Log(xParticlePositions[index]);
+                //if (i > 500)
+                   // Debug.Log(xParticlePositions[index]);
                 index++;
             }
             /* if (i < 512 * 512 / 3) {
@@ -106,8 +106,8 @@ public class ComputeHookup : MonoBehaviour
         compute.SetTexture(computeKernel, "tex_trace", tex_trace);
 
         // other variables
-        int worldWidth = 100;
-        int worldHeight = 100;
+        int worldWidth = 512;
+        int worldHeight = 512;
         compute.SetFloat("half_sense_spread", 25.0f); // 15 to 30 degrees default
         compute.SetFloat("sense_distance", worldHeight / 100.0f); // in world-space units; default = about 1/100 of the world 'cube' size
         compute.SetFloat("turn_angle", 15.0f); // 15.0 is default
@@ -170,8 +170,9 @@ public class ComputeHookup : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-
+    void Update() {
+        int computeKernel = compute.FindKernel("CSMain");
+        compute.Dispatch(computeKernel, 512 / 8, 512 / 8, 1);
+        mat.mainTexture = result;
     }
 }

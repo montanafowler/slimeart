@@ -99,8 +99,39 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
     float particle_weight = particle_weights[idx];
     bool is_data = (theta < -1.0); // FLAG IF TRUE PUT THE GALIXY IN THE DEPOSIT // RANDOMLY WRITE DOTS SO I ESTABLISH THE COMMUNICATION BETWEEN THE TWO SHADERS
 
+    // Make a step
+    float xi = 0.5;//clamp(rng.random_float(), 0.001, 0.999); // random for each particle and timestep
+    float distance_scaling_factor = -0.3033 * log((pow(xi + 0.005, -0.4) - 0.9974) / 7.326); // using Maxwell-Boltzmann distribution
+    float2 dp = float2(cos(theta), sin(theta)) * move_distance * (0.1 + 0.9 * distance_scaling_factor);
+    
+    
+    /*if ((x + dp.x) > pixelWidth || (x + dp.x) < 0.0) {
+        theta = atan2(sin(theta), -cos(theta));
+        dp = float2(cos(theta), sin(theta)) * move_distance * (0.1 + 0.9 * distance_scaling_factor);
+    } 
+
+    if ((y + dp.y) > pixelHeight || (y + dp.y) < 0.0) {
+        theta = atan2(-sin(theta), cos(theta));
+        dp = float2(cos(theta), sin(theta)) * move_distance * (0.1 + 0.9 * distance_scaling_factor);
+    } */
+
+    x += dp.x;
+    y += dp.y;
+    
+    
+    
+    // Keep the particle inside environment
+    x = fmod(x, world_width); // problem 7/28
+    y = fmod(y, world_height);
+    
+
+    // Update particle state
+    particles_x[idx] = x;
+    particles_y[idx] = y;
+    particles_theta[idx] = theta;
+
     Result[id.xy] = float4(0.0, 0.0, 0.0, 1.0);//float4(id.x / 512.0, id.y / 512.0, 0.3, 1.0);
-    Result[uint2(x, y)] = float4(x / 512.0, y / 512.0, 0.3, 1.0);
+    Result[uint2(x, y)] = float4(1.0, 1.0, 1.0, 1.0);//float4(x / 512.0, y / 512.0, 0.8, 1.0);
 
     /*// If data, then just write out deposit and exit
     if (is_data) {

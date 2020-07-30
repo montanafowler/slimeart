@@ -391,3 +391,130 @@ Cmd: compileComputeKernel
   api=4 insize=10026 outsize=5491 ok=1
 Cmd: preprocessCompute
   insize=10024 outsize=10026 ok=1
+Cmd: preprocessCompute
+  insize=10077 outsize=10079 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10079 outsize=5570 ok=1
+Cmd: preprocessCompute
+  insize=10136 outsize=10138 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10138 outsize=5622 ok=1
+Cmd: preprocessCompute
+  insize=10183 outsize=10185 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10185 outsize=5710 ok=1
+Cmd: preprocessCompute
+  insize=10183 outsize=10185 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10185 outsize=5710 ok=1
+Cmd: preprocessCompute
+  insize=10202 outsize=10204 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10204 outsize=5730 ok=1
+Cmd: preprocessCompute
+  insize=10202 outsize=10204 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10204 outsize=5774 ok=1
+Cmd: preprocessCompute
+  insize=10185 outsize=10187 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10187 outsize=5730 ok=1
+Cmd: preprocessCompute
+  insize=10184 outsize=10186 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10186 outsize=5730 ok=1
+Cmd: preprocessCompute
+  insize=10184 outsize=10186 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10186 outsize=5730 ok=1
+Cmd: preprocessCompute
+  insize=10185 outsize=10187 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10187 outsize=5730 ok=1
+Cmd: preprocessCompute
+  insize=10184 outsize=10186 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10186 outsize=5730 ok=1
+Cmd: preprocessCompute
+  insize=10184 outsize=10186 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10186 outsize=5730 ok=1
+Cmd: preprocessCompute
+  insize=10184 outsize=10186 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10186 outsize=5730 ok=1
+Cmd: preprocessCompute
+  insize=10184 outsize=10186 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10186 outsize=5730 ok=1
+Cmd: preprocessCompute
+  insize=10184 outsize=10186 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10186 outsize=5730 ok=1
+Cmd: preprocessCompute
+  insize=10185 outsize=10187 ok=1
+Cmd: preprocessCompute
+  insize=10189 outsize=10191 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10191 outsize=5555 ok=1
+Cmd: preprocessCompute
+  insize=10163 outsize=10165 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10165 outsize=5535 ok=1
+Cmd: preprocessCompute
+  insize=10212 outsize=10214 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10214 outsize=5571 ok=1
+Cmd: preprocessCompute
+  insize=10226 outsize=10228 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10228 outsize=5691 ok=1
+Cmd: preprocessCompute
+  insize=10225 outsize=10227 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10227 outsize=5691 ok=1
+Cmd: preprocessCompute
+  insize=10224 outsize=10226 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10226 outsize=5691 ok=1
+Cmd: preprocessCompute
+  insize=10205 outsize=10207 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10207 outsize=5627 ok=1
+Cmd: preprocessCompute
+  insize=10210 outsize=10212 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10212 outsize=5627 ok=1
+Cmd: preprocessCompute
+  insize=10338 outsize=10340 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10340 outsize=797 ok=1
+Cmd: preprocessCompute
+  insize=10379 outsize=10381 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at ComputeShader.compute(80): implicit truncation of vector type
+  api=4 insize=10381 outsize=797 ok=1
