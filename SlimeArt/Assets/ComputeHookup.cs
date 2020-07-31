@@ -36,6 +36,7 @@ public class ComputeHookup : MonoBehaviour
     public int pixelWidth;
     public int pixelHeight;
     public const float PI = 3.1415926535897931f;
+    public int swap;
 
     //public Camera camera;
     // Start is called before the first frame update
@@ -63,26 +64,18 @@ public class ComputeHookup : MonoBehaviour
             for (int j = 0; j < 512; j++) {
                 xParticlePositions[index] = Random.Range(0.0f, 512.0f);// i / (512.0f);
                 yParticlePositions[index] = Random.Range(0.0f, 512.0f);// j / (512.0f);
-                thetaParticles[i] = Random.Range(0.0f, 2.0f * PI);
-                //if (i > 500)
-                   // Debug.Log(xParticlePositions[index]);
+                thetaParticles[index] = Random.Range(0.0f, 2.0f * PI);
+                weightsParticles[index] = 1.0f; // particle
+                
+                if (Random.Range(0.0f, 1.0f) < 0.0005f) {
+                    //thetaParticles[i] = -2.0f; // make it a deposit so it goes in the deposit texture
+                    weightsParticles[index] = 2.0f;
+                    //Debug.Log("x: " + xParticlePositions[index] + " y: " + yParticlePositions[index]);
+                } else if (index > 512 * 512 / 3) {
+                    weightsParticles[index] = 0.0f; // particle
+                }
                 index++;
             }
-            /* if (i < 512 * 512 / 3) {
-                 xParticlePositions[i] = Random.Range(0.0f, 1.0f) * pixelWidth;
-                 yParticlePositions[i] = Random.Range(0.0f, 1.0f) * pixelHeight;
-                 thetaParticles[i] = Random.Range(0.0f, 2.0f * PI);
-                 if (Random.Range(0.0f, 1.0f) < 0.25f) {
-
-                 }
-                 weightsParticles[i] = 1.0f;
-             } else {
-                 xParticlePositions[i] = -1.0f;
-                 yParticlePositions[i] = -1.0f;
-                 thetaParticles[i] = -1.0f;
-                 weightsParticles[i] = -1.0f;
-             }*/
-            
         }
         
         // x particle positions
@@ -99,7 +92,8 @@ public class ComputeHookup : MonoBehaviour
 
         // deposit texture for propegate shader
         tex_deposit = initializeRenderTexture();
-        compute.SetTexture(computeKernel, "tex_deposit", tex_deposit);
+        deposit_in = initializeRenderTexture();
+        compute.SetTexture(computeKernel, "tex_deposit", deposit_in);
 
         // trace texture for the propegate shader
         tex_trace = initializeRenderTexture();
@@ -111,7 +105,7 @@ public class ComputeHookup : MonoBehaviour
         compute.SetFloat("half_sense_spread", 25.0f); // 15 to 30 degrees default
         compute.SetFloat("sense_distance", worldHeight / 100.0f); // in world-space units; default = about 1/100 of the world 'cube' size
         compute.SetFloat("turn_angle", 15.0f); // 15.0 is default
-        compute.SetFloat("move_distance", worldHeight / 100.0f / 4.0f); //  in world-space units; default = about 1/5--1/3 of sense_distance
+        compute.SetFloat("move_distance", 0.001f);//worldHeight / 100.0f / 4.0f); //  in world-space units; default = about 1/5--1/3 of sense_distance
         compute.SetFloat("agent_deposit", 15.0f); // 15.0 is default
         compute.SetInt("world_width", worldWidth); 
         compute.SetInt("world_height", worldHeight); 
@@ -123,12 +117,19 @@ public class ComputeHookup : MonoBehaviour
         
         // dispatch the texture
         compute.Dispatch(computeKernel, 512 / 8, 512 / 8, 1);
-        mat.mainTexture = result;
+        //mat.mainTexture = result;
 
         //decay kernel
-        int decayKernel = decay.FindKernel("CSMain");
+        //int decayKernel = decay.FindKernel("CSMain");
 
-        
+        // deposit texture for propegate shader
+        //deposit_in = initializeRenderTexture();
+        //decay.SetTexture(computeKernel, "deposit_in", deposit_in);
+
+        // trace texture for the propegate shader
+        //deposit_out = initializeRenderTexture();
+        //compute.SetTexture(computeKernel, "deposit_out", deposit_out);
+
 
         // deposit_in
         //deposit_in = new RenderTexture(512, 512, 32);
@@ -144,15 +145,17 @@ public class ComputeHookup : MonoBehaviour
       //  tex_trace.Create();
 
         // send squares texture in as deposit_in
-        decay.SetTexture(decayKernel, "deposit_in", result);
-        decay.SetTexture(decayKernel, "deposit_out", deposit_out);
+        //decay.SetTexture(decayKernel, "deposit_in", tex_deposit);
+        //decay.SetTexture(decayKernel, "deposit_out", deposit_out);
        // decay.SetTexture(decayKernel, "tex_trace", tex_trace);
-        decay.Dispatch(decayKernel, 512 / 8, 512 / 8, 1);
+        //decay.Dispatch(decayKernel, 512 / 8, 512 / 8, 1);
 
         float h = Camera.main.pixelWidth;
-       // Debug.Log(h);
+        // Debug.Log(h);
 
-        //mat.mainTexture = deposit_out;
+        // mat.mainTexture = deposit_out;
+        swap = 0;
+
     }
 
     ComputeBuffer initializeComputeBuffer(float[] arr, string shaderBufferName, int computeKernel) {
@@ -171,8 +174,31 @@ public class ComputeHookup : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
+        int decayKernel = decay.FindKernel("CSMain");
         int computeKernel = compute.FindKernel("CSMain");
+
+        if (swap == 0) {
+            decay.SetTexture(decayKernel, "deposit_in", deposit_in);
+            decay.SetTexture(decayKernel, "deposit_out", deposit_out);
+            compute.SetTexture(computeKernel, "tex_deposit", deposit_out);
+            swap = 1;
+        } else {
+            decay.SetTexture(decayKernel, "deposit_in", deposit_out);
+            decay.SetTexture(decayKernel, "deposit_out", deposit_in);
+            compute.SetTexture(computeKernel, "tex_deposit", deposit_in);
+            swap = 0;
+        }
+        //mat.mainTexture = result;
+        decay.Dispatch(decayKernel, 512 / 8, 512 / 8, 1);
         compute.Dispatch(computeKernel, 512 / 8, 512 / 8, 1);
-        mat.mainTexture = result;
+        //mat.mainTexture = result;
+        if (swap == 0)
+        {
+            mat.mainTexture = deposit_in;
+        } else
+        {
+            mat.mainTexture = deposit_out;
+        }
+        //mat.mainTexture = result;
     }
 }
