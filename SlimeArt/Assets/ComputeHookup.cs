@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ComputeHookup : MonoBehaviour
 { 
-    public ComputeShader compute;
+    public ComputeShader propegate;
     public ComputeShader decay;
 
     public ComputeBuffer initialGalaxyPositions;
@@ -17,13 +17,12 @@ public class ComputeHookup : MonoBehaviour
     public RenderTexture result;
     public RenderTexture deposit_in;
     public RenderTexture deposit_out;
-    public RenderTexture tex_deposit;
     public RenderTexture tex_trace;
     public Material mat;
 
-
-    public float sense_spread; // default = 15-30 degrees
+    public float half_sense_spread; // default = 15-30 degrees
     public float sense_distance; // in world-space units; default = about 1/100 of the world 'cube' size
+    public float sense_distance_divisor; // 100.0f
     public float turn_angle; // default = 15 degrees
     public float move_distance; // in world-space units; default = about 1/5--1/3 of sense_distance
     public float agent_deposit; // 0 for data-driven fitting, >0 for self-reinforcing behavior
@@ -42,36 +41,30 @@ public class ComputeHookup : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Debug.Log("TESTING SAVING ISSUE");
-
-        // kernel is the compute shader (initial spark)
-        // result will have the thing to blur in it
-        int computeKernel = compute.FindKernel("CSMain");
+        // kernel is the propegate shader (initial spark)
+        int propegateKernel = propegate.FindKernel("CSMain");
         
-        // dealing with the aspect ratio
         pixelHeight = 512;
         pixelWidth = 512;//(int)(Camera.main.aspect * pixelHeight);
 
-        result = initializeRenderTexture();
-
         // random seeding of arrays
-        float[] xParticlePositions = new float[512 * 512];
-        float[] yParticlePositions = new float[512 * 512];
-        float[] thetaParticles = new float[512 * 512];
-        float[] weightsParticles = new float[512 * 512];
+        float[] xParticlePositions = new float[pixelWidth * pixelHeight];
+        float[] yParticlePositions = new float[pixelWidth * pixelHeight];
+        float[] thetaParticles = new float[pixelWidth * pixelHeight];
+        float[] weightsParticles = new float[pixelWidth * pixelHeight];
         int index = 0;
+
         for (int i = 0; i < 512; i++) {
             for (int j = 0; j < 512; j++) {
-                xParticlePositions[index] = Random.Range(0.0f, 512.0f);// i / (512.0f);
-                yParticlePositions[index] = Random.Range(0.0f, 512.0f);// j / (512.0f);
+                xParticlePositions[index] = Random.Range(0.0f, (float)pixelWidth);// i / (512.0f);
+                yParticlePositions[index] = Random.Range(0.0f, (float)pixelHeight);// j / (512.0f);
                 thetaParticles[index] = Random.Range(0.0f, 2.0f * PI);
                 weightsParticles[index] = 1.0f; // particle
                 
                 if (Random.Range(0.0f, 1.0f) < 0.0005f) {
                     //thetaParticles[i] = -2.0f; // make it a deposit so it goes in the deposit texture
                     weightsParticles[index] = 2.0f;
-                    //Debug.Log("x: " + xParticlePositions[index] + " y: " + yParticlePositions[index]);
-                } else if (index > 512 * 512 / 3) {
+                } else if (index > pixelWidth * pixelHeight / 3) {
                     weightsParticles[index] = 0.0f; // particle
                 }
                 index++;
@@ -79,89 +72,51 @@ public class ComputeHookup : MonoBehaviour
         }
         
         // x particle positions
-        particles_x = initializeComputeBuffer(xParticlePositions, "particles_x", computeKernel);
+        particles_x = initializeComputeBuffer(xParticlePositions, "particles_x", propegateKernel);
 
         // y particle positions
-        particles_y = initializeComputeBuffer(yParticlePositions, "particles_y", computeKernel);
+        particles_y = initializeComputeBuffer(yParticlePositions, "particles_y", propegateKernel);
 
         // particles theta
-        particles_theta = initializeComputeBuffer(thetaParticles, "particles_theta", computeKernel);
+        particles_theta = initializeComputeBuffer(thetaParticles, "particles_theta", propegateKernel);
 
         // particle weights
-        particles_weights = initializeComputeBuffer(weightsParticles, "particle_weights", computeKernel);
+        particles_weights = initializeComputeBuffer(weightsParticles, "particle_weights", propegateKernel);
 
         // deposit texture for propegate shader
-        tex_deposit = initializeRenderTexture();
+        //tex_deposit = initializeRenderTexture();
         deposit_in = initializeRenderTexture();
-        compute.SetTexture(computeKernel, "tex_deposit", deposit_in);
+        result = initializeRenderTexture();
 
         // trace texture for the propegate shader
         tex_trace = initializeRenderTexture();
-        compute.SetTexture(computeKernel, "tex_trace", tex_trace);
 
         // other variables
-        int worldWidth = 512;
-        int worldHeight = 512;
-        compute.SetFloat("half_sense_spread", 25.0f); // 15 to 30 degrees default
-        compute.SetFloat("sense_distance", worldHeight / 100.0f); // in world-space units; default = about 1/100 of the world 'cube' size
-        compute.SetFloat("turn_angle", 15.0f); // 15.0 is default
-        compute.SetFloat("move_distance", 0.001f);//worldHeight / 100.0f / 4.0f); //  in world-space units; default = about 1/5--1/3 of sense_distance
-        compute.SetFloat("agent_deposit", 15.0f); // 15.0 is default
-        compute.SetInt("world_width", worldWidth); 
-        compute.SetInt("world_height", worldHeight); 
-        compute.SetFloat("move_sense_coef", 1.0f); // ?
-        compute.SetFloat("normalization_factor", 2.0f); // ?
-        compute.SetFloat("pixelWidth", pixelWidth);
-        compute.SetFloat("pixelHeight", pixelHeight);
-        compute.SetTexture(computeKernel, "Result", result);
-        
+        world_width = 512;
+        world_height = 512;
+        half_sense_spread = Random.Range(15.0f, 30.0f);
+        sense_distance_divisor = 100.0f;
+        turn_angle = 15.0f;
+        move_distance = 0.001f;
+        agent_deposit = 15.0f;
+        move_sense_coef = 1.0f;
+        normalization_factor = 2.0f;
+
+        updatePropegateShaderVariables(deposit_in);
+
         // dispatch the texture
-        compute.Dispatch(computeKernel, 512 / 8, 512 / 8, 1);
-        //mat.mainTexture = result;
+        propegate.Dispatch(propegateKernel, 512 / 8, 512 / 8, 1);
 
-        //decay kernel
-        //int decayKernel = decay.FindKernel("CSMain");
-
-        // deposit texture for propegate shader
-        //deposit_in = initializeRenderTexture();
-        //decay.SetTexture(computeKernel, "deposit_in", deposit_in);
-
-        // trace texture for the propegate shader
-        //deposit_out = initializeRenderTexture();
-        //compute.SetTexture(computeKernel, "deposit_out", deposit_out);
-
-
-        // deposit_in
-        //deposit_in = new RenderTexture(512, 512, 32);
-        //deposit_in.enableRandomWrite = true;
-        //deposit_in.Create();
-
-        // deposit_out is gonna have the blurred triangles
         deposit_out = initializeRenderTexture();
 
-        // tex_trace is keeping track of the trace
-       // tex_trace = new RenderTexture(512, 512, 32);
-      //  tex_trace.enableRandomWrite = true;
-      //  tex_trace.Create();
-
-        // send squares texture in as deposit_in
-        //decay.SetTexture(decayKernel, "deposit_in", tex_deposit);
-        //decay.SetTexture(decayKernel, "deposit_out", deposit_out);
-       // decay.SetTexture(decayKernel, "tex_trace", tex_trace);
-        //decay.Dispatch(decayKernel, 512 / 8, 512 / 8, 1);
-
-        float h = Camera.main.pixelWidth;
-        // Debug.Log(h);
-
-        // mat.mainTexture = deposit_out;
         swap = 0;
 
     }
 
-    ComputeBuffer initializeComputeBuffer(float[] arr, string shaderBufferName, int computeKernel) {
+    ComputeBuffer initializeComputeBuffer(float[] arr, string shaderBufferName, int propegateKernel) {
         ComputeBuffer computeBuffer = new ComputeBuffer(arr.Length, sizeof(float));
         computeBuffer.SetData(arr);
-        compute.SetBuffer(computeKernel, shaderBufferName, computeBuffer);
+        propegate.SetBuffer(propegateKernel, shaderBufferName, computeBuffer);
         return computeBuffer;
     }
 
@@ -172,33 +127,50 @@ public class ComputeHookup : MonoBehaviour
         return renderTexture;
     }
 
+    void updatePropegateShaderVariables(RenderTexture depositTexture) {
+        int propegateKernel = propegate.FindKernel("CSMain");
+        propegate.SetTexture(propegateKernel, "tex_deposit", depositTexture);
+        propegate.SetTexture(propegateKernel, "tex_trace", tex_trace);
+        propegate.SetFloat("half_sense_spread", half_sense_spread); // 15 to 30 degrees default
+        propegate.SetFloat("sense_distance", world_height / sense_distance_divisor); // in world-space units; default = about 1/100 of the world 'cube' size
+        propegate.SetFloat("turn_angle", turn_angle); // 15.0 is default
+        propegate.SetFloat("move_distance", move_distance);//worldHeight / 100.0f / 4.0f); //  in world-space units; default = about 1/5--1/3 of sense_distance
+        propegate.SetFloat("agent_deposit", agent_deposit); // 15.0 is default
+        propegate.SetInt("world_width", world_width);
+        propegate.SetInt("world_height", world_height);
+        propegate.SetFloat("move_sense_coef", move_sense_coef); // ?
+        propegate.SetFloat("normalization_factor", normalization_factor); // ?
+        propegate.SetFloat("pixelWidth", pixelWidth);
+        propegate.SetFloat("pixelHeight", pixelHeight);
+        propegate.SetTexture(propegateKernel, "Result", result);
+    }
+
     // Update is called once per frame
     void Update() {
         int decayKernel = decay.FindKernel("CSMain");
-        int computeKernel = compute.FindKernel("CSMain");
+        int propegateKernel = propegate.FindKernel("CSMain");
 
         if (swap == 0) {
             decay.SetTexture(decayKernel, "deposit_in", deposit_in);
             decay.SetTexture(decayKernel, "deposit_out", deposit_out);
-            compute.SetTexture(computeKernel, "tex_deposit", deposit_out);
+            updatePropegateShaderVariables(deposit_out);
             swap = 1;
         } else {
             decay.SetTexture(decayKernel, "deposit_in", deposit_out);
             decay.SetTexture(decayKernel, "deposit_out", deposit_in);
-            compute.SetTexture(computeKernel, "tex_deposit", deposit_in);
+            updatePropegateShaderVariables(deposit_in);
             swap = 0;
         }
-        //mat.mainTexture = result;
-        decay.Dispatch(decayKernel, 512 / 8, 512 / 8, 1);
-        compute.Dispatch(computeKernel, 512 / 8, 512 / 8, 1);
-        //mat.mainTexture = result;
-        if (swap == 0)
-        {
+
+        decay.Dispatch(decayKernel, pixelWidth / 8, pixelHeight / 8, 1);
+        propegate.Dispatch(propegateKernel, pixelWidth / 8, pixelHeight / 8, 1);
+
+        if (swap == 0) { 
             mat.mainTexture = deposit_in;
-        } else
-        {
+        } else {
             mat.mainTexture = deposit_out;
         }
+
         //mat.mainTexture = result;
     }
 }
