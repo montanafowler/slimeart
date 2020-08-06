@@ -37,6 +37,8 @@ public class ComputeHookup : MonoBehaviour
     public const float PI = 3.1415926535897931f;
     public int swap;
 
+    public Vector2[] linePositions;
+
     //public Camera camera;
     // Start is called before the first frame update
     void Start()
@@ -54,8 +56,8 @@ public class ComputeHookup : MonoBehaviour
         float[] weightsParticles = new float[pixelWidth * pixelHeight];
         int index = 0;
 
-        for (int i = 0; i < 512; i++) {
-            for (int j = 0; j < 512; j++) {
+        for (int i = 0; i < pixelWidth; i++) {
+            for (int j = 0; j < pixelHeight; j++) {
                 xParticlePositions[index] = Random.Range(0.0f, (float)pixelWidth);// i / (512.0f);
                 yParticlePositions[index] = Random.Range(0.0f, (float)pixelHeight);// j / (512.0f);
                 thetaParticles[index] = Random.Range(0.0f, 2.0f * PI);
@@ -64,7 +66,7 @@ public class ComputeHookup : MonoBehaviour
                 if (Random.Range(0.0f, 1.0f) < 0.0005f) {
                     //thetaParticles[i] = -2.0f; // make it a deposit so it goes in the deposit texture
                     weightsParticles[index] = 2.0f;
-                } else if (index > pixelWidth * pixelHeight / 3) {
+                } else if (index > pixelWidth * pixelHeight * 3 / 4) {
                     weightsParticles[index] = 0.0f; // particle
                 }
                 index++;
@@ -166,11 +168,29 @@ public class ComputeHookup : MonoBehaviour
         propegate.Dispatch(propegateKernel, pixelWidth / 8, pixelHeight / 8, 1);
 
         if (swap == 0) { 
-            mat.mainTexture = deposit_in;
+            //mat.mainTexture = deposit_in;
         } else {
-            mat.mainTexture = deposit_out;
+            //mat.mainTexture = deposit_out;
         }
 
-        //mat.mainTexture = result;
+        mat.mainTexture = result;
+
+        if(Input.GetMouseButtonDown(0))
+        {
+            Debug.Log("mouse button down");
+            linePositions = new Vector2[1000];
+            linePositions[0] = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, 
+                Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
+        }
+
+        if(Input.GetMouseButton(0))
+        {
+            Vector2 tempMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            if (Vector2.Distance(tempMousePosition, linePositions[fingerPositions.Count - 1]) > .1f) {
+
+            }
+        }
     }
+
+    
 }
