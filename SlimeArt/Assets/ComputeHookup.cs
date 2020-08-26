@@ -48,8 +48,8 @@ public class ComputeHookup : MonoBehaviour
 
     private string formatText = "{0}";
     private TextMeshProUGUI moveDistanceSliderText;
-    private TextMeshPro senseDistanceSliderText;
-    private TextMeshPro DepositStrengthSliderText;
+    private TextMeshProUGUI senseDistanceSliderText;
+    private TextMeshProUGUI depositStrengthSliderText;
 
     //public Camera camera;
     // Start is called before the first frame update
@@ -149,13 +149,24 @@ public class ComputeHookup : MonoBehaviour
         deposit_strength = depositStrengthSlider.value;
 
         moveDistanceSliderText = GameObject.Find("MoveDistanceSliderText").GetComponent<TextMeshProUGUI>();
-        Debug.Log(moveDistanceSliderText);
         moveDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(moveDistanceSliderText, "move distance: ", moveDistanceSlider.value); });
+        updateSliderLabel(moveDistanceSliderText, "move distance: ", moveDistanceSlider.value);
+
+        senseDistanceSliderText = GameObject.Find("SenseDistanceSliderText").GetComponent<TextMeshProUGUI>();
+        senseDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(senseDistanceSliderText, "sense distance: ", senseDistanceSlider.value); });
+        updateSliderLabel(senseDistanceSliderText, "sense distance: ", senseDistanceSlider.value);
+
+        depositStrengthSliderText = GameObject.Find("DepositStrengthSliderText").GetComponent<TextMeshProUGUI>();
+        depositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value); });
+        updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value);
+
         updatePropegateShaderVariables(deposit_in);
     }
 
     public void updateSliderLabel(TextMeshProUGUI label, string labelText, float value) {
-        label.SetText(labelText + formatText, value);
+        Debug.Log("value " + value);
+        Debug.Log(moveDistanceSlider.value);
+        label.SetText(labelText + value.ToString());
     }
 
     ComputeBuffer initializeComputeBuffer(float[] arr, string shaderBufferName, int propegateKernel) {
