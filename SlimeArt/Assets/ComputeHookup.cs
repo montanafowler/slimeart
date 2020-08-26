@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ComputeHookup : MonoBehaviour
 { 
@@ -44,6 +45,11 @@ public class ComputeHookup : MonoBehaviour
     private Slider moveDistanceSlider;
     private Slider senseDistanceSlider;
     private Slider depositStrengthSlider;
+
+    private string formatText = "{0}";
+    private TextMeshProUGUI moveDistanceSliderText;
+    private TextMeshPro senseDistanceSliderText;
+    private TextMeshPro DepositStrengthSliderText;
 
     //public Camera camera;
     // Start is called before the first frame update
@@ -142,7 +148,14 @@ public class ComputeHookup : MonoBehaviour
         sense_distance = senseDistanceSlider.value;
         deposit_strength = depositStrengthSlider.value;
 
+        moveDistanceSliderText = GameObject.Find("MoveDistanceSliderText").GetComponent<TextMeshProUGUI>();
+        Debug.Log(moveDistanceSliderText);
+        moveDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(moveDistanceSliderText, "move distance: ", moveDistanceSlider.value); });
         updatePropegateShaderVariables(deposit_in);
+    }
+
+    public void updateSliderLabel(TextMeshProUGUI label, string labelText, float value) {
+        label.SetText(labelText + formatText, value);
     }
 
     ComputeBuffer initializeComputeBuffer(float[] arr, string shaderBufferName, int propegateKernel) {
