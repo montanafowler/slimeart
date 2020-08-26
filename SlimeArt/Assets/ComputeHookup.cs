@@ -192,6 +192,8 @@ public class ComputeHookup : MonoBehaviour
         sense_distance = senseDistanceSlider.value;
         move_distance = moveDistanceSlider.value;
         deposit_strength = depositStrengthSlider.value;
+        agent_deposit = agentDepositStrengthSlider.value;
+
         int propegateKernel = propegate.FindKernel("CSMain");
 
         propegate.SetTexture(propegateKernel, "tex_deposit", depositTexture);
@@ -213,6 +215,11 @@ public class ComputeHookup : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
+        if (Input.GetKeyDown("escape")) {
+            Debug.Log("quit");
+            Application.Quit(); // Quits the game
+        }
+
         int decayKernel = decay.FindKernel("CSMain");
         int propegateKernel = propegate.FindKernel("CSMain");
 
