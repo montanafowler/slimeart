@@ -23,6 +23,7 @@ int world_height; // grid dimensions - note that the particle positions are also
 int world_depth; //
 float move_sense_coef;
 float normalization_factor;
+float deposit_strength;
 
 float pixelWidth;
 float pixelHeight;
@@ -100,7 +101,7 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
     bool is_data = (particle_weight == 2.0); // FLAG IF TRUE PUT THE GALIXY IN THE DEPOSIT // RANDOMLY WRITE DOTS SO I ESTABLISH THE COMMUNICATION BETWEEN THE TWO SHADERS
 
     if (is_data) {
-        tex_deposit[uint2(x, y)] += 10.0 * particle_weight; // NOT ATOMIC! (not sure what particle weight is... maybe parameter?)
+        tex_deposit[uint2(x, y)] += deposit_strength;// *particle_weight; // NOT ATOMIC! (not sure what particle weight is... maybe parameter?)
         Result[id.xy] = float4(0.0, 0.0, 0.0, 1.0);
         Result[uint2(x, y)] = float4(1.0, 0.0, 0.0, 1.0);
         return;

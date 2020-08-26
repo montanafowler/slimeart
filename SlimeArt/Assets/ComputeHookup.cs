@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ComputeHookup : MonoBehaviour
 { 
@@ -31,6 +32,7 @@ public class ComputeHookup : MonoBehaviour
     public int world_depth; //
     public float move_sense_coef;
     public float normalization_factor;
+    public float deposit_strength;
 
     public int pixelWidth;
     public int pixelHeight;
@@ -38,6 +40,10 @@ public class ComputeHookup : MonoBehaviour
     public int swap;
 
     public Vector2[] linePositions;
+
+    private Slider moveDistanceSlider;
+    private Slider senseDistanceSlider;
+    private Slider depositStrengthSlider;
 
     //public Camera camera;
     // Start is called before the first frame update
@@ -56,6 +62,17 @@ public class ComputeHookup : MonoBehaviour
         float[] weightsParticles = new float[pixelWidth * pixelHeight];
         int index = 0;
 
+        float increment5 = 512.0f / 5.0f;
+        float increment4 = 512.0f / 4.0f;
+        float[] xGalaxyCoordinates = { increment5, increment5 * 2, increment5 * 3, increment5 * 4,
+                                       increment5, increment5 * 2, increment5 * 3, increment5 * 4,
+                                       increment5, increment5 * 2, increment5 * 3, increment5 * 4};
+        float[] yGalaxyCoordinates = { increment4, increment4, increment4, increment4, 
+                                        increment4 * 2, increment4 * 2,increment4 * 2,increment4 * 2,
+                                        increment4 * 3 , increment4 * 3, increment4 * 3, increment4 * 3 };
+
+
+
         for (int i = 0; i < pixelWidth; i++) {
             for (int j = 0; j < pixelHeight; j++) {
                 xParticlePositions[index] = Random.Range(0.0f, (float)pixelWidth);// i / (512.0f);
@@ -63,8 +80,9 @@ public class ComputeHookup : MonoBehaviour
                 thetaParticles[index] = Random.Range(0.0f, 2.0f * PI);
                 weightsParticles[index] = 1.0f; // particle
                 
-                if (Random.Range(0.0f, 1.0f) < 0.0005f) {
-                    //thetaParticles[i] = -2.0f; // make it a deposit so it goes in the deposit texture
+                if (index < 12) {
+                    xParticlePositions[index] = xGalaxyCoordinates[index];
+                    yParticlePositions[index] = yGalaxyCoordinates[index];
                     weightsParticles[index] = 2.0f;
                 } else if (index > pixelWidth * pixelHeight * 3 / 4) {
                     weightsParticles[index] = 0.0f; // particle
@@ -87,6 +105,18 @@ public class ComputeHookup : MonoBehaviour
 
         // deposit texture for propegate shader
         //tex_deposit = initializeRenderTexture();
+        setupVariables();
+
+        // dispatch the texture
+        propegate.Dispatch(propegateKernel, 512 / 8, 512 / 8, 1);
+
+        deposit_out = initializeRenderTexture();
+
+        swap = 0;
+
+    }
+
+    void setupVariables() {
         deposit_in = initializeRenderTexture();
         result = initializeRenderTexture();
 
@@ -100,19 +130,19 @@ public class ComputeHookup : MonoBehaviour
         sense_distance_divisor = 100.0f;
         turn_angle = 15.0f;
         move_distance = 0.001f;
-        agent_deposit = 15.0f;
+        agent_deposit = 0.0001f;
         move_sense_coef = 1.0f;
         normalization_factor = 2.0f;
 
+        moveDistanceSlider = GameObject.Find("MoveDistanceSlider").GetComponent<Slider>();
+        senseDistanceSlider = GameObject.Find("SenseDistanceSlider").GetComponent<Slider>();
+        depositStrengthSlider = GameObject.Find("DepositStrengthSlider").GetComponent<Slider>();
+
+        move_distance = moveDistanceSlider.value;
+        sense_distance = senseDistanceSlider.value;
+        deposit_strength = depositStrengthSlider.value;
+
         updatePropegateShaderVariables(deposit_in);
-
-        // dispatch the texture
-        propegate.Dispatch(propegateKernel, 512 / 8, 512 / 8, 1);
-
-        deposit_out = initializeRenderTexture();
-
-        swap = 0;
-
     }
 
     ComputeBuffer initializeComputeBuffer(float[] arr, string shaderBufferName, int propegateKernel) {
@@ -130,11 +160,15 @@ public class ComputeHookup : MonoBehaviour
     }
 
     void updatePropegateShaderVariables(RenderTexture depositTexture) {
+        sense_distance = senseDistanceSlider.value;
+        move_distance = moveDistanceSlider.value;
+        deposit_strength = depositStrengthSlider.value;
         int propegateKernel = propegate.FindKernel("CSMain");
+
         propegate.SetTexture(propegateKernel, "tex_deposit", depositTexture);
         propegate.SetTexture(propegateKernel, "tex_trace", tex_trace);
         propegate.SetFloat("half_sense_spread", half_sense_spread); // 15 to 30 degrees default
-        propegate.SetFloat("sense_distance", world_height / sense_distance_divisor); // in world-space units; default = about 1/100 of the world 'cube' size
+        propegate.SetFloat("sense_distance", sense_distance); // in world-space units; default = about 1/100 of the world 'cube' size
         propegate.SetFloat("turn_angle", turn_angle); // 15.0 is default
         propegate.SetFloat("move_distance", move_distance);//worldHeight / 100.0f / 4.0f); //  in world-space units; default = about 1/5--1/3 of sense_distance
         propegate.SetFloat("agent_deposit", agent_deposit); // 15.0 is default
@@ -144,6 +178,7 @@ public class ComputeHookup : MonoBehaviour
         propegate.SetFloat("normalization_factor", normalization_factor); // ?
         propegate.SetFloat("pixelWidth", pixelWidth);
         propegate.SetFloat("pixelHeight", pixelHeight);
+        propegate.SetFloat("deposit_strength", deposit_strength);
         propegate.SetTexture(propegateKernel, "Result", result);
     }
 
@@ -168,14 +203,14 @@ public class ComputeHookup : MonoBehaviour
         propegate.Dispatch(propegateKernel, pixelWidth / 8, pixelHeight / 8, 1);
 
         if (swap == 0) { 
-            //mat.mainTexture = deposit_in;
+           // mat.mainTexture = deposit_in;
         } else {
-            //mat.mainTexture = deposit_out;
+          //  mat.mainTexture = deposit_out;
         }
 
         mat.mainTexture = result;
 
-        if(Input.GetMouseButtonDown(0))
+        /*if(Input.GetMouseButtonDown(0))
         {
             Debug.Log("mouse button down");
             linePositions = new Vector2[1000];
@@ -189,7 +224,7 @@ public class ComputeHookup : MonoBehaviour
             if (Vector2.Distance(tempMousePosition, linePositions[fingerPositions.Count - 1]) > .1f) {
 
             }
-        }
+        }*/
     }
 
     
