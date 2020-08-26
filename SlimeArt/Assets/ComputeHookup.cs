@@ -45,11 +45,12 @@ public class ComputeHookup : MonoBehaviour
     private Slider moveDistanceSlider;
     private Slider senseDistanceSlider;
     private Slider depositStrengthSlider;
+    private Slider agentDepositStrengthSlider;
 
-    private string formatText = "{0}";
     private TextMeshProUGUI moveDistanceSliderText;
     private TextMeshProUGUI senseDistanceSliderText;
     private TextMeshProUGUI depositStrengthSliderText;
+    private TextMeshProUGUI agentDepositStrengthSliderText;
 
     //public Camera camera;
     // Start is called before the first frame update
@@ -143,10 +144,12 @@ public class ComputeHookup : MonoBehaviour
         moveDistanceSlider = GameObject.Find("MoveDistanceSlider").GetComponent<Slider>();
         senseDistanceSlider = GameObject.Find("SenseDistanceSlider").GetComponent<Slider>();
         depositStrengthSlider = GameObject.Find("DepositStrengthSlider").GetComponent<Slider>();
+        agentDepositStrengthSlider = GameObject.Find("AgentDepositStrengthSlider").GetComponent<Slider>();
 
         move_distance = moveDistanceSlider.value;
         sense_distance = senseDistanceSlider.value;
         deposit_strength = depositStrengthSlider.value;
+        agent_deposit = agentDepositStrengthSlider.value;
 
         moveDistanceSliderText = GameObject.Find("MoveDistanceSliderText").GetComponent<TextMeshProUGUI>();
         moveDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(moveDistanceSliderText, "move distance: ", moveDistanceSlider.value); });
@@ -160,12 +163,14 @@ public class ComputeHookup : MonoBehaviour
         depositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value); });
         updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value);
 
+        agentDepositStrengthSliderText = GameObject.Find("AgentDepositStrengthSliderText").GetComponent<TextMeshProUGUI>();
+        agentDepositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value); });
+        updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value);
+
         updatePropegateShaderVariables(deposit_in);
     }
 
     public void updateSliderLabel(TextMeshProUGUI label, string labelText, float value) {
-        Debug.Log("value " + value);
-        Debug.Log(moveDistanceSlider.value);
         label.SetText(labelText + value.ToString());
     }
 
