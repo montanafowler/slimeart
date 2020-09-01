@@ -61,8 +61,8 @@ public class ComputeHookup : MonoBehaviour
         // kernel is the propegate shader (initial spark)
         int propegateKernel = propegate.FindKernel("CSMain");
         
-        pixelHeight = 512;
-        pixelWidth = 512;//(int)(Camera.main.aspect * pixelHeight);
+        pixelHeight = Screen.height;
+        pixelWidth = Screen.width;//(int)(Camera.main.aspect * pixelHeight);
 
         // random seeding of arrays
         float[] xParticlePositions = new float[pixelWidth * pixelHeight];
@@ -71,8 +71,8 @@ public class ComputeHookup : MonoBehaviour
         float[] weightsParticles = new float[pixelWidth * pixelHeight];
         int index = 0;
 
-        float increment5 = 512.0f / 5.0f;
-        float increment4 = 512.0f / 4.0f;
+        float increment5 = pixelHeight / 5.0f;
+        float increment4 = pixelHeight / 4.0f;
         float[] xGalaxyCoordinates = { increment5, increment5 * 2, increment5 * 3, increment5 * 4,
                                        increment5, increment5 * 2, increment5 * 3, increment5 * 4,
                                        increment5, increment5 * 2, increment5 * 3, increment5 * 4};
@@ -117,7 +117,7 @@ public class ComputeHookup : MonoBehaviour
         setupVariables();
 
         // dispatch the texture
-        propegate.Dispatch(propegateKernel, 512 / 8, 512 / 8, 1);
+        propegate.Dispatch(propegateKernel, pixelWidth / 8, pixelHeight / 8, 1);
 
         deposit_out = initializeRenderTexture();
 
@@ -133,8 +133,8 @@ public class ComputeHookup : MonoBehaviour
         tex_trace = initializeRenderTexture();
 
         // other variables
-        world_width = 512;
-        world_height = 512;
+        world_width = Screen.width;
+        world_height = Screen.height;
         half_sense_spread = Random.Range(15.0f, 30.0f);
         sense_distance_divisor = 100.0f;
         turn_angle = 15.0f;
@@ -258,21 +258,24 @@ public class ComputeHookup : MonoBehaviour
 
         mat.mainTexture = result;
 
-        /*if(Input.GetMouseButtonDown(0))
-        {
-            Debug.Log("mouse button down");
-            linePositions = new Vector2[1000];
-            linePositions[0] = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, 
-                Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
+        if(Input.GetMouseButtonDown(0)) {
+            Debug.Log("mouse button down" + Input.mousePosition);
+            Debug.Log(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            Debug.Log("Screen Width : " + Screen.width);
+            Debug.Log("Screen Height : " + Screen.height);
+
+            // linePositions = new Vector2[1000];
+            //  linePositions[0] = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, 
+            //  Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
         }
 
         if(Input.GetMouseButton(0))
         {
-            Vector2 tempMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            if (Vector2.Distance(tempMousePosition, linePositions[fingerPositions.Count - 1]) > .1f) {
+            //Vector2 tempMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+           // if (Vector2.Distance(tempMousePosition, linePositions[fingerPositions.Count - 1]) > .1f) {
 
-            }
-        }*/
+           // }
+        }
     }
 
     
