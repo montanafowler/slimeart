@@ -52,6 +52,8 @@ public class ComputeHookup : MonoBehaviour
     private TextMeshProUGUI depositStrengthSliderText;
     private TextMeshProUGUI agentDepositStrengthSliderText;
 
+    private TMP_Dropdown modeDropdown;
+
     //public Camera camera;
     // Start is called before the first frame update
     void Start()
@@ -167,7 +169,17 @@ public class ComputeHookup : MonoBehaviour
         agentDepositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value); });
         updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value);
 
+        modeDropdown = GameObject.Find("ModeDropdown").GetComponent<TMP_Dropdown>();
+        modeDropdown.onValueChanged.AddListener(delegate { changeMode(modeDropdown.value);  });
+
+        Button playButton = GameObject.Find("PlayButton").GetComponent<Button>();
+        Debug.Log(playButton);
         updatePropegateShaderVariables(deposit_in);
+    }
+
+    private void changeMode(float value) {
+        Debug.Log("change mode" + value);
+
     }
 
     public void updateSliderLabel(TextMeshProUGUI label, string labelText, float value) {
