@@ -14,9 +14,9 @@ public class ComputeHookup : MonoBehaviour
     public ComputeBuffer particles_x;
     public ComputeBuffer particles_y;
     public ComputeBuffer particles_theta;
-    public ComputeBuffer particles_weights;
+    public ComputeBuffer data_types;
 
-    public RenderTexture result;
+    public RenderTexture particle_render_texture;
     public RenderTexture deposit_in;
     public RenderTexture deposit_out;
     public RenderTexture tex_trace;
@@ -53,11 +53,25 @@ public class ComputeHookup : MonoBehaviour
     private TextMeshProUGUI agentDepositStrengthSliderText;
 
     private TMP_Dropdown modeDropdown;
+    private TMP_Dropdown viewDropdown;
+    private float OBSERVE_MODE = 0.0f;
+    private float DRAW_DEPOSIT_MODE = 1.0f;
+    private float DRAW_DEPOSIT_EMITTERS_MODE = 2.0f;
+    private float DRAW_PARTICLES_MODE = 3.0f;
+    private float PARTICLE_VIEW = 0.0f;
+    private float DEPOSIT_VIEW = 1.0f;
+
+    private float PARTICLE = 1.0f;
+    private float DEPOSIT_EMITTER = 2.0f;
+    private float DEPOSIT = 3.0f;
+    private float NO_DATA = 0.0f;
+
+    private int available_data_index = 0;
+
 
     //public Camera camera;
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         // kernel is the propegate shader (initial spark)
         int propegateKernel = propegate.FindKernel("CSMain");
         
@@ -68,7 +82,7 @@ public class ComputeHookup : MonoBehaviour
         float[] xParticlePositions = new float[pixelWidth * pixelHeight];
         float[] yParticlePositions = new float[pixelWidth * pixelHeight];
         float[] thetaParticles = new float[pixelWidth * pixelHeight];
-        float[] weightsParticles = new float[pixelWidth * pixelHeight];
+        float[] dataTypes = new float[pixelWidth * pixelHeight];
         int index = 0;
 
         float increment5 = pixelHeight / 5.0f;
@@ -80,21 +94,25 @@ public class ComputeHookup : MonoBehaviour
                                         increment4 * 2, increment4 * 2,increment4 * 2,increment4 * 2,
                                         increment4 * 3 , increment4 * 3, increment4 * 3, increment4 * 3 };
 
-
+        bool firstNoData = true;
 
         for (int i = 0; i < pixelWidth; i++) {
             for (int j = 0; j < pixelHeight; j++) {
                 xParticlePositions[index] = Random.Range(0.0f, (float)pixelWidth);// i / (512.0f);
                 yParticlePositions[index] = Random.Range(0.0f, (float)pixelHeight);// j / (512.0f);
                 thetaParticles[index] = Random.Range(0.0f, 2.0f * PI);
-                weightsParticles[index] = 1.0f; // particle
+                dataTypes[index] = PARTICLE; // particle
                 
                 if (index < 12) {
                     xParticlePositions[index] = xGalaxyCoordinates[index];
                     yParticlePositions[index] = yGalaxyCoordinates[index];
-                    weightsParticles[index] = 2.0f;
+                    dataTypes[index] = DEPOSIT_EMITTER;
                 } else if (index > pixelWidth * pixelHeight * 3 / 4) {
-                    weightsParticles[index] = 0.0f; // particle
+                    if (firstNoData) {
+                        firstNoData = false;
+                        available_data_index = index;
+                    }
+                    dataTypes[index] = NO_DATA; // particle
                 }
                 index++;
             }
@@ -109,8 +127,8 @@ public class ComputeHookup : MonoBehaviour
         // particles theta
         particles_theta = initializeComputeBuffer(thetaParticles, "particles_theta", propegateKernel);
 
-        // particle weights
-        particles_weights = initializeComputeBuffer(weightsParticles, "particle_weights", propegateKernel);
+        // data types, like if it is deposit emitter, particle, deposit, or no data
+        data_types = initializeComputeBuffer(dataTypes, "data_types", propegateKernel);
 
         // deposit texture for propegate shader
         //tex_deposit = initializeRenderTexture();
@@ -127,7 +145,7 @@ public class ComputeHookup : MonoBehaviour
 
     void setupVariables() {
         deposit_in = initializeRenderTexture();
-        result = initializeRenderTexture();
+        particle_render_texture = initializeRenderTexture();
 
         // trace texture for the propegate shader
         tex_trace = initializeRenderTexture();
@@ -170,16 +188,25 @@ public class ComputeHookup : MonoBehaviour
         updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value);
 
         modeDropdown = GameObject.Find("ModeDropdown").GetComponent<TMP_Dropdown>();
-        modeDropdown.onValueChanged.AddListener(delegate { changeMode(modeDropdown.value);  });
+        //modeDropdown.onValueChanged.AddListener(delegate { changeMode(modeDropdown.value);  });
+
+        viewDropdown = GameObject.Find("ViewDropdown").GetComponent<TMP_Dropdown>();
+        viewDropdown.onValueChanged.AddListener(delegate { changeMode(viewDropdown.value); });
 
         Button playButton = GameObject.Find("PlayButton").GetComponent<Button>();
-        Debug.Log(playButton);
+        //Debug.Log(playButton);
         updatePropegateShaderVariables(deposit_in);
     }
 
     private void changeMode(float value) {
-        Debug.Log("change mode" + value);
+        if (value == PARTICLE_VIEW) {
+            mat.mainTexture = particle_render_texture;
+        } else if (value == DEPOSIT_VIEW) {
 
+        }
+        Debug.Log("change mode " + value);
+        Debug.Log("PARTICLE_VIEW " + PARTICLE_VIEW);
+        Debug.Log("Desposit view " + DEPOSIT_VIEW);
     }
 
     public void updateSliderLabel(TextMeshProUGUI label, string labelText, float value) {
@@ -222,7 +249,52 @@ public class ComputeHookup : MonoBehaviour
         propegate.SetFloat("pixelWidth", pixelWidth);
         propegate.SetFloat("pixelHeight", pixelHeight);
         propegate.SetFloat("deposit_strength", deposit_strength);
-        propegate.SetTexture(propegateKernel, "Result", result);
+        propegate.SetTexture(propegateKernel, "particle_render_texture", particle_render_texture);
+    }
+
+    void draw(float x, float y) {
+        if (modeDropdown.value != OBSERVE_MODE && available_data_index < pixelHeight * pixelWidth) {
+            //Debug.Log("draw in " + )
+            float[] particlesX = new float[pixelWidth * pixelHeight]; 
+            float[] particlesY = new float[pixelWidth * pixelHeight]; 
+            //float[] particlesTheta = new float[pixelWidth * pixelHeight];
+            float[] dataTypes = new float[pixelWidth * pixelHeight]; 
+            particles_x.GetData(particlesX);
+            particles_y.GetData(particlesY);
+           //particles_theta.GetData(particlesTheta);
+            data_types.GetData(dataTypes);
+
+            particlesX[available_data_index] = x;
+            particlesY[available_data_index] = y;
+            Debug.Log("particlesX[available_data_index]" + particlesX[available_data_index]);
+            Debug.Log("particlesY[available_data_index]" + particlesY[available_data_index]);
+
+
+            if (modeDropdown.value == DRAW_DEPOSIT_MODE)  {
+                // draw temporary deposit that dissolves
+                dataTypes[available_data_index] = DEPOSIT;
+            } else if (modeDropdown.value == DRAW_DEPOSIT_EMITTERS_MODE) {
+                // draw deposit emitters that continuously emit deposit
+                dataTypes[available_data_index] = DEPOSIT_EMITTER;
+            } else if (modeDropdown.value == DRAW_PARTICLES_MODE) {
+                // draw particles
+                dataTypes[available_data_index] = PARTICLE;
+            }
+            available_data_index++;
+            Debug.Log("dataTypes" + particlesX[available_data_index]);
+            int propegateKernel = propegate.FindKernel("CSMain");
+
+            // x particle positions
+            particles_x = initializeComputeBuffer(particlesX, "particles_x", propegateKernel);
+
+            // y particle positions
+            particles_y = initializeComputeBuffer(particlesY, "particles_y", propegateKernel);
+
+            // data types, like if it is deposit emitter, particle, deposit, or no data
+            data_types = initializeComputeBuffer(dataTypes, "data_types", propegateKernel);
+        }
+
+
     }
 
     // Update is called once per frame
@@ -250,32 +322,27 @@ public class ComputeHookup : MonoBehaviour
         decay.Dispatch(decayKernel, pixelWidth / 8, pixelHeight / 8, 1);
         propegate.Dispatch(propegateKernel, pixelWidth / 8, pixelHeight / 8, 1);
 
-        if (swap == 0) { 
-           // mat.mainTexture = deposit_in;
-        } else {
-          //  mat.mainTexture = deposit_out;
+        if (viewDropdown.value == DEPOSIT_VIEW) {
+            if (swap == 0) {
+                mat.mainTexture = deposit_in;
+            } else {
+                mat.mainTexture = deposit_out;
+            }
+        } 
+        
+        if (viewDropdown.value == PARTICLE_VIEW) {
+            mat.mainTexture = particle_render_texture;
         }
 
-        mat.mainTexture = result;
-
-        if(Input.GetMouseButtonDown(0)) {
-            Debug.Log("mouse button down" + Input.mousePosition);
-            Debug.Log(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-            Debug.Log("Screen Width : " + Screen.width);
-            Debug.Log("Screen Height : " + Screen.height);
-
-            // linePositions = new Vector2[1000];
-            //  linePositions[0] = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, 
-            //  Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
+        if (Input.GetMouseButton(0)) {
+            //Debug.Log("mouse button down " + Input.mousePosition);
+            //Debug.Log("Screen Width : " + Screen.width);
+            //Debug.Log("Screen Height : " + Screen.height);
+            draw(Input.mousePosition.x, Input.mousePosition.y);
+            
         }
 
-        if(Input.GetMouseButton(0))
-        {
-            //Vector2 tempMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-           // if (Vector2.Distance(tempMousePosition, linePositions[fingerPositions.Count - 1]) > .1f) {
-
-           // }
-        }
+   
     }
 
     
