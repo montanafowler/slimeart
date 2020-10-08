@@ -297,6 +297,10 @@ public class ComputeHookup : MonoBehaviour
 
         int decayKernel = decay.FindKernel("CSMain");
         int propegateKernel = propegate.FindKernel("CSMain");
+        int intPixWidth = (int)pixelWidth;
+        int intPixHeight = (int)pixelHeight;
+        decay.SetInt("pixelWidth", (int)pixelWidth);
+        decay.SetInt("pixelHeight", (int)pixelHeight);
 
         if (swap == 0) {
             decay.SetTexture(decayKernel, "deposit_in", deposit_in);
@@ -329,12 +333,7 @@ public class ComputeHookup : MonoBehaviour
             Debug.Log("mouse button down " + Input.mousePosition);
             Debug.Log("Screen Width : " + Screen.width);
             Debug.Log("Screen Height : " + Screen.height);
-            draw(Input.mousePosition.x, Input.mousePosition.y);
-            
+            draw(Input.mousePosition.x, Input.mousePosition.y);   
         }
-
-   
     }
-
-    
 }

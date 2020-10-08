@@ -5,6 +5,8 @@
 // with cs.SetTexture
 RWTexture2D<float4> deposit_in;
 RWTexture2D<float4> deposit_out;
+int pixelWidth;
+int pixelHeight;
 
 
 [numthreads(8,8,1)]
@@ -21,8 +23,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         for (int dy = -1; dy <= 1; dy++) {
             float weight = (all(int2(dx,dy)) == 0)? 1.0 : 1.0 / sqrt(float(abs(dx) + abs(dy)));
             int2 txcoord = int2(p) + int2(dx, dy);
-            txcoord.x = txcoord.x % 512;
-            txcoord.y = txcoord.y % 512;
+            txcoord.x = txcoord.x % pixelWidth;
+            txcoord.y = txcoord.y % pixelHeight;
             v += weight * deposit_in[txcoord];
             w += weight;
         }
