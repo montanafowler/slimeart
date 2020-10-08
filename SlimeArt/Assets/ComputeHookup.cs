@@ -86,7 +86,7 @@ public class ComputeHookup : MonoBehaviour
         int index = 0;
 
         float increment5 = pixelHeight / 5.0f;
-        float increment4 = pixelHeight / 4.0f;
+        float increment4 = pixelWidth / 4.0f;
         float[] xGalaxyCoordinates = { increment5, increment5 * 2, increment5 * 3, increment5 * 4,
                                        increment5, increment5 * 2, increment5 * 3, increment5 * 4,
                                        increment5, increment5 * 2, increment5 * 3, increment5 * 4};
@@ -137,14 +137,14 @@ public class ComputeHookup : MonoBehaviour
         // dispatch the texture
         propegate.Dispatch(propegateKernel, pixelWidth / 8, pixelHeight / 8, 1);
 
-        deposit_out = initializeRenderTexture();
-
+        
         swap = 0;
 
     }
 
     void setupVariables() {
         deposit_in = initializeRenderTexture();
+        deposit_out = initializeRenderTexture();
         particle_render_texture = initializeRenderTexture();
 
         // trace texture for the propegate shader
@@ -191,23 +191,14 @@ public class ComputeHookup : MonoBehaviour
         //modeDropdown.onValueChanged.AddListener(delegate { changeMode(modeDropdown.value);  });
 
         viewDropdown = GameObject.Find("ViewDropdown").GetComponent<TMP_Dropdown>();
-        viewDropdown.onValueChanged.AddListener(delegate { changeMode(viewDropdown.value); });
+        //viewDropdown.onValueChanged.AddListener(delegate { changeMode(viewDropdown.value); });
 
         Button playButton = GameObject.Find("PlayButton").GetComponent<Button>();
         //Debug.Log(playButton);
         updatePropegateShaderVariables(deposit_in);
     }
 
-    private void changeMode(float value) {
-        if (value == PARTICLE_VIEW) {
-            mat.mainTexture = particle_render_texture;
-        } else if (value == DEPOSIT_VIEW) {
-
-        }
-        Debug.Log("change mode " + value);
-        Debug.Log("PARTICLE_VIEW " + PARTICLE_VIEW);
-        Debug.Log("Desposit view " + DEPOSIT_VIEW);
-    }
+    
 
     public void updateSliderLabel(TextMeshProUGUI label, string labelText, float value) {
         label.SetText(labelText + value.ToString());
@@ -242,8 +233,8 @@ public class ComputeHookup : MonoBehaviour
         propegate.SetFloat("turn_angle", turn_angle); // 15.0 is default
         propegate.SetFloat("move_distance", move_distance);//worldHeight / 100.0f / 4.0f); //  in world-space units; default = about 1/5--1/3 of sense_distance
         propegate.SetFloat("agent_deposit", agent_deposit); // 15.0 is default
-        propegate.SetInt("world_width", world_width);
-        propegate.SetInt("world_height", world_height);
+        propegate.SetFloat("world_width", (float)world_width);
+        propegate.SetFloat("world_height", (float)world_height);
         propegate.SetFloat("move_sense_coef", move_sense_coef); // ?
         propegate.SetFloat("normalization_factor", normalization_factor); // ?
         propegate.SetFloat("pixelWidth", pixelWidth);
@@ -335,9 +326,9 @@ public class ComputeHookup : MonoBehaviour
         }
 
         if (Input.GetMouseButton(0)) {
-            //Debug.Log("mouse button down " + Input.mousePosition);
-            //Debug.Log("Screen Width : " + Screen.width);
-            //Debug.Log("Screen Height : " + Screen.height);
+            Debug.Log("mouse button down " + Input.mousePosition);
+            Debug.Log("Screen Width : " + Screen.width);
+            Debug.Log("Screen Height : " + Screen.height);
             draw(Input.mousePosition.x, Input.mousePosition.y);
             
         }
