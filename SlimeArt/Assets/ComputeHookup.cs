@@ -104,9 +104,9 @@ public class ComputeHookup : MonoBehaviour
                 dataTypes[index] = PARTICLE; // particle
                 
                 if (index < 12) {
-                    xParticlePositions[index] = xGalaxyCoordinates[index];
-                    yParticlePositions[index] = yGalaxyCoordinates[index];
-                    dataTypes[index] = DEPOSIT_EMITTER;
+                    //xParticlePositions[index] = xGalaxyCoordinates[index];
+                    //yParticlePositions[index] = yGalaxyCoordinates[index];
+                    //dataTypes[index] = DEPOSIT_EMITTER;
                 } else if (index > pixelWidth * pixelHeight * 3 / 4) {
                     if (firstNoData) {
                         firstNoData = false;
@@ -254,12 +254,11 @@ public class ComputeHookup : MonoBehaviour
             particles_y.GetData(particlesY);
            //particles_theta.GetData(particlesTheta);
             data_types.GetData(dataTypes);
-
-            particlesX[available_data_index] = x;
-            particlesY[available_data_index] = y;
-            Debug.Log("particlesX[available_data_index]" + particlesX[available_data_index]);
-            Debug.Log("particlesY[available_data_index]" + particlesY[available_data_index]);
-
+            Debug.Log("x: " + x + " screen.width " + Screen.width + " fraction: " + (x / Screen.width));
+            particlesX[available_data_index] = pixelWidth - x;
+            particlesY[available_data_index] = pixelHeight - y;
+            //Debug.Log("particlesX[available_data_index]" + particlesX[available_data_index]);
+            //Debug.Log("particlesY[available_data_index]" + particlesY[available_data_index]);
 
             if (modeDropdown.value == DRAW_DEPOSIT_MODE)  {
                 // draw temporary deposit that dissolves
@@ -272,7 +271,7 @@ public class ComputeHookup : MonoBehaviour
                 dataTypes[available_data_index] = PARTICLE;
             }
             available_data_index++;
-            Debug.Log("dataTypes" + particlesX[available_data_index]);
+            //Debug.Log("dataTypes" + particlesX[available_data_index]);
             int propegateKernel = propegate.FindKernel("CSMain");
 
             // x particle positions
@@ -284,8 +283,6 @@ public class ComputeHookup : MonoBehaviour
             // data types, like if it is deposit emitter, particle, deposit, or no data
             data_types = initializeComputeBuffer(dataTypes, "data_types", propegateKernel);
         }
-
-
     }
 
     // Update is called once per frame
@@ -330,9 +327,9 @@ public class ComputeHookup : MonoBehaviour
         }
 
         if (Input.GetMouseButton(0)) {
-            Debug.Log("mouse button down " + Input.mousePosition);
-            Debug.Log("Screen Width : " + Screen.width);
-            Debug.Log("Screen Height : " + Screen.height);
+            //Debug.Log("mouse button down " + Input.mousePosition);
+            //Debug.Log("Screen Width : " + Screen.width);
+            //Debug.Log("Screen Height : " + Screen.height);
             draw(Input.mousePosition.x, Input.mousePosition.y);   
         }
     }
