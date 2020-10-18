@@ -85,15 +85,6 @@ public class ComputeHookup : MonoBehaviour
         float[] dataTypes = new float[pixelWidth * pixelHeight];
         int index = 0;
 
-        float increment5 = pixelHeight / 5.0f;
-        float increment4 = pixelWidth / 4.0f;
-        float[] xGalaxyCoordinates = { increment5, increment5 * 2, increment5 * 3, increment5 * 4,
-                                       increment5, increment5 * 2, increment5 * 3, increment5 * 4,
-                                       increment5, increment5 * 2, increment5 * 3, increment5 * 4};
-        float[] yGalaxyCoordinates = { increment4, increment4, increment4, increment4, 
-                                        increment4 * 2, increment4 * 2,increment4 * 2,increment4 * 2,
-                                        increment4 * 3 , increment4 * 3, increment4 * 3, increment4 * 3 };
-
         bool firstNoData = true;
 
         for (int i = 0; i < pixelWidth; i++) {
@@ -103,17 +94,13 @@ public class ComputeHookup : MonoBehaviour
                 thetaParticles[index] = Random.Range(0.0f, 2.0f * PI);
                 dataTypes[index] = PARTICLE; // particle
                 
-                if (index < 12) {
-                    //xParticlePositions[index] = xGalaxyCoordinates[index];
-                    //yParticlePositions[index] = yGalaxyCoordinates[index];
-                    //dataTypes[index] = DEPOSIT_EMITTER;
-                } else if (index > pixelWidth * pixelHeight * 3 / 4) {
+                //if (index > pixelWidth * pixelHeight * 3 / 4) {
                     if (firstNoData) {
                         firstNoData = false;
                         available_data_index = index;
                     }
                     dataTypes[index] = NO_DATA; // particle
-                }
+                //}
                 index++;
             }
         }
@@ -254,7 +241,7 @@ public class ComputeHookup : MonoBehaviour
             particles_y.GetData(particlesY);
            //particles_theta.GetData(particlesTheta);
             data_types.GetData(dataTypes);
-            Debug.Log("x: " + x + " screen.width " + Screen.width + " fraction: " + (x / Screen.width));
+            //Debug.Log("x: " + x + " screen.width " + Screen.width + " fraction: " + (x / Screen.width));
             particlesX[available_data_index] = pixelWidth - x;
             particlesY[available_data_index] = pixelHeight - y;
             //Debug.Log("particlesX[available_data_index]" + particlesX[available_data_index]);
@@ -269,6 +256,7 @@ public class ComputeHookup : MonoBehaviour
             } else if (modeDropdown.value == DRAW_PARTICLES_MODE) {
                 // draw particles
                 dataTypes[available_data_index] = PARTICLE;
+                Debug.Log("ADD PARTICLE");
             }
             available_data_index++;
             //Debug.Log("dataTypes" + particlesX[available_data_index]);
