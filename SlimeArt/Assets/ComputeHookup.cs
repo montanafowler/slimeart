@@ -239,13 +239,16 @@ public class ComputeHookup : MonoBehaviour
             float[] dataTypes = new float[pixelWidth * pixelHeight]; 
             particles_x.GetData(particlesX);
             particles_y.GetData(particlesY);
+            //Debug.Log("particles_x---" + particlesX[0]);
+
+
            //particles_theta.GetData(particlesTheta);
             data_types.GetData(dataTypes);
             //Debug.Log("x: " + x + " screen.width " + Screen.width + " fraction: " + (x / Screen.width));
             particlesX[available_data_index] = pixelWidth - x;
             particlesY[available_data_index] = pixelHeight - y;
-            //Debug.Log("particlesX[available_data_index]" + particlesX[available_data_index]);
-            //Debug.Log("particlesY[available_data_index]" + particlesY[available_data_index]);
+            Debug.Log("particlesX[available_data_index]" + particlesX[available_data_index]);
+            Debug.Log("particlesY[available_data_index]" + particlesY[available_data_index]);
 
             if (modeDropdown.value == DRAW_DEPOSIT_MODE)  {
                 // draw temporary deposit that dissolves
@@ -255,8 +258,16 @@ public class ComputeHookup : MonoBehaviour
                 dataTypes[available_data_index] = DEPOSIT_EMITTER;
             } else if (modeDropdown.value == DRAW_PARTICLES_MODE) {
                 // draw particles
+                Debug.Log("available_data_index " + available_data_index);
+           
                 dataTypes[available_data_index] = PARTICLE;
-                Debug.Log("ADD PARTICLE");
+                
+                for(int i = 0; i < 10; i++)
+                {
+                   // Debug.Log(dataTypes[i]);
+                }
+               // Debug.Log(dataTypes);
+                //Debug.Log("ADD PARTICLE");
             }
             available_data_index++;
             //Debug.Log("dataTypes" + particlesX[available_data_index]);
