@@ -9,12 +9,14 @@ public class ComputeHookup : MonoBehaviour
 { 
     public ComputeShader propegate;
     public ComputeShader decay;
+    public ComputeShader blank_canvas_shader;
 
     public ComputeBuffer initialGalaxyPositions;
     public ComputeBuffer particles_x;
     public ComputeBuffer particles_y;
     public ComputeBuffer particles_theta;
     public ComputeBuffer data_types;
+    public ComputeBuffer blank_canvas;
 
     public RenderTexture particle_render_texture;
     public RenderTexture deposit_in;
@@ -83,6 +85,7 @@ public class ComputeHookup : MonoBehaviour
         float[] yParticlePositions = new float[pixelWidth * pixelHeight];
         float[] thetaParticles = new float[pixelWidth * pixelHeight];
         float[] dataTypes = new float[pixelWidth * pixelHeight];
+        float[] blankCanvas = new float[pixelWidth * pixelHeight];
         int index = 0;
 
         bool firstNoData = true;
@@ -93,8 +96,9 @@ public class ComputeHookup : MonoBehaviour
                 yParticlePositions[index] = Random.Range(0.0f, (float)pixelHeight);// j / (512.0f);
                 thetaParticles[index] = Random.Range(0.0f, 2.0f * PI);
                 dataTypes[index] = PARTICLE; // particle
+                blankCanvas[index] = 0.0f;
                 
-                //if (index > pixelWidth * pixelHeight * 3 / 4) {
+                //if (index > pixelWidth * pixelHeight /* 3*/ / 4) {
                     if (firstNoData) {
                         firstNoData = false;
                         available_data_index = index;
@@ -117,14 +121,20 @@ public class ComputeHookup : MonoBehaviour
         // data types, like if it is deposit emitter, particle, deposit, or no data
         data_types = initializeComputeBuffer(dataTypes, "data_types", propegateKernel);
 
+        blank_canvas = initializeComputeBuffer(blankCanvas, "blank_canvas", blank_canvas_shader.FindKernel("CSMain"));
+        
         // deposit texture for propegate shader
         //tex_deposit = initializeRenderTexture();
         setupVariables();
 
+        blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
+        blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), pixelWidth / 8, pixelHeight / 8, 1);
+        //mat.mainTexture = particle_render_texture;
+
         // dispatch the texture
         propegate.Dispatch(propegateKernel, pixelWidth / 8, pixelHeight / 8, 1);
 
-        
+
         swap = 0;
 
     }
@@ -247,8 +257,8 @@ public class ComputeHookup : MonoBehaviour
             //Debug.Log("x: " + x + " screen.width " + Screen.width + " fraction: " + (x / Screen.width));
             particlesX[available_data_index] = pixelWidth - x;
             particlesY[available_data_index] = pixelHeight - y;
-            Debug.Log("particlesX[available_data_index]" + particlesX[available_data_index]);
-            Debug.Log("particlesY[available_data_index]" + particlesY[available_data_index]);
+           // Debug.Log("particlesX[available_data_index]" + particlesX[available_data_index]);
+        //    Debug.Log("particlesY[available_data_index]" + particlesY[available_data_index]);
 
             if (modeDropdown.value == DRAW_DEPOSIT_MODE)  {
                 // draw temporary deposit that dissolves
@@ -258,7 +268,7 @@ public class ComputeHookup : MonoBehaviour
                 dataTypes[available_data_index] = DEPOSIT_EMITTER;
             } else if (modeDropdown.value == DRAW_PARTICLES_MODE) {
                 // draw particles
-                Debug.Log("available_data_index " + available_data_index);
+              //  Debug.Log("available_data_index " + available_data_index);
            
                 dataTypes[available_data_index] = PARTICLE;
                 
@@ -309,6 +319,8 @@ public class ComputeHookup : MonoBehaviour
             updatePropegateShaderVariables(deposit_in);
             swap = 0;
         }
+        //blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
+        blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), pixelWidth / 8, pixelHeight / 8, 1);
 
         decay.Dispatch(decayKernel, pixelWidth / 8, pixelHeight / 8, 1);
         propegate.Dispatch(propegateKernel, pixelWidth / 8, pixelHeight / 8, 1);

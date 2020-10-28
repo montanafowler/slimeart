@@ -6,7 +6,9 @@ MonoImporter:
   defaultReferences:
   - propegate: {fileID: 7200000, guid: 80cd6922b0456554cb262de6cf75d629, type: 3}
   - decay: {fileID: 7200000, guid: 3170db2154fa436439d93b4e180e81a1, type: 3}
-  - result: {fileID: 8400000, guid: 459d54c3ebb531a40b942ea7cbd98728, type: 2}
+  - blank_canvas_shader: {fileID: 7200000, guid: 64f0c6654292ab44ba22ec3ab836460f,
+      type: 3}
+  - particle_render_texture: {instanceID: 0}
   - deposit_in: {fileID: 8400000, guid: b6097ac744855d24787ceaea3d3ac2da, type: 2}
   - deposit_out: {fileID: 8400000, guid: 37df3ce43c9b29641ad2f23ce9e5bc44, type: 2}
   - tex_trace: {fileID: 8400000, guid: b4eed3f6333f28b488b30100f8da4977, type: 2}

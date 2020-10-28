@@ -111,8 +111,11 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
     //bool deposit_emitter_bool = data_type == DEPOSIT_EMITTER;
 
     if (data_type == PARTICLE) {
-        particle_render_texture[id.xy] = float4(1.0, 1.0, 1.0, 1.0);
-        return;
+        //particle_render_texture[id.xy] = float4(1.0, 1.0, 1.0, 1.0);
+        //particle_render_texture[id.xy] = float4(0.0, 0.0, 0.0, 1.0);
+        //particle_render_texture[uint2(x_normalized * world_width,
+           // y_normalized * world_height)] = float4(1.0, 1.0, 1.0, 1.0);
+        //return;
     }
 
     if (data_type == DEPOSIT_EMITTER) {
@@ -131,7 +134,10 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
 
     if (data_type == NO_DATA) {
         // no particle
-        particle_render_texture[id.xy] = float4(1.0, 0.0, 0.0, 1.0);//float4(id.x / 512.0, id.y / 512.0, 0.3, 1.0);
+        //if (particle_render_texture[id.xy] != float4(0.0, 0.0, 0.0, 1.0)) {
+          //  particle_render_texture[id.xy] = float4(0.0, 0.0, 0.0, 1.0);
+      //  }
+        //float4(id.x / 512.0, id.y / 512.0, 0.3, 1.0);
         return;
     }
 
@@ -206,7 +212,8 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
     //float4(distance_scaling_factor/*actualtrace, abs(center_axis.x), abs(center_axis.y), abs(center_axis.z)/*direction of agents); // NOT ATOMIC!
 
 
-    particle_render_texture[id.xy] = float4(0.0, 0.0, 0.0, 1.0);//float4(id.x / 512.0, id.y / 512.0, 0.3, 1.0);
-    particle_render_texture[uint2(x, y)] = float4(1.0, 1.0, 1.0, 1.0);//float4(x / 512.0, y / 512.0, 0.8, 1.0);
+    //particle_render_texture[id.xy] = float4(0.0, 1.0, 0.0, 1.0);//float4(id.x / 512.0, id.y / 512.0, 0.3, 1.0);
+    particle_render_texture[uint2(x_normalized * world_width,
+        y_normalized * world_height)] = float4(1.0, 1.0, 1.0, 1.0);//float4(x / 512.0, y / 512.0, 0.8, 1.0);
 
 }
