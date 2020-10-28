@@ -252,45 +252,40 @@ public class ComputeHookup : MonoBehaviour
 
     void draw(float x, float y) {
         if (modeDropdown.value != OBSERVE_MODE && available_data_index < pixelHeight * pixelWidth) {
-            //Debug.Log("draw in " + )
             float[] particlesX = new float[pixelWidth * pixelHeight]; 
             float[] particlesY = new float[pixelWidth * pixelHeight]; 
             //float[] particlesTheta = new float[pixelWidth * pixelHeight];
             float[] dataTypes = new float[pixelWidth * pixelHeight]; 
             particles_x.GetData(particlesX);
             particles_y.GetData(particlesY);
-            //Debug.Log("particles_x---" + particlesX[0]);
-
-
-           //particles_theta.GetData(particlesTheta);
             data_types.GetData(dataTypes);
-            //Debug.Log("x: " + x + " screen.width " + Screen.width + " fraction: " + (x / Screen.width));
-            particlesX[available_data_index] = pixelWidth - x;
-            particlesY[available_data_index] = pixelHeight - y;
-           // Debug.Log("particlesX[available_data_index]" + particlesX[available_data_index]);
-        //    Debug.Log("particlesY[available_data_index]" + particlesY[available_data_index]);
+            //particles_theta.GetData(particlesTheta);
 
-            if (modeDropdown.value == DRAW_DEPOSIT_MODE)  {
-                // draw temporary deposit that dissolves
-                dataTypes[available_data_index] = DEPOSIT;
-            } else if (modeDropdown.value == DRAW_DEPOSIT_EMITTERS_MODE) {
-                // draw deposit emitters that continuously emit deposit
-                dataTypes[available_data_index] = DEPOSIT_EMITTER;
-            } else if (modeDropdown.value == DRAW_PARTICLES_MODE) {
-                // draw particles
-              //  Debug.Log("available_data_index " + available_data_index);
-           
-                dataTypes[available_data_index] = PARTICLE;
-                
-                for(int i = 0; i < 10; i++)
-                {
-                   // Debug.Log(dataTypes[i]);
+            float centerX = pixelWidth - x;
+            float centerY = pixelHeight - y;
+            brush_size = brushSizeSlider.value;
+            for (int dx = (int)-brush_size; dx < (int)brush_size; dx++) {
+                for(int dy = (int)-brush_size; dy < (int)brush_size; dy++) {
+                    particlesX[available_data_index] = centerX + dx;
+                    particlesY[available_data_index] = centerY + dy;
+                    if (modeDropdown.value == DRAW_DEPOSIT_MODE) {
+                        // draw temporary deposit that dissolves
+                        dataTypes[available_data_index] = DEPOSIT;
+                    } else if (modeDropdown.value == DRAW_DEPOSIT_EMITTERS_MODE) {
+                        // draw deposit emitters that continuously emit deposit
+                        dataTypes[available_data_index] = DEPOSIT_EMITTER;
+                    } else if (modeDropdown.value == DRAW_PARTICLES_MODE) {
+                        // draw particles
+                        dataTypes[available_data_index] = PARTICLE;
+                    }
+                    available_data_index++;
                 }
-               // Debug.Log(dataTypes);
-                //Debug.Log("ADD PARTICLE");
             }
-            available_data_index++;
-            //Debug.Log("dataTypes" + particlesX[available_data_index]);
+ 
+            //particlesX[available_data_index] = pixelWidth - x;
+            //particlesY[available_data_index] = pixelHeight - y;
+
+            
             int propegateKernel = propegate.FindKernel("CSMain");
 
             // x particle positions
