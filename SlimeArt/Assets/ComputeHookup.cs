@@ -36,6 +36,7 @@ public class ComputeHookup : MonoBehaviour
     public float move_sense_coef;
     public float normalization_factor;
     public float deposit_strength;
+    public float brush_size;
 
     public int pixelWidth;
     public int pixelHeight;
@@ -48,11 +49,13 @@ public class ComputeHookup : MonoBehaviour
     private Slider senseDistanceSlider;
     private Slider depositStrengthSlider;
     private Slider agentDepositStrengthSlider;
+    private Slider brushSizeSlider;
 
     private TextMeshProUGUI moveDistanceSliderText;
     private TextMeshProUGUI senseDistanceSliderText;
     private TextMeshProUGUI depositStrengthSliderText;
     private TextMeshProUGUI agentDepositStrengthSliderText;
+    private TextMeshProUGUI brushSizeSliderText;
 
     private TMP_Dropdown modeDropdown;
     private TMP_Dropdown viewDropdown;
@@ -162,11 +165,13 @@ public class ComputeHookup : MonoBehaviour
         senseDistanceSlider = GameObject.Find("SenseDistanceSlider").GetComponent<Slider>();
         depositStrengthSlider = GameObject.Find("DepositStrengthSlider").GetComponent<Slider>();
         agentDepositStrengthSlider = GameObject.Find("AgentDepositStrengthSlider").GetComponent<Slider>();
+        brushSizeSlider = GameObject.Find("BrushSizeSlider").GetComponent<Slider>();
 
         move_distance = moveDistanceSlider.value;
         sense_distance = senseDistanceSlider.value;
         deposit_strength = depositStrengthSlider.value;
         agent_deposit = agentDepositStrengthSlider.value;
+        brush_size = brushSizeSlider.value;
 
         moveDistanceSliderText = GameObject.Find("MoveDistanceSliderText").GetComponent<TextMeshProUGUI>();
         moveDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(moveDistanceSliderText, "move distance: ", moveDistanceSlider.value); });
@@ -183,6 +188,11 @@ public class ComputeHookup : MonoBehaviour
         agentDepositStrengthSliderText = GameObject.Find("AgentDepositStrengthSliderText").GetComponent<TextMeshProUGUI>();
         agentDepositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value); });
         updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value);
+
+        brushSizeSliderText = GameObject.Find("BrushSizeSliderText").GetComponent<TextMeshProUGUI>();
+        brushSizeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushSizeSliderText, "brush size: ", brushSizeSlider.value); });
+        updateSliderLabel(brushSizeSliderText, "brush size: ", agentDepositStrengthSlider.value);
+
 
         modeDropdown = GameObject.Find("ModeDropdown").GetComponent<TMP_Dropdown>();
         //modeDropdown.onValueChanged.AddListener(delegate { changeMode(modeDropdown.value);  });
