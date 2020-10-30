@@ -72,6 +72,7 @@ public class ComputeHookup : MonoBehaviour
     private float NO_DATA = 0.0f;
 
     private int available_data_index = 0;
+    private int MAX_SPACE;
 
 
     //public Camera camera;
@@ -83,12 +84,17 @@ public class ComputeHookup : MonoBehaviour
         pixelHeight = Screen.height;
         pixelWidth = Screen.width;//(int)(Camera.main.aspect * pixelHeight);
 
+        Debug.Log("pixelHeight " + pixelHeight);
+        Debug.Log("pixelWidth " + pixelWidth);
+        MAX_SPACE = pixelHeight * pixelWidth * 5;
+        Debug.Log("pixelWidth*PixelHeight " + MAX_SPACE);
+
         // random seeding of arrays
-        float[] xParticlePositions = new float[pixelWidth * pixelHeight];
-        float[] yParticlePositions = new float[pixelWidth * pixelHeight];
-        float[] thetaParticles = new float[pixelWidth * pixelHeight];
-        float[] dataTypes = new float[pixelWidth * pixelHeight];
-        float[] blankCanvas = new float[pixelWidth * pixelHeight];
+        float[] xParticlePositions = new float[MAX_SPACE];
+        float[] yParticlePositions = new float[MAX_SPACE];
+        float[] thetaParticles = new float[MAX_SPACE];
+        float[] dataTypes = new float[MAX_SPACE];
+        float[] blankCanvas = new float[MAX_SPACE];
         int index = 0;
 
         bool firstNoData = true;
@@ -252,12 +258,12 @@ public class ComputeHookup : MonoBehaviour
 
     void draw(float x, float y) {
         if (modeDropdown.value != OBSERVE_MODE 
-            && available_data_index < pixelHeight * pixelWidth
-            && available_data_index < pixelHeight*pixelWidth) {
-            float[] particlesX = new float[pixelWidth * pixelHeight]; 
-            float[] particlesY = new float[pixelWidth * pixelHeight]; 
-            //float[] particlesTheta = new float[pixelWidth * pixelHeight];
-            float[] dataTypes = new float[pixelWidth * pixelHeight]; 
+            && available_data_index < MAX_SPACE
+            && available_data_index < MAX_SPACE) {
+            float[] particlesX = new float[MAX_SPACE]; 
+            float[] particlesY = new float[MAX_SPACE]; 
+            //float[] particlesTheta = new float[MAX_SPACE];
+            float[] dataTypes = new float[MAX_SPACE]; 
             particles_x.GetData(particlesX);
             particles_y.GetData(particlesY);
             data_types.GetData(dataTypes);
@@ -266,11 +272,17 @@ public class ComputeHookup : MonoBehaviour
             float centerX = pixelWidth - x;
             float centerY = pixelHeight - y;
             float newX, newY;
-            brush_size = brushSizeSlider.value;
+            brush_size = (brushSizeSlider.value + 1)/2;
             for (int dx = (int)-brush_size; dx < (int)brush_size; dx++) {
                 for(int dy = (int)-brush_size; dy < (int)brush_size; dy++) {
                     newX = centerX + dx;
                     newY = centerY + dy;
+
+                    if (available_data_index >= MAX_SPACE) {
+                        Debug.Log("MAX SPACE REACHED");
+                        break;
+                    }
+
                     if ((newX-centerX)*(newX-centerX) 
                         + (newY-centerY)*(newY-centerY) < brush_size*brush_size) {
                         particlesX[available_data_index] = centerX + dx;
@@ -293,6 +305,10 @@ public class ComputeHookup : MonoBehaviour
                         available_data_index++;
                     }
                     
+                }
+                if (available_data_index >= MAX_SPACE) {
+                    Debug.Log("MAX SPACE REACHED");
+                    break;
                 }
             }
  
