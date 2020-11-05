@@ -80,7 +80,7 @@ public class ComputeHookup : MonoBehaviour
     void Start() {
         // kernel is the propegate shader (initial spark)
         int propegateKernel = propegate.FindKernel("CSMain");
-        
+
         pixelHeight = Screen.height;
         pixelWidth = Screen.width;//(int)(Camera.main.aspect * pixelHeight);
 
@@ -88,7 +88,12 @@ public class ComputeHookup : MonoBehaviour
         Debug.Log("pixelWidth " + pixelWidth);
         MAX_SPACE = pixelHeight * pixelWidth * 5;
         Debug.Log("pixelWidth*PixelHeight " + MAX_SPACE);
-
+        Debug.Log("MAT properties: mainTextureScale");
+        mat.mainTextureScale = new Vector2(0.9f, 1.0f);
+        Debug.Log(mat.mainTextureScale);
+        Debug.Log("MAT properties: mainTextureOffset");
+        mat.mainTextureOffset = new Vector2(-0.1f, 0.0f);
+        Debug.Log(mat.mainTextureOffset);
         // random seeding of arrays
         float[] xParticlePositions = new float[MAX_SPACE];
         float[] yParticlePositions = new float[MAX_SPACE];
@@ -257,9 +262,13 @@ public class ComputeHookup : MonoBehaviour
     }
 
     void draw(float x, float y) {
+        float centerX = pixelWidth - x + (mat.mainTextureOffset.x * pixelWidth * mat.mainTextureScale.x);
+        float centerY = pixelHeight - y;
         if (modeDropdown.value != OBSERVE_MODE 
             && available_data_index < MAX_SPACE
-            && available_data_index < MAX_SPACE) {
+            && available_data_index < MAX_SPACE
+            && (centerX < 
+            (pixelWidth + mat.mainTextureOffset.x * pixelWidth)))  {
             float[] particlesX = new float[MAX_SPACE]; 
             float[] particlesY = new float[MAX_SPACE]; 
             //float[] particlesTheta = new float[MAX_SPACE];
@@ -269,8 +278,8 @@ public class ComputeHookup : MonoBehaviour
             data_types.GetData(dataTypes);
             //particles_theta.GetData(particlesTheta);
 
-            float centerX = pixelWidth - x;
-            float centerY = pixelHeight - y;
+            //float centerX = pixelWidth - x - (mat.mainTextureOffset.x * pixelWidth);
+            //float centerY = pixelHeight - y;
             float newX, newY;
             brush_size = (brushSizeSlider.value + 1)/2;
             for (int dx = (int)-brush_size; dx < (int)brush_size; dx++) {
