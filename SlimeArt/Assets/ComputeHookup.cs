@@ -84,16 +84,16 @@ public class ComputeHookup : MonoBehaviour
         pixelHeight = Screen.height;
         pixelWidth = Screen.width;//(int)(Camera.main.aspect * pixelHeight);
 
-        Debug.Log("pixelHeight " + pixelHeight);
-        Debug.Log("pixelWidth " + pixelWidth);
-        MAX_SPACE = pixelHeight * pixelWidth * 5;
-        Debug.Log("pixelWidth*PixelHeight " + MAX_SPACE);
-        Debug.Log("MAT properties: mainTextureScale");
+        //Debug.Log("pixelHeight " + pixelHeight);
+        //Debug.Log("pixelWidth " + pixelWidth);
+        MAX_SPACE = pixelHeight * pixelWidth * 5;   
+        Debug.Log("MAX_SPACE " + MAX_SPACE);
+        //Debug.Log("MAT properties: mainTextureScale");
         mat.mainTextureScale = new Vector2(0.9f, 1.0f);
-        Debug.Log(mat.mainTextureScale);
-        Debug.Log("MAT properties: mainTextureOffset");
+        //Debug.Log(mat.mainTextureScale);
+        //Debug.Log("MAT properties: mainTextureOffset");
         mat.mainTextureOffset = new Vector2(-0.1f, 0.0f);
-        Debug.Log(mat.mainTextureOffset);
+        //Debug.Log(mat.mainTextureOffset);
         // random seeding of arrays
         float[] xParticlePositions = new float[MAX_SPACE];
         float[] yParticlePositions = new float[MAX_SPACE];
@@ -146,7 +146,11 @@ public class ComputeHookup : MonoBehaviour
         //mat.mainTexture = particle_render_texture;
 
         // dispatch the texture
-        propegate.Dispatch(propegateKernel, pixelWidth / 8, pixelHeight / 8, 1);
+        //propegate.Dispatch(propegateKernel, pixelWidth / 8, pixelHeight / 8, 1);
+        Debug.Log(pixelWidth / 8);
+    // Change MAX SPACE TO BE NUM_OF_AGENTS
+
+        propegate.Dispatch(propegateKernel, MAX_SPACE/256, 256, 1);
 
 
         swap = 0;
