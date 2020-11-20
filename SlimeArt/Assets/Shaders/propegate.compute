@@ -27,6 +27,8 @@ float deposit_strength;
 
 float pixelWidth;
 float pixelHeight;
+float COMPUTE_GRID_WIDTH;
+float COMPUTE_GRID_HEIGHT;
 
 #define PI 3.141592
 #define HALFPI 0.5 * PI
@@ -97,7 +99,7 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
     //uint idx = thread_index + 1000 * group_idx;
 
     //THIS IS WRONG NOW!!!!!!!! 11/18/20 because compute grid isn't pixelWidth wide
-    uint idx = id.x + id.y * pixelWidth; // not sure if this is right 7/3/20
+    uint idx = id.x + id.y * COMPUTE_GRID_WIDTH; // not sure if this is right 7/3/20
 
     //DEBUG
     //particle_render_texture[id.xy] = float4(id.x/world_width, id.y/world_height, 0.0, 1.0);

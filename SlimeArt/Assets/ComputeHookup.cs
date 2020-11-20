@@ -73,6 +73,8 @@ public class ComputeHookup : MonoBehaviour
 
     private int available_data_index = 0;
     private int MAX_SPACE;
+    private int COMPUTE_GRID_WIDTH;
+    private int COMPUTE_GRID_HEIGHT;
 
 
     //public Camera camera;
@@ -88,12 +90,13 @@ public class ComputeHookup : MonoBehaviour
         //Debug.Log("pixelWidth " + pixelWidth);
         MAX_SPACE = pixelHeight * pixelWidth * 5;   
         Debug.Log("MAX_SPACE " + MAX_SPACE);
-        //Debug.Log("MAT properties: mainTextureScale");
-        mat.mainTextureScale = new Vector2(0.9f, 1.0f);
-        //Debug.Log(mat.mainTextureScale);
-        //Debug.Log("MAT properties: mainTextureOffset");
-        mat.mainTextureOffset = new Vector2(-0.1f, 0.0f);
-        //Debug.Log(mat.mainTextureOffset);
+        
+        COMPUTE_GRID_HEIGHT = 256;
+        COMPUTE_GRID_WIDTH = MAX_SPACE / COMPUTE_GRID_HEIGHT;
+
+        //mat.mainTextureScale = new Vector2(0.9f, 1.0f);
+        //mat.mainTextureOffset = new Vector2(-0.1f, 0.0f);
+
         // random seeding of arrays
         float[] xParticlePositions = new float[MAX_SPACE];
         float[] yParticlePositions = new float[MAX_SPACE];
@@ -142,15 +145,14 @@ public class ComputeHookup : MonoBehaviour
         setupVariables();
 
         blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
-        blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), pixelWidth / 8, pixelHeight / 8, 1);
+        blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
         //mat.mainTexture = particle_render_texture;
 
         // dispatch the texture
         //propegate.Dispatch(propegateKernel, pixelWidth / 8, pixelHeight / 8, 1);
-        Debug.Log(pixelWidth / 8);
-    // Change MAX SPACE TO BE NUM_OF_AGENTS
+       // Change MAX SPACE TO BE NUM_OF_AGENTS
 
-        propegate.Dispatch(propegateKernel, MAX_SPACE/256, 256, 1);
+        propegate.Dispatch(propegateKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
 
 
         swap = 0;
@@ -263,16 +265,22 @@ public class ComputeHookup : MonoBehaviour
         propegate.SetFloat("pixelHeight", pixelHeight);
         propegate.SetFloat("deposit_strength", deposit_strength);
         propegate.SetTexture(propegateKernel, "particle_render_texture", particle_render_texture);
+        propegate.SetFloat("COMPUTE_GRID_WIDTH", (float)COMPUTE_GRID_WIDTH);
+        propegate.SetFloat("COMPUTE_GRID_HEIGHT", (float)COMPUTE_GRID_HEIGHT);
+    }
+
+    int getNextAvailableIndex() {
+        return 0;
     }
 
     void draw(float x, float y) {
-        float centerX = pixelWidth - x + (mat.mainTextureOffset.x * pixelWidth * mat.mainTextureScale.x);
+        float centerX = pixelWidth - x -100;// + (mat.mainTextureOffset.x * pixelWidth * mat.mainTextureScale.x);
         float centerY = pixelHeight - y;
         if (modeDropdown.value != OBSERVE_MODE 
             && available_data_index < MAX_SPACE
             && available_data_index < MAX_SPACE
-            && (centerX < 
-            (pixelWidth + mat.mainTextureOffset.x * pixelWidth)))  {
+            //&& (centerX < (pixelWidth /*+ mat.mainTextureOffset.x * pixelWidth*/))
+            )  {
             float[] particlesX = new float[MAX_SPACE]; 
             float[] particlesY = new float[MAX_SPACE]; 
             //float[] particlesTheta = new float[MAX_SPACE];
@@ -368,10 +376,10 @@ public class ComputeHookup : MonoBehaviour
             swap = 0;
         }
         //blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
-        blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), pixelWidth / 8, pixelHeight / 8, 1);
+        blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
 
-        decay.Dispatch(decayKernel, pixelWidth / 8, pixelHeight / 8, 1);
-        propegate.Dispatch(propegateKernel, pixelWidth / 8, pixelHeight / 8, 1);
+        decay.Dispatch(decayKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+        propegate.Dispatch(propegateKernel,COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
 
         if (viewDropdown.value == DEPOSIT_VIEW) {
             if (swap == 0) {
