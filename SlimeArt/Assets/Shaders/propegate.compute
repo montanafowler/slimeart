@@ -89,13 +89,14 @@ float mod(float x, float y) {
     return x - y * floor(x / y);
 }
 
+// THIS MIGHT BE WRONG TOO!! COMPUTE GRID STUFF 11/18/20
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID) {
 //void main(uint thread_index : SV_GroupIndex, uint3 group_id : SV_GroupID)
     //uint group_idx = group_id.x + group_id.y * 10 + group_id.z * 100;
     //uint idx = thread_index + 1000 * group_idx;
 
-    //THIS IS WRONG NOW!!!!!!!! 10/18/20 because compute grid isn't pixelWidth wide
+    //THIS IS WRONG NOW!!!!!!!! 11/18/20 because compute grid isn't pixelWidth wide
     uint idx = id.x + id.y * pixelWidth; // not sure if this is right 7/3/20
 
     //DEBUG
