@@ -95,7 +95,7 @@ public class ComputeHookup : MonoBehaviour
         COMPUTE_GRID_WIDTH = MAX_SPACE / COMPUTE_GRID_HEIGHT;
 
         //mat.mainTextureScale = new Vector2(0.9f, 1.0f);
-        //mat.mainTextureOffset = new Vector2(-0.1f, 0.0f);
+        mat.mainTextureOffset = new Vector2(0.0f, 0.0f);
 
         // random seeding of arrays
         float[] xParticlePositions = new float[MAX_SPACE];
@@ -274,7 +274,10 @@ public class ComputeHookup : MonoBehaviour
     }
 
     void draw(float x, float y) {
-        float centerX = pixelWidth - x -100;// + (mat.mainTextureOffset.x * pixelWidth * mat.mainTextureScale.x);
+        //mat.mainTextureOffset = ;
+        Debug.Log("material width");
+        // TODODODODODODOD GET THE OFFSET RIGHT, somehow the width of the UI cube
+        float centerX = pixelWidth - x - pixelWidth*4/19;// + (mat.mainTextureOffset.x * pixelWidth * mat.mainTextureScale.x);
         float centerY = pixelHeight - y;
         if (modeDropdown.value != OBSERVE_MODE 
             && available_data_index < MAX_SPACE

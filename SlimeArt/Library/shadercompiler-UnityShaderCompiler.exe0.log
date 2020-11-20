@@ -1,2 +1,9 @@
 Base path: 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data', plugins path 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data/PlaybackEngines'
 Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=9524 outsize=9526 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at propegate.compute(87): implicit truncation of vector type
+  api=4 insize=9526 outsize=5753 ok=1
+Cmd: preprocessCompute
+  insize=428 outsize=427 ok=1
