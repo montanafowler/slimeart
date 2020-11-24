@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+
 public class ComputeHookup : MonoBehaviour
 { 
     public ComputeShader propegate;
@@ -76,6 +77,12 @@ public class ComputeHookup : MonoBehaviour
     private int COMPUTE_GRID_WIDTH;
     private int COMPUTE_GRID_HEIGHT;
 
+    private const int LINEAR_SPACE_MANAGEMENT = 0;
+    private const int GROUP_THEORY_SPACE_MANAGEMENT = 1;
+    private const int STOCHASTIC_SPACE_MANAGEMENT = 2;
+
+    //private readonly System.Random random = new System.Random();
+    private int group_theory_increment;
 
     //public Camera camera;
     // Start is called before the first frame update
@@ -90,6 +97,13 @@ public class ComputeHookup : MonoBehaviour
         //Debug.Log("pixelWidth " + pixelWidth);
         MAX_SPACE = pixelHeight * pixelWidth * 5;   
         Debug.Log("MAX_SPACE " + MAX_SPACE);
+
+        group_theory_increment = 3;
+        while(MAX_SPACE % group_theory_increment == 0) {
+            group_theory_increment++;
+        }
+        Debug.Log("group_theory_increment " + group_theory_increment);
+        
         
         COMPUTE_GRID_HEIGHT = 256;
         COMPUTE_GRID_WIDTH = MAX_SPACE / COMPUTE_GRID_HEIGHT;
@@ -270,7 +284,32 @@ public class ComputeHookup : MonoBehaviour
     }
 
     int getNextAvailableIndex() {
-        return 0;
+        int spaceManagement = GROUP_THEORY_SPACE_MANAGEMENT;//LINEAR_SPACE_MANAGEMENT;
+        
+        switch(spaceManagement) {
+            case LINEAR_SPACE_MANAGEMENT:
+                available_data_index++;
+                if (available_data_index >= MAX_SPACE) {
+                    Debug.Log("LINEAR MAX SPACE REACHED");
+                    available_data_index = 0;
+                }
+                break;
+            case GROUP_THEORY_SPACE_MANAGEMENT:
+                available_data_index += group_theory_increment;
+                if (available_data_index >= MAX_SPACE) {
+                    Debug.Log("GROUP THEORY MAX SPACE REACHED");
+                    available_data_index = available_data_index % MAX_SPACE;
+                }
+                break;
+            case STOCHASTIC_SPACE_MANAGEMENT:
+            default:
+                available_data_index = Random.Range(0, MAX_SPACE);
+                break;
+        }
+        
+        // in order indexing with wrap:
+        
+        return available_data_index;
     }
 
     void draw(float x, float y) {
@@ -279,11 +318,15 @@ public class ComputeHookup : MonoBehaviour
         // TODODODODODODOD GET THE OFFSET RIGHT, somehow the width of the UI cube
         float centerX = pixelWidth - x - pixelWidth*4/19;// + (mat.mainTextureOffset.x * pixelWidth * mat.mainTextureScale.x);
         float centerY = pixelHeight - y;
+        
         if (modeDropdown.value != OBSERVE_MODE 
-            && available_data_index < MAX_SPACE
-            && available_data_index < MAX_SPACE
+            //&& nextAvailableIndex < MAX_SPACE
+            //&& nextAvailableIndex < MAX_SPACE
             //&& (centerX < (pixelWidth /*+ mat.mainTextureOffset.x * pixelWidth*/))
             )  {
+
+            //int nextAvailableIndex = getNextAvailableIndex();
+
             float[] particlesX = new float[MAX_SPACE]; 
             float[] particlesY = new float[MAX_SPACE]; 
             //float[] particlesTheta = new float[MAX_SPACE];
@@ -302,38 +345,38 @@ public class ComputeHookup : MonoBehaviour
                     newX = centerX + dx;
                     newY = centerY + dy;
 
-                    if (available_data_index >= MAX_SPACE) {
-                        Debug.Log("MAX SPACE REACHED");
-                        break;
-                    }
+                    //if (nextAvailableIndex >= MAX_SPACE) {
+                      //  Debug.Log("MAX SPACE REACHED");
+                        //break;
+                    //}
 
                     if ((newX-centerX)*(newX-centerX) 
                         + (newY-centerY)*(newY-centerY) < brush_size*brush_size) {
-                        particlesX[available_data_index] = centerX + dx;
-                        particlesY[available_data_index] = centerY + dy;
+                        int nextAvailableIndex = getNextAvailableIndex();
+                        particlesX[nextAvailableIndex] = centerX + dx;
+                        particlesY[nextAvailableIndex] = centerY + dy;
                         if (modeDropdown.value == DRAW_DEPOSIT_MODE)
                         {
                             // draw temporary deposit that dissolves
-                            dataTypes[available_data_index] = DEPOSIT;
+                            dataTypes[nextAvailableIndex] = DEPOSIT;
                         }
                         else if (modeDropdown.value == DRAW_DEPOSIT_EMITTERS_MODE)
                         {
                             // draw deposit emitters that continuously emit deposit
-                            dataTypes[available_data_index] = DEPOSIT_EMITTER;
+                            dataTypes[nextAvailableIndex] = DEPOSIT_EMITTER;
                         }
                         else if (modeDropdown.value == DRAW_PARTICLES_MODE)
                         {
                             // draw particles
-                            dataTypes[available_data_index] = PARTICLE;
+                            dataTypes[nextAvailableIndex] = PARTICLE;
                         }
-                        available_data_index++;
                     }
                     
                 }
-                if (available_data_index >= MAX_SPACE) {
+                /*if (nextAvailableIndex >= MAX_SPACE) {
                     Debug.Log("MAX SPACE REACHED");
                     break;
-                }
+                }*/
             }
  
             //particlesX[available_data_index] = pixelWidth - x;
