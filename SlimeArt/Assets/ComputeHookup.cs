@@ -18,6 +18,16 @@ public class ComputeHookup : MonoBehaviour
     public ComputeBuffer particles_theta;
     public ComputeBuffer data_types;
     public ComputeBuffer blank_canvas;
+    public ComputeBuffer particle_id_buffer;
+    public ComputeBuffer move_distance_buffer;
+    public ComputeBuffer sense_distance_buffer;
+    public ComputeBuffer particle_deposit_strength_buffer;
+    public ComputeBuffer lifetime_buffer;
+    public ComputeBuffer particle_red_channel_buffer;
+    public ComputeBuffer particle_green_channel_buffer;
+    public ComputeBuffer particle_blue_channel_buffer;
+    public ComputeBuffer attracted_to_buffer;
+    public ComputeBuffer repelled_by_buffer;
 
     public RenderTexture particle_render_texture;
     public RenderTexture deposit_in;
@@ -60,10 +70,10 @@ public class ComputeHookup : MonoBehaviour
 
     private TMP_Dropdown modeDropdown;
     private TMP_Dropdown viewDropdown;
-    private float OBSERVE_MODE = 0.0f;
-    private float DRAW_DEPOSIT_MODE = 1.0f;
-    private float DRAW_DEPOSIT_EMITTERS_MODE = 2.0f;
-    private float DRAW_PARTICLES_MODE = 3.0f;
+    private float OBSERVE_MODE = 2.0f;
+    private float DRAW_DEPOSIT_MODE = 3.0f;
+    private float DRAW_DEPOSIT_EMITTERS_MODE = 1.0f;
+    private float DRAW_PARTICLES_MODE = 0.0f;
     private float PARTICLE_VIEW = 0.0f;
     private float DEPOSIT_VIEW = 1.0f;
 
@@ -91,7 +101,7 @@ public class ComputeHookup : MonoBehaviour
         int propegateKernel = propegate.FindKernel("CSMain");
 
         pixelHeight = Screen.height;
-        pixelWidth = Screen.width;//(int)(Camera.main.aspect * pixelHeight);
+        pixelWidth = Screen.width;
 
         //Debug.Log("pixelHeight " + pixelHeight);
         //Debug.Log("pixelWidth " + pixelWidth);
@@ -107,8 +117,6 @@ public class ComputeHookup : MonoBehaviour
         
         COMPUTE_GRID_HEIGHT = 256;
         COMPUTE_GRID_WIDTH = MAX_SPACE / COMPUTE_GRID_HEIGHT;
-
-        //mat.mainTextureScale = new Vector2(0.9f, 1.0f);
         mat.mainTextureOffset = new Vector2(0.0f, 0.0f);
 
         // random seeding of arrays
@@ -267,10 +275,10 @@ public class ComputeHookup : MonoBehaviour
         propegate.SetTexture(propegateKernel, "tex_deposit", depositTexture);
         propegate.SetTexture(propegateKernel, "tex_trace", tex_trace);
         propegate.SetFloat("half_sense_spread", half_sense_spread); // 15 to 30 degrees default
-        propegate.SetFloat("sense_distance", sense_distance); // in world-space units; default = about 1/100 of the world 'cube' size
+      //  propegate.SetFloat("sense_distance", sense_distance); // in world-space units; default = about 1/100 of the world 'cube' size
         propegate.SetFloat("turn_angle", turn_angle); // 15.0 is default
-        propegate.SetFloat("move_distance", move_distance);//worldHeight / 100.0f / 4.0f); //  in world-space units; default = about 1/5--1/3 of sense_distance
-        propegate.SetFloat("agent_deposit", agent_deposit); // 15.0 is default
+      //  propegate.SetFloat("move_distance", move_distance);//worldHeight / 100.0f / 4.0f); //  in world-space units; default = about 1/5--1/3 of sense_distance
+       // propegate.SetFloat("agent_deposit", agent_deposit); // 15.0 is default
         propegate.SetFloat("world_width", (float)world_width);
         propegate.SetFloat("world_height", (float)world_height);
         propegate.SetFloat("move_sense_coef", move_sense_coef); // ?
@@ -284,7 +292,9 @@ public class ComputeHookup : MonoBehaviour
     }
 
     int getNextAvailableIndex() {
-        int spaceManagement = GROUP_THEORY_SPACE_MANAGEMENT;//LINEAR_SPACE_MANAGEMENT;
+        int spaceManagement = STOCHASTIC_SPACE_MANAGEMENT;
+        //GROUP_THEORY_SPACE_MANAGEMENT;
+        //LINEAR_SPACE_MANAGEMENT;
         
         switch(spaceManagement) {
             case LINEAR_SPACE_MANAGEMENT:
@@ -297,7 +307,7 @@ public class ComputeHookup : MonoBehaviour
             case GROUP_THEORY_SPACE_MANAGEMENT:
                 available_data_index += group_theory_increment;
                 if (available_data_index >= MAX_SPACE) {
-                    Debug.Log("GROUP THEORY MAX SPACE REACHED");
+                    //Debug.Log("GROUP THEORY MAX SPACE REACHED");
                     available_data_index = available_data_index % MAX_SPACE;
                 }
                 break;
@@ -319,11 +329,7 @@ public class ComputeHookup : MonoBehaviour
         float centerX = pixelWidth - x - pixelWidth*4/19;// + (mat.mainTextureOffset.x * pixelWidth * mat.mainTextureScale.x);
         float centerY = pixelHeight - y;
         
-        if (modeDropdown.value != OBSERVE_MODE 
-            //&& nextAvailableIndex < MAX_SPACE
-            //&& nextAvailableIndex < MAX_SPACE
-            //&& (centerX < (pixelWidth /*+ mat.mainTextureOffset.x * pixelWidth*/))
-            )  {
+        if (modeDropdown.value != OBSERVE_MODE)  {
 
             //int nextAvailableIndex = getNextAvailableIndex();
 

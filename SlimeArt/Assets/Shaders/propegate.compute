@@ -10,14 +10,24 @@ RWStructuredBuffer<float> particles_x; //x positons of every particle normalized
 RWStructuredBuffer<float> particles_y; // y positions of every particle normalized
 RWStructuredBuffer<float> particles_theta; // direction of movement for every particle
 RWStructuredBuffer<float> data_types; // how strong a deposit
+RWStructuredBuffer<string> particle_id_buffer;
+RWStructuredBuffer<float> move_distance_buffer;
+RWStructuredBuffer<float> sense_distance_buffer;
+RWStructuredBuffer<float> particle_deposit_strength_buffer;
+RWStructuredBuffer<float> lifetime_buffer;
+RWStructuredBuffer<float> particle_red_channel_buffer;
+RWStructuredBuffer<float> particle_green_channel_buffer;
+RWStructuredBuffer<float> particle_blue_channel_buffer;
+//RWStructuredBuffer<float> attracted_to_buffer; TODO
+//RWStructuredBuffer<float> repelled_by_buffer; TODO
 RWTexture2D<float4> tex_deposit;
 RWTexture2D<float4> tex_trace;
 
 float half_sense_spread; // default = 15-30 degrees
-float sense_distance; // in world-space units; default = about 1/100 of the world 'cube' size
+//float sense_distance; // in world-space units; default = about 1/100 of the world 'cube' size
 float turn_angle; // default = 15 degrees
-float move_distance; // in world-space units; default = about 1/5--1/3 of sense_distance
-float agent_deposit; // 0 for data-driven fitting, >0 for self-reinforcing behavior
+//float move_distance; // in world-space units; default = about 1/5--1/3 of sense_distance
+//float agent_deposit; // 0 for data-driven fitting, >0 for self-reinforcing behavior
 float world_width; //
 float world_height; // grid dimensions - note that the particle positions are also stored in the grid coordinates, but continuous
 int world_depth; //
@@ -112,6 +122,9 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
     float y = particles_y[idx];
     float theta = particles_theta[idx];
     float data_type = data_types[idx];
+    float move_distance = move_distance_buffer[idx];
+    float sense_distance = sense_distance_buffer[idx];
+    float agent_deposit = agent_deposit_buffer[idx];
     //bool deposit_emitter_bool = data_type == DEPOSIT_EMITTER;
 
     if (data_type == PARTICLE) {
