@@ -108,16 +108,9 @@ float mod(float x, float y) {
 // THIS MIGHT BE WRONG TOO!! COMPUTE GRID STUFF 11/18/20
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID) {
-//void main(uint thread_index : SV_GroupIndex, uint3 group_id : SV_GroupID)
-    //uint group_idx = group_id.x + group_id.y * 10 + group_id.z * 100;
-    //uint idx = thread_index + 1000 * group_idx;
 
-    //THIS IS WRONG NOW!!!!!!!! 11/18/20 because compute grid isn't pixelWidth wide
     uint idx = id.x + id.y * COMPUTE_GRID_WIDTH; // not sure if this is right 7/3/20
 
-    //DEBUG
-    //particle_render_texture[id.xy] = float4(id.x/world_width, id.y/world_height, 0.0, 1.0);
-    //return;
     if (idx % 4 != 0) {
         return; // we should only do calculations when we have the first of the four indices of the buffers
     }
@@ -138,34 +131,20 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
     float blue = red_green_blue_alpha[idx + 2];
     float alpha = red_green_blue_alpha[idx + 3];
 
-    if (data_type == PARTICLE) {
-        //particle_render_texture[id.xy] = float4(1.0, 1.0, 1.0, 1.0);
-        //particle_render_texture[id.xy] = float4(0.0, 0.0, 0.0, 1.0);
-        //particle_render_texture[uint2(x_normalized * world_width,
-           // y_normalized * world_height)] = float4(1.0, 1.0, 1.0, 1.0);
-        //return;
-    }
-
     if (data_type == DEPOSIT_EMITTER) {
         tex_deposit[uint2(x_normalized * world_width, 
             y_normalized * world_height)] += float4(deposit_strength, deposit_strength, deposit_strength,1.0);// *particle_weight; // NOT ATOMIC! (not sure what particle weight is... maybe parameter?)
-        //RIGHT? particle_render_texture[id.xy] = float4(0.0, 0.0, 0.0, 1.0);
         return;
     }
 
     if (data_type == DEPOSIT) {
         tex_deposit[uint2(x, y)] += float4(deposit_strength, 0.0, 0.0, 1.0);// *particle_weight; // NOT ATOMIC! (not sure what particle weight is... maybe parameter?)
-        //RIGHT? particle_render_texture[id.xy] = float4(0.0, 0.0, 0.0, 1.0);
         x_y_theta_dataType[idx + 3] = NO_DATA; // it is temporary deposit, so erase it after
         return;
     }
 
     if (data_type == NO_DATA) {
         // no particle
-        //if (particle_render_texture[id.xy] != float4(0.0, 0.0, 0.0, 1.0)) {
-          //  particle_render_texture[id.xy] = float4(0.0, 0.0, 0.0, 1.0);
-      //  }
-        //float4(id.x / 512.0, id.y / 512.0, 0.3, 1.0);
         return;
     }
 
