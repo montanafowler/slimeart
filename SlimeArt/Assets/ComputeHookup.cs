@@ -8,7 +8,7 @@ using TMPro;
 
 public class ComputeHookup : MonoBehaviour
 { 
-    public ComputeShader propegate;
+    public ComputeShader propagate;
     public ComputeShader decay;
     public ComputeShader blank_canvas_shader;
 
@@ -84,6 +84,7 @@ public class ComputeHookup : MonoBehaviour
 
     private int available_data_index = 0;
     private int MAX_SPACE;
+    private int MAX_NUM_PARTICLES;
     private int COMPUTE_GRID_WIDTH;
     private int COMPUTE_GRID_HEIGHT;
 
@@ -93,100 +94,89 @@ public class ComputeHookup : MonoBehaviour
 
     //private readonly System.Random random = new System.Random();
     private int group_theory_increment;
+    private int propagateKernel;
 
     //public Camera camera;
     // Start is called before the first frame update
     void Start() {
-        // kernel is the propegate shader (initial spark)
-        int propegateKernel = propegate.FindKernel("CSMain");
-
+        // kernel is the propagate shader (initial spark)
+        propagateKernel = propagate.FindKernel("CSMain");
         pixelHeight = Screen.height;
         pixelWidth = Screen.width;
-
-        //Debug.Log("pixelHeight " + pixelHeight);
-        //Debug.Log("pixelWidth " + pixelWidth);
-        MAX_SPACE = pixelHeight * pixelWidth * 5;   
+        MAX_SPACE = pixelHeight * pixelWidth * 5;
+        MAX_NUMBER_OF_PARTICLES = MAX_SPACE / 4;
+        
         Debug.Log("MAX_SPACE " + MAX_SPACE);
 
-        group_theory_increment = 3;
-        while(MAX_SPACE % group_theory_increment == 0) {
-            group_theory_increment++;
-        }
-        Debug.Log("group_theory_increment " + group_theory_increment);
-        
-        
         COMPUTE_GRID_HEIGHT = 256;
         COMPUTE_GRID_WIDTH = MAX_SPACE / COMPUTE_GRID_HEIGHT;
         mat.mainTextureOffset = new Vector2(0.0f, 0.0f);
 
+        calculateGroupTheoryIncrement();
+        setupBuffers(); // sets up the buffers with their info.
+        setupUI();
+
+        blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
+        blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+
+        // dispatch the texture
+        propagate.Dispatch(propagateKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+        swap = 0; // alternating copying
+    }
+
+    void setupBuffers() {
         // random seeding of arrays
         float[] xParticlePositions = new float[MAX_SPACE];
         float[] yParticlePositions = new float[MAX_SPACE];
         float[] thetaParticles = new float[MAX_SPACE];
         float[] dataTypes = new float[MAX_SPACE];
         float[] blankCanvas = new float[MAX_SPACE];
-        int index = 0;
+        float[] moveDistanceBuffer = new float[MAX_SPACE];
+        string[] particleIdBuffer = new string[MAX_SPACE];
+        float[] senseDistanceBuffer = new float[MAX_SPACE];
+        float[] particleDepositStrengthBuffer = new float[MAX_SPACE];
+        float[] lifetimeBuffer = new float[MAX_SPACE];
+        float[] particleRedChannelBuffer = new float[MAX_SPACE];
+        float[] particleGreenChannelBuffer = new float[MAX_SPACE];
+        float[] particleBlueChannelBuffer = new float[MAX_SPACE];
+        string[] attractedToBuffer = new string[MAX_SPACE];
+        string[] repelledByBuffer = new string[MAX_SPACE];
 
-        bool firstNoData = true;
+        //x_y_theta_dataType
+        float[] moveDist_SenseDist_particleDepositStrength_lifetime = float[];
+        //red_green_blue
+        //attractedTo
+        //repelledBy
 
-        for (int i = 0; i < pixelWidth; i++) {
-            for (int j = 0; j < pixelHeight; j++) {
-                xParticlePositions[index] = Random.Range(0.0f, (float)pixelWidth);// i / (512.0f);
-                yParticlePositions[index] = Random.Range(0.0f, (float)pixelHeight);// j / (512.0f);
-                thetaParticles[index] = Random.Range(0.0f, 2.0f * PI);
-                dataTypes[index] = PARTICLE; // particle
-                blankCanvas[index] = 0.0f;
-                
-                //if (index > pixelWidth * pixelHeight /* 3*/ / 4) {
-                    if (firstNoData) {
-                        firstNoData = false;
-                        available_data_index = index;
-                    }
-                    dataTypes[index] = NO_DATA; // particle
-                //}
-                index++;
-            }
+
+        for (int i = 0; i < MAX_SPACE; i++) {
+            dataTypes[i] = NO_DATA;
         }
-        
+
         // x particle positions
-        particles_x = initializeComputeBuffer(xParticlePositions, "particles_x", propegateKernel);
+        particles_x = initializeComputeBuffer(xParticlePositions, "particles_x", propagateKernel);
 
         // y particle positions
-        particles_y = initializeComputeBuffer(yParticlePositions, "particles_y", propegateKernel);
+        particles_y = initializeComputeBuffer(yParticlePositions, "particles_y", propagateKernel);
 
         // particles theta
-        particles_theta = initializeComputeBuffer(thetaParticles, "particles_theta", propegateKernel);
+        particles_theta = initializeComputeBuffer(thetaParticles, "particles_theta", propagateKernel);
 
         // data types, like if it is deposit emitter, particle, deposit, or no data
-        data_types = initializeComputeBuffer(dataTypes, "data_types", propegateKernel);
+        data_types = initializeComputeBuffer(dataTypes, "data_types", propagateKernel);
 
         blank_canvas = initializeComputeBuffer(blankCanvas, "blank_canvas", blank_canvas_shader.FindKernel("CSMain"));
-        
-        // deposit texture for propegate shader
+
+        // deposit texture for propagate shader
         //tex_deposit = initializeRenderTexture();
-        setupVariables();
-
-        blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
-        blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
-        //mat.mainTexture = particle_render_texture;
-
-        // dispatch the texture
-        //propegate.Dispatch(propegateKernel, pixelWidth / 8, pixelHeight / 8, 1);
-       // Change MAX SPACE TO BE NUM_OF_AGENTS
-
-        propegate.Dispatch(propegateKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
-
-
-        swap = 0;
-
     }
 
-    void setupVariables() {
+    void setupUI() {
         deposit_in = initializeRenderTexture();
         deposit_out = initializeRenderTexture();
         particle_render_texture = initializeRenderTexture();
 
-        // trace texture for the propegate shader
+        // trace texture for the propagate shader
         tex_trace = initializeRenderTexture();
 
         // other variables
@@ -240,20 +230,25 @@ public class ComputeHookup : MonoBehaviour
         //viewDropdown.onValueChanged.AddListener(delegate { changeMode(viewDropdown.value); });
 
         Button playButton = GameObject.Find("PlayButton").GetComponent<Button>();
-        //Debug.Log(playButton);
-        updatePropegateShaderVariables(deposit_in);
+        updatepropagateShaderVariables(deposit_in);
     }
 
-    
+    void calculateGroupTheoryIncrement() {
+        group_theory_increment = 3;
+        while (MAX_SPACE % group_theory_increment == 0) {
+            group_theory_increment++;
+        }
+        //Debug.Log("group_theory_increment " + group_theory_increment);
+    }
 
     public void updateSliderLabel(TextMeshProUGUI label, string labelText, float value) {
         label.SetText(labelText + value.ToString());
     }
 
-    ComputeBuffer initializeComputeBuffer(float[] arr, string shaderBufferName, int propegateKernel) {
+    ComputeBuffer initializeComputeBuffer(float[] arr, string shaderBufferName, int propagateKernel) {
         ComputeBuffer computeBuffer = new ComputeBuffer(arr.Length, sizeof(float));
         computeBuffer.SetData(arr);
-        propegate.SetBuffer(propegateKernel, shaderBufferName, computeBuffer);
+        propagate.SetBuffer(propagateKernel, shaderBufferName, computeBuffer);
         return computeBuffer;
     }
 
@@ -264,38 +259,37 @@ public class ComputeHookup : MonoBehaviour
         return renderTexture;
     }
 
-    void updatePropegateShaderVariables(RenderTexture depositTexture) {
+    void updatepropagateShaderVariables(RenderTexture depositTexture) {
         sense_distance = senseDistanceSlider.value;
         move_distance = moveDistanceSlider.value;
         deposit_strength = depositStrengthSlider.value;
         agent_deposit = agentDepositStrengthSlider.value;
 
-        int propegateKernel = propegate.FindKernel("CSMain");
+        int propagateKernel = propagate.FindKernel("CSMain");
 
-        propegate.SetTexture(propegateKernel, "tex_deposit", depositTexture);
-        propegate.SetTexture(propegateKernel, "tex_trace", tex_trace);
-        propegate.SetFloat("half_sense_spread", half_sense_spread); // 15 to 30 degrees default
-      //  propegate.SetFloat("sense_distance", sense_distance); // in world-space units; default = about 1/100 of the world 'cube' size
-        propegate.SetFloat("turn_angle", turn_angle); // 15.0 is default
-      //  propegate.SetFloat("move_distance", move_distance);//worldHeight / 100.0f / 4.0f); //  in world-space units; default = about 1/5--1/3 of sense_distance
-       // propegate.SetFloat("agent_deposit", agent_deposit); // 15.0 is default
-        propegate.SetFloat("world_width", (float)world_width);
-        propegate.SetFloat("world_height", (float)world_height);
-        propegate.SetFloat("move_sense_coef", move_sense_coef); // ?
-        propegate.SetFloat("normalization_factor", normalization_factor); // ?
-        propegate.SetFloat("pixelWidth", pixelWidth);
-        propegate.SetFloat("pixelHeight", pixelHeight);
-        propegate.SetFloat("deposit_strength", deposit_strength);
-        propegate.SetTexture(propegateKernel, "particle_render_texture", particle_render_texture);
-        propegate.SetFloat("COMPUTE_GRID_WIDTH", (float)COMPUTE_GRID_WIDTH);
-        propegate.SetFloat("COMPUTE_GRID_HEIGHT", (float)COMPUTE_GRID_HEIGHT);
+        propagate.SetTexture(propagateKernel, "tex_deposit", depositTexture);
+        propagate.SetTexture(propagateKernel, "tex_trace", tex_trace);
+        propagate.SetFloat("half_sense_spread", half_sense_spread); // 15 to 30 degrees default
+      //  propagate.SetFloat("sense_distance", sense_distance); // in world-space units; default = about 1/100 of the world 'cube' size
+        propagate.SetFloat("turn_angle", turn_angle); // 15.0 is default
+      //  propagate.SetFloat("move_distance", move_distance);//worldHeight / 100.0f / 4.0f); //  in world-space units; default = about 1/5--1/3 of sense_distance
+       // propagate.SetFloat("agent_deposit", agent_deposit); // 15.0 is default
+        propagate.SetFloat("world_width", (float)world_width);
+        propagate.SetFloat("world_height", (float)world_height);
+        propagate.SetFloat("move_sense_coef", move_sense_coef); // ?
+        propagate.SetFloat("normalization_factor", normalization_factor); // ?
+        propagate.SetFloat("pixelWidth", pixelWidth);
+        propagate.SetFloat("pixelHeight", pixelHeight);
+        propagate.SetFloat("deposit_strength", deposit_strength);
+        propagate.SetTexture(propagateKernel, "particle_render_texture", particle_render_texture);
+        propagate.SetFloat("COMPUTE_GRID_WIDTH", (float)COMPUTE_GRID_WIDTH);
+        propagate.SetFloat("COMPUTE_GRID_HEIGHT", (float)COMPUTE_GRID_HEIGHT);
     }
 
     int getNextAvailableIndex() {
         int spaceManagement = STOCHASTIC_SPACE_MANAGEMENT;
         //GROUP_THEORY_SPACE_MANAGEMENT;
         //LINEAR_SPACE_MANAGEMENT;
-        
         switch(spaceManagement) {
             case LINEAR_SPACE_MANAGEMENT:
                 available_data_index++;
@@ -307,7 +301,6 @@ public class ComputeHookup : MonoBehaviour
             case GROUP_THEORY_SPACE_MANAGEMENT:
                 available_data_index += group_theory_increment;
                 if (available_data_index >= MAX_SPACE) {
-                    //Debug.Log("GROUP THEORY MAX SPACE REACHED");
                     available_data_index = available_data_index % MAX_SPACE;
                 }
                 break;
@@ -316,34 +309,24 @@ public class ComputeHookup : MonoBehaviour
                 available_data_index = Random.Range(0, MAX_SPACE);
                 break;
         }
-        
-        // in order indexing with wrap:
-        
         return available_data_index;
     }
 
     void draw(float x, float y) {
-        //mat.mainTextureOffset = ;
-        Debug.Log("material width");
         // TODODODODODODOD GET THE OFFSET RIGHT, somehow the width of the UI cube
         float centerX = pixelWidth - x - pixelWidth*4/19;// + (mat.mainTextureOffset.x * pixelWidth * mat.mainTextureScale.x);
         float centerY = pixelHeight - y;
         
         if (modeDropdown.value != OBSERVE_MODE)  {
 
-            //int nextAvailableIndex = getNextAvailableIndex();
-
             float[] particlesX = new float[MAX_SPACE]; 
             float[] particlesY = new float[MAX_SPACE]; 
-            //float[] particlesTheta = new float[MAX_SPACE];
-            float[] dataTypes = new float[MAX_SPACE]; 
+            float[] dataTypes = new float[MAX_SPACE];
+            float[] moveDistanceBuffer = new float[MAX_SPACE];
             particles_x.GetData(particlesX);
             particles_y.GetData(particlesY);
             data_types.GetData(dataTypes);
-            //particles_theta.GetData(particlesTheta);
 
-            //float centerX = pixelWidth - x - (mat.mainTextureOffset.x * pixelWidth);
-            //float centerY = pixelHeight - y;
             float newX, newY;
             brush_size = (brushSizeSlider.value + 1)/2;
             for (int dx = (int)-brush_size; dx < (int)brush_size; dx++) {
@@ -351,54 +334,36 @@ public class ComputeHookup : MonoBehaviour
                     newX = centerX + dx;
                     newY = centerY + dy;
 
-                    //if (nextAvailableIndex >= MAX_SPACE) {
-                      //  Debug.Log("MAX SPACE REACHED");
-                        //break;
-                    //}
-
                     if ((newX-centerX)*(newX-centerX) 
                         + (newY-centerY)*(newY-centerY) < brush_size*brush_size) {
                         int nextAvailableIndex = getNextAvailableIndex();
                         particlesX[nextAvailableIndex] = centerX + dx;
                         particlesY[nextAvailableIndex] = centerY + dy;
-                        if (modeDropdown.value == DRAW_DEPOSIT_MODE)
-                        {
+                        if (modeDropdown.value == DRAW_DEPOSIT_MODE) {
                             // draw temporary deposit that dissolves
                             dataTypes[nextAvailableIndex] = DEPOSIT;
-                        }
-                        else if (modeDropdown.value == DRAW_DEPOSIT_EMITTERS_MODE)
-                        {
+                        } else if (modeDropdown.value == DRAW_DEPOSIT_EMITTERS_MODE) {
                             // draw deposit emitters that continuously emit deposit
                             dataTypes[nextAvailableIndex] = DEPOSIT_EMITTER;
-                        }
-                        else if (modeDropdown.value == DRAW_PARTICLES_MODE)
-                        {
+                        } else if (modeDropdown.value == DRAW_PARTICLES_MODE) {
                             // draw particles
                             dataTypes[nextAvailableIndex] = PARTICLE;
                         }
                     }
                     
                 }
-                /*if (nextAvailableIndex >= MAX_SPACE) {
-                    Debug.Log("MAX SPACE REACHED");
-                    break;
-                }*/
             }
  
-            //particlesX[available_data_index] = pixelWidth - x;
-            //particlesY[available_data_index] = pixelHeight - y;
-
-            
-            int propegateKernel = propegate.FindKernel("CSMain");
+            int propagateKernel = propagate.FindKernel("CSMain");
 
             // x particle positions
-            particles_x = initializeComputeBuffer(particlesX, "particles_x", propegateKernel);
+            particles_x = initializeComputeBuffer(particlesX, "particles_x", propagateKernel);
 
             // y particle positions
-            particles_y = initializeComputeBuffer(particlesY, "particles_y", propegateKernel);
+            particles_y = initializeComputeBuffer(particlesY, "particles_y", propagateKernel);
 
             // data types, like if it is deposit emitter, particle, deposit, or no data
-            data_types = initializeComputeBuffer(dataTypes, "data_types", propegateKernel);
+            data_types = initializeComputeBuffer(dataTypes, "data_types", propagateKernel);
         }
     }
 
@@ -410,7 +375,7 @@ public class ComputeHookup : MonoBehaviour
         }
 
         int decayKernel = decay.FindKernel("CSMain");
-        int propegateKernel = propegate.FindKernel("CSMain");
+        int propagateKernel = propagate.FindKernel("CSMain");
         int intPixWidth = (int)pixelWidth;
         int intPixHeight = (int)pixelHeight;
         decay.SetInt("pixelWidth", (int)pixelWidth);
@@ -419,19 +384,19 @@ public class ComputeHookup : MonoBehaviour
         if (swap == 0) {
             decay.SetTexture(decayKernel, "deposit_in", deposit_in);
             decay.SetTexture(decayKernel, "deposit_out", deposit_out);
-            updatePropegateShaderVariables(deposit_out);
+            updatepropagateShaderVariables(deposit_out);
             swap = 1;
         } else {
             decay.SetTexture(decayKernel, "deposit_in", deposit_out);
             decay.SetTexture(decayKernel, "deposit_out", deposit_in);
-            updatePropegateShaderVariables(deposit_in);
+            updatepropagateShaderVariables(deposit_in);
             swap = 0;
         }
         //blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
         blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
 
         decay.Dispatch(decayKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
-        propegate.Dispatch(propegateKernel,COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+        propagate.Dispatch(propagateKernel,COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
 
         if (viewDropdown.value == DEPOSIT_VIEW) {
             if (swap == 0) {
@@ -446,9 +411,6 @@ public class ComputeHookup : MonoBehaviour
         }
 
         if (Input.GetMouseButton(0)) {
-            //Debug.Log("mouse button down " + Input.mousePosition);
-            //Debug.Log("Screen Width : " + Screen.width);
-            //Debug.Log("Screen Height : " + Screen.height);
             draw(Input.mousePosition.x, Input.mousePosition.y);   
         }
     }

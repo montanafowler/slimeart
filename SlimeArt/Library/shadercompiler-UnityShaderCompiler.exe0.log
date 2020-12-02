@@ -1,7 +1,0 @@
-Base path: 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data', plugins path 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data/PlaybackEngines'
-Cmd: initializeCompiler
-Cmd: preprocessCompute
-  insize=10226 outsize=10228 ok=1
-Cmd: compileComputeKernel
-  error: 2 plat 4 at propegate.compute(13): object element type cannot be an object type
-  api=4 insize=10228 outsize=0 ok=0
