@@ -6,12 +6,15 @@
 // with cs.SetTexture
 RWTexture2D<float4> particle_render_texture;
 
-RWStructuredBuffer<float> particles_x; //x positons of every particle normalized
-RWStructuredBuffer<float> particles_y; // y positions of every particle normalized
-RWStructuredBuffer<float> particles_theta; // direction of movement for every particle
-RWStructuredBuffer<float> data_types; // how strong a deposit
+//RWStructuredBuffer<float> particles_x; //x positons of every particle normalized
+//RWStructuredBuffer<float> particles_y; // y positions of every particle normalized
+//RWStructuredBuffer<float> particles_theta; // direction of movement for every particle
+//RWStructuredBuffer<float> data_types; // how strong a deposit
+RWStructuredBuffer<float> x_y_theta_dataType;
+RWStructuredBuffer<float> moveDist_SenseDist_particleDepositStrength_lifetime;
+RWStructuredBuffer<float> red_green_blue_alpha;
 //RWStructuredBuffer<string> particle_id_buffer;
-RWStructuredBuffer<float4> moveDist_SenseDist_particleDepositStrength_lifetime;
+//RWStructuredBuffer<float4> moveDist_SenseDist_particleDepositStrength_lifetime;
 //RWTexture2D<float4> moveDist_SenseDist_particleDepositStrength_lifetime;
 //RWStructuredBuffer<float> sense_distance_buffer;
 //RWStructuredBuffer<float> particle_deposit_strength_buffer;
@@ -115,18 +118,25 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
     //DEBUG
     //particle_render_texture[id.xy] = float4(id.x/world_width, id.y/world_height, 0.0, 1.0);
     //return;
+    if (idx % 4 != 0) {
+        return; // we should only do calculations when we have the first of the four indices of the buffers
+    }
 
     // Fetch current particle state
-    float x_normalized = particles_x[idx]/world_width;// *pixelWidth;
-    float y_normalized = particles_y[idx]/world_height;// *pixelHeight;
-    float x = particles_x[idx];
-    float y = particles_y[idx];
-    float theta = particles_theta[idx];
-    float data_type = data_types[idx];
-    float move_distance = move_distance_buffer[idx];
-    float sense_distance = sense_distance_buffer[idx];
-    float agent_deposit = particle_deposit_strength_buffer[idx];
-    //bool deposit_emitter_bool = data_type == DEPOSIT_EMITTER;
+    float x_normalized = x_y_theta_dataType[idx] / world_width;//particles_x[idx]/world_width;// *pixelWidth;
+    float y_normalized = x_y_theta_dataType[idx + 1] / world_height;//particles_y[idx]/world_height;// *pixelHeight;
+    float x = x_y_theta_dataType[idx]; //particles_x[idx];
+    float y = x_y_theta_dataType[idx + 1];// particles_y[idx];
+    float theta = x_y_theta_dataType[idx + 2];//particles_theta[idx];
+    float data_type = x_y_theta_dataType[idx + 3];//data_types[idx];
+    float move_distance = moveDist_SenseDist_particleDepositStrength_lifetime[idx];//move_distance_buffer[idx];
+    float sense_distance = moveDist_SenseDist_particleDepositStrength_lifetime[idx + 1];//sense_distance_buffer[idx];
+    float agent_deposit = moveDist_SenseDist_particleDepositStrength_lifetime[idx + 2]; //particle_deposit_strength_buffer[idx];
+    float lifetime = moveDist_SenseDist_particleDepositStrength_lifetime[idx + 3];
+    float red = red_green_blue_alpha[idx];
+    float green = red_green_blue_alpha[idx + 1];
+    float blue = red_green_blue_alpha[idx + 2];
+    float alpha = red_green_blue_alpha[idx + 3];
 
     if (data_type == PARTICLE) {
         //particle_render_texture[id.xy] = float4(1.0, 1.0, 1.0, 1.0);

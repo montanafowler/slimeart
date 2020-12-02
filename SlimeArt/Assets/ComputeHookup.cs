@@ -29,6 +29,10 @@ public class ComputeHookup : MonoBehaviour
     public ComputeBuffer attracted_to_buffer;
     public ComputeBuffer repelled_by_buffer;
 
+    public ComputeBuffer x_y_theta_dataType_buffer;
+    public ComputeBuffer moveDist_SenseDist_particleDepositStrength_lifetime_buffer;
+    public ComputeBuffer red_green_blue_alpha_buffer;
+
     public RenderTexture particle_render_texture;
     public RenderTexture deposit_in;
     public RenderTexture deposit_out;
@@ -94,6 +98,7 @@ public class ComputeHookup : MonoBehaviour
 
     //private readonly System.Random random = new System.Random();
     private int group_theory_increment;
+    private int group_theory_index = 0;
     private int propagateKernel;
 
     //public Camera camera;
@@ -104,7 +109,7 @@ public class ComputeHookup : MonoBehaviour
         pixelHeight = Screen.height;
         pixelWidth = Screen.width;
         MAX_SPACE = pixelHeight * pixelWidth * 5;
-        MAX_NUMBER_OF_PARTICLES = MAX_SPACE / 4;
+        MAX_NUM_PARTICLES = MAX_SPACE / 4;
         
         Debug.Log("MAX_SPACE " + MAX_SPACE);
 
@@ -142,28 +147,33 @@ public class ComputeHookup : MonoBehaviour
         string[] attractedToBuffer = new string[MAX_SPACE];
         string[] repelledByBuffer = new string[MAX_SPACE];
 
-        //x_y_theta_dataType
-        float[] moveDist_SenseDist_particleDepositStrength_lifetime = float[];
-        //red_green_blue
+        float[] x_y_theta_dataType_array = new float[MAX_SPACE];
+        float[] moveDist_SenseDist_particleDepositStrength_lifetime_array = new float[MAX_SPACE];
+        float[] red_green_blue_alpha_array = new float[MAX_SPACE];
         //attractedTo
         //repelledBy
 
-
-        for (int i = 0; i < MAX_SPACE; i++) {
-            dataTypes[i] = NO_DATA;
-        }
-
         // x particle positions
-        particles_x = initializeComputeBuffer(xParticlePositions, "particles_x", propagateKernel);
+        //particles_x = initializeComputeBuffer(xParticlePositions, "particles_x", propagateKernel);
 
         // y particle positions
-        particles_y = initializeComputeBuffer(yParticlePositions, "particles_y", propagateKernel);
+        //particles_y = initializeComputeBuffer(yParticlePositions, "particles_y", propagateKernel);
 
         // particles theta
-        particles_theta = initializeComputeBuffer(thetaParticles, "particles_theta", propagateKernel);
+        //particles_theta = initializeComputeBuffer(thetaParticles, "particles_theta", propagateKernel);
 
         // data types, like if it is deposit emitter, particle, deposit, or no data
-        data_types = initializeComputeBuffer(dataTypes, "data_types", propagateKernel);
+        //data_types = initializeComputeBuffer(dataTypes, "data_types", propagateKernel);
+
+        //x,y,theta,data
+        x_y_theta_dataType_buffer = initializeComputeBuffer(x_y_theta_dataType_array, "x_y_theta_dataType", propagateKernel);
+
+        //moveDist,senseDist,particleDepositStrength,lifetime
+        moveDist_SenseDist_particleDepositStrength_lifetime_buffer = initializeComputeBuffer(moveDist_SenseDist_particleDepositStrength_lifetime_array, 
+            "moveDist_SenseDist_particleDepositStrength_lifetime", propagateKernel);
+
+        //red,green,blue,alpha
+        red_green_blue_alpha_buffer = initializeComputeBuffer(red_green_blue_alpha_array, "red_green_blue_alpha", propagateKernel);
 
         blank_canvas = initializeComputeBuffer(blankCanvas, "blank_canvas", blank_canvas_shader.FindKernel("CSMain"));
 
@@ -288,25 +298,26 @@ public class ComputeHookup : MonoBehaviour
 
     int getNextAvailableIndex() {
         int spaceManagement = STOCHASTIC_SPACE_MANAGEMENT;
-        //GROUP_THEORY_SPACE_MANAGEMENT;
+        //GROUP_THEORY_SPACE_MANAGEMENT; UNAVAILABLE RN....
         //LINEAR_SPACE_MANAGEMENT;
         switch(spaceManagement) {
             case LINEAR_SPACE_MANAGEMENT:
-                available_data_index++;
+                available_data_index += 4;
                 if (available_data_index >= MAX_SPACE) {
                     Debug.Log("LINEAR MAX SPACE REACHED");
                     available_data_index = 0;
                 }
                 break;
             case GROUP_THEORY_SPACE_MANAGEMENT:
-                available_data_index += group_theory_increment;
-                if (available_data_index >= MAX_SPACE) {
-                    available_data_index = available_data_index % MAX_SPACE;
+                group_theory_index += group_theory_increment;
+                if (group_theory_index >= MAX_NUM_PARTICLES) {
+                    group_theory_index = group_theory_index % MAX_NUM_PARTICLES;
+                    available_data_index = group_theory_index * 4;
                 }
                 break;
             case STOCHASTIC_SPACE_MANAGEMENT:
             default:
-                available_data_index = Random.Range(0, MAX_SPACE);
+                available_data_index = Random.Range(0, MAX_NUM_PARTICLES) * 4;
                 break;
         }
         return available_data_index;
@@ -319,13 +330,12 @@ public class ComputeHookup : MonoBehaviour
         
         if (modeDropdown.value != OBSERVE_MODE)  {
 
-            float[] particlesX = new float[MAX_SPACE]; 
-            float[] particlesY = new float[MAX_SPACE]; 
-            float[] dataTypes = new float[MAX_SPACE];
-            float[] moveDistanceBuffer = new float[MAX_SPACE];
-            particles_x.GetData(particlesX);
-            particles_y.GetData(particlesY);
-            data_types.GetData(dataTypes);
+            float[] x_y_theta_dataType_array = new float[MAX_SPACE];
+            float[] moveDist_SenseDist_particleDepositStrength_lifetime_array = new float[MAX_SPACE];
+            float[] red_green_blue_alpha_array = new float[MAX_SPACE];
+            x_y_theta_dataType_buffer.GetData(x_y_theta_dataType_array);
+            moveDist_SenseDist_particleDepositStrength_lifetime_buffer.GetData(moveDist_SenseDist_particleDepositStrength_lifetime_array);
+            red_green_blue_alpha_buffer.GetData(red_green_blue_alpha_array);
 
             float newX, newY;
             brush_size = (brushSizeSlider.value + 1)/2;
