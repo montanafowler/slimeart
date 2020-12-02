@@ -254,9 +254,25 @@ public class ComputeHookup : MonoBehaviour
         brushDensitySlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushDensitySliderText, "brush density: ", brushDensitySlider.value); });
         updateSliderLabel(brushDensitySliderText, "brush density: ", brushDensitySlider.value);
 
-        brushSizeSliderText = GameObject.Find("BrushSizeSliderText").GetComponent<TextMeshProUGUI>();
-        brushSizeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushSizeSliderText, "brush size: ", brushSizeSlider.value); });
-        updateSliderLabel(brushSizeSliderText, "brush size: ", agentDepositStrengthSlider.value);
+        lifetimeSliderText = GameObject.Find("ParticleLifetimeSliderText").GetComponent<TextMeshProUGUI>();
+        lifetimeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value); });
+        updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value);
+
+        particleRedChannelSliderText = GameObject.Find("ParticleRedChannelSliderText").GetComponent<TextMeshProUGUI>();
+        particleRedChannelSlider.onValueChanged.AddListener(delegate { updateSliderLabel(particleRedChannelSliderText, "Particle Red Channel: ", particleRedChannelSlider.value); });
+        updateSliderLabel(particleRedChannelSliderText, "Particle Red Channel: ", particleRedChannelSlider.value);
+
+        particleGreenChannelSliderText = GameObject.Find("ParticleGreenChannelSliderText").GetComponent<TextMeshProUGUI>();
+        particleGreenChannelSlider.onValueChanged.AddListener(delegate { updateSliderLabel(particleGreenChannelSliderText, "Particle Green Channel: ", particleGreenChannelSlider.value); });
+        updateSliderLabel(particleGreenChannelSliderText, "Particle Green Channel: ", particleGreenChannelSlider.value);
+
+        particleBlueChannelSliderText = GameObject.Find("ParticleBlueChannelSliderText").GetComponent<TextMeshProUGUI>();
+        particleBlueChannelSlider.onValueChanged.AddListener(delegate { updateSliderLabel(particleBlueChannelSliderText, "Particle Blue Channel: ", particleBlueChannelSlider.value); });
+        updateSliderLabel(particleBlueChannelSliderText, "Particle Blue Channel: ", particleBlueChannelSlider.value);
+
+        particleAlphaChannelSliderText = GameObject.Find("ParticleAlphaChannelSliderText").GetComponent<TextMeshProUGUI>();
+        particleAlphaChannelSlider.onValueChanged.AddListener(delegate { updateSliderLabel(particleAlphaChannelSliderText, "Particle Alpha Channel: ", particleAlphaChannelSlider.value); });
+        updateSliderLabel(particleAlphaChannelSliderText, "Particle Alpha Channel: ", particleAlphaChannelSlider.value);
 
 
         modeDropdown = GameObject.Find("ModeDropdown").GetComponent<TMP_Dropdown>();
@@ -373,6 +389,7 @@ public class ComputeHookup : MonoBehaviour
                     if ((newX-centerX)*(newX-centerX) 
                         + (newY-centerY)*(newY-centerY) < brush_size*brush_size) {
                         int nextAvailableIndex = getNextAvailableIndex();
+                        if(nextAvailableIndex + 3 >= MAX_SPACE) { continue; } // make sure we don't go out of bounds
                         x_y_theta_dataType_array[nextAvailableIndex] = centerX + dx; //X
                         x_y_theta_dataType_array[nextAvailableIndex + 1] = centerY + dy; //Y
                         x_y_theta_dataType_array[nextAvailableIndex + 2] = Random.Range(-PI, PI); //random Theta
@@ -380,7 +397,12 @@ public class ComputeHookup : MonoBehaviour
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex] = moveDistanceSlider.value;
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 1] = senseDistanceSlider.value;
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 2] = agentDepositStrengthSlider.value;
-                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 3] = ;
+                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 3] = lifetimeSlider.value;
+
+                        red_green_blue_alpha_array[nextAvailableIndex] = particleRedChannelSlider.value;
+                        red_green_blue_alpha_array[nextAvailableIndex + 1] = particleGreenChannelSlider.value;
+                        red_green_blue_alpha_array[nextAvailableIndex + 2] = particleBlueChannelSlider.value;
+                        red_green_blue_alpha_array[nextAvailableIndex + 3] = particleAlphaChannelSlider.value;
 
                         if (modeDropdown.value == DRAW_DEPOSIT_MODE) {
                             // draw temporary deposit that dissolves
@@ -399,14 +421,16 @@ public class ComputeHookup : MonoBehaviour
  
             int propagateKernel = propagate.FindKernel("CSMain");
 
-            // x particle positions
-            particles_x = initializeComputeBuffer(particlesX, "particles_x", propagateKernel);
+            //x,y,theta,data
+            x_y_theta_dataType_buffer = initializeComputeBuffer(x_y_theta_dataType_array, "x_y_theta_dataType", propagateKernel);
 
-            // y particle positions
-            particles_y = initializeComputeBuffer(particlesY, "particles_y", propagateKernel);
+            //moveDist,senseDist,particleDepositStrength,lifetime
+            moveDist_SenseDist_particleDepositStrength_lifetime_buffer = initializeComputeBuffer(moveDist_SenseDist_particleDepositStrength_lifetime_array,
+                "moveDist_SenseDist_particleDepositStrength_lifetime", propagateKernel);
 
-            // data types, like if it is deposit emitter, particle, deposit, or no data
-            data_types = initializeComputeBuffer(dataTypes, "data_types", propagateKernel);
+            //red,green,blue,alpha
+            red_green_blue_alpha_buffer = initializeComputeBuffer(red_green_blue_alpha_array, "red_green_blue_alpha", propagateKernel);
+
         }
     }
 

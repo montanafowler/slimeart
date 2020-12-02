@@ -149,14 +149,14 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
     if (data_type == DEPOSIT_EMITTER) {
         tex_deposit[uint2(x_normalized * world_width, 
             y_normalized * world_height)] += float4(deposit_strength, deposit_strength, deposit_strength,1.0);// *particle_weight; // NOT ATOMIC! (not sure what particle weight is... maybe parameter?)
-        particle_render_texture[id.xy] = float4(0.0, 0.0, 0.0, 1.0);
+        //RIGHT? particle_render_texture[id.xy] = float4(0.0, 0.0, 0.0, 1.0);
         return;
     }
 
     if (data_type == DEPOSIT) {
         tex_deposit[uint2(x, y)] += float4(deposit_strength, 0.0, 0.0, 1.0);// *particle_weight; // NOT ATOMIC! (not sure what particle weight is... maybe parameter?)
-        particle_render_texture[id.xy] = float4(0.0, 0.0, 0.0, 1.0);
-        data_types[idx] = NO_DATA; // it is temporary deposit, so erase it after
+        //RIGHT? particle_render_texture[id.xy] = float4(0.0, 0.0, 0.0, 1.0);
+        x_y_theta_dataType[idx + 3] = NO_DATA; // it is temporary deposit, so erase it after
         return;
     }
 
@@ -229,10 +229,18 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
     y = fmod(y, world_height);
     
     // Update particle state
-    particles_x[idx] = x;
-    particles_y[idx] = y;
-    particles_theta[idx] = theta;
-    data_types[idx] = data_type;
+    x_y_theta_dataType[idx] = x; //particles_x[idx];
+    x_y_theta_dataType[idx + 1] = y;// particles_y[idx];
+    x_y_theta_dataType[idx + 2] = theta;//particles_theta[idx];
+    x_y_theta_dataType[idx + 3] = data_type;//data_types[idx];
+    moveDist_SenseDist_particleDepositStrength_lifetime[idx] = move_distance;//move_distance_buffer[idx];
+    moveDist_SenseDist_particleDepositStrength_lifetime[idx + 1] = sense_distance;//sense_distance_buffer[idx];
+    moveDist_SenseDist_particleDepositStrength_lifetime[idx + 2] = agent_deposit; //particle_deposit_strength_buffer[idx];
+    moveDist_SenseDist_particleDepositStrength_lifetime[idx + 3] = lifetime;
+    red_green_blue_alpha[idx] = red;
+    red_green_blue_alpha[idx + 1] = green;
+    red_green_blue_alpha[idx + 2] = blue;
+    red_green_blue_alpha[idx + 3] = alpha;
 
     // Update deposit and trace grids
     tex_deposit[uint2(x, y)] += float4(agent_deposit, 0.0, 0.0, 1.0); // NOT ATOMIC! // the trace is not blurred, trace is not food, but agents also leave deposit
@@ -242,6 +250,6 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
 
     //particle_render_texture[id.xy] = float4(0.0, 1.0, 0.0, 1.0);//float4(id.x / 512.0, id.y / 512.0, 0.3, 1.0);
     particle_render_texture[uint2(x_normalized * world_width,
-        y_normalized * world_height)] = float4(1.0, 1.0, 1.0, 1.0);//float4(x / 512.0, y / 512.0, 0.8, 1.0);
+        y_normalized * world_height)] = float4(red, green, blue, alpha);//float4(x / 512.0, y / 512.0, 0.8, 1.0);
 
 }
