@@ -1,0 +1,14 @@
+Base path: 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data', plugins path 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data/PlaybackEngines'
+Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=11056 outsize=11058 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at propegate.compute(101): implicit truncation of vector type
+  error: 2 plat 4 at propegate.compute(166): 'cos': no matching 1 parameter intrinsic function; Possible intrinsic functions are: cos(float|half|min10float|min16float)
+  error: 2 plat 4 at propegate.compute(166): undeclared identifier 'theta'
+  api=4 insize=11058 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=10948 outsize=10950 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at propegate.compute(101): implicit truncation of vector type
+  api=4 insize=10950 outsize=5975 ok=1

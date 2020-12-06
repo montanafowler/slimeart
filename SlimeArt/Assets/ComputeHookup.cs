@@ -92,6 +92,7 @@ public class ComputeHookup : MonoBehaviour
     private float DRAW_PARTICLES_MODE = 0.0f;
     private float PARTICLE_VIEW = 0.0f;
     private float DEPOSIT_VIEW = 1.0f;
+    private float TRACE_VIEW = 2.0f;
 
     private float PARTICLE = 1.0f;
     private float DEPOSIT_EMITTER = 2.0f;
@@ -475,6 +476,10 @@ public class ComputeHookup : MonoBehaviour
         
         if (viewDropdown.value == PARTICLE_VIEW) {
             mat.mainTexture = particle_render_texture;
+        }
+
+        if (viewDropdown.value == TRACE_VIEW) {
+            mat.mainTexture = tex_trace;
         }
 
         if (Input.GetMouseButton(0)) {

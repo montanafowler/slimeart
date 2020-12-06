@@ -224,7 +224,7 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
     // Update deposit and trace grids
     tex_deposit[uint2(x, y)] += float4(agent_deposit, 0.0, 0.0, 1.0); // NOT ATOMIC! // the trace is not blurred, trace is not food, but agents also leave deposit
     tex_trace[uint2(x, y)] += float4(distance_scaling_factor, abs(center_axis.x), abs(center_axis.y), 1.0); // NOT ATOMIC!
-    float4(distance_scaling_factor/*actualtrace*/, abs(center_axis.x), abs(center_axis.y), abs(center_axis.z)/*direction of agents*/); // NOT ATOMIC!
+   //float4(distance_scaling_factor/*actualtrace*/, abs(center_axis.x), abs(center_axis.y), abs(center_axis.z)/*direction of agents*/); // NOT ATOMIC!
 
 
     //particle_render_texture[id.xy] = float4(0.0, 1.0, 0.0, 1.0);//float4(id.x / 512.0, id.y / 512.0, 0.3, 1.0);
