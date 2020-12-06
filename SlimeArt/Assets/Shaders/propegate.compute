@@ -25,7 +25,7 @@ RWStructuredBuffer<float> red_green_blue_alpha;
 //RWStructuredBuffer<string> attracted_to_buffer; TODO
 //RWStructuredBuffer<string> repelled_by_buffer; TODO
 RWTexture2D<float4> tex_deposit;
-//RWTexture2D<float4> tex_trace;
+RWTexture2D<float4> tex_trace;
 
 float half_sense_spread; // default = 15-30 degrees
 //float sense_distance; // in world-space units; default = about 1/100 of the world 'cube' size
@@ -53,18 +53,18 @@ float COMPUTE_GRID_HEIGHT;
 #define NO_DATA 0.0
 
 struct RNG {
-    #define BAD_W 0x464fffffU
-    #define BAD_Z 0x9068ffffU
+#define BAD_W 0x464fffffU
+#define BAD_Z 0x9068ffffU
     uint m_w;
-	uint m_z;
+    uint m_z;
 
     void set_seed(uint seed1, uint seed2)
-	{
-		m_w = seed1;
-		m_z = seed2;
-		if (m_w == 0U || m_w == BAD_W) ++m_w;
-		if (m_w == 0U || m_z == BAD_Z) ++m_z;
-	}
+    {
+        m_w = seed1;
+        m_z = seed2;
+        if (m_w == 0U || m_w == BAD_W) ++m_w;
+        if (m_w == 0U || m_z == BAD_Z) ++m_z;
+    }
 
     void get_seed(out uint seed1, out uint seed2)
     {
@@ -73,16 +73,16 @@ struct RNG {
     }
 
     uint random_uint()
-	{
-		m_z = 36969U * (m_z & 65535U) + (m_z >> 16U);
-		m_w = 18000U * (m_w & 65535U) + (m_w >> 16U);
-		return uint((m_z << 16U) + m_w);
-	}
+    {
+        m_z = 36969U * (m_z & 65535U) + (m_z >> 16U);
+        m_w = 18000U * (m_w & 65535U) + (m_w >> 16U);
+        return uint((m_z << 16U) + m_w);
+    }
 
     float random_float()
-	{
-		return float(random_uint()) / float(0xFFFFFFFFU);
-	}
+    {
+        return float(random_uint()) / float(0xFFFFFFFFU);
+    }
 };
 
 uint wang_hash(uint seed)
@@ -96,7 +96,7 @@ uint wang_hash(uint seed)
 }
 
 float2 rotate(float2 v, float2 a, float angle) {
-    float3 particle_render_texture = float3(0.0,0.0,0.0);//cos(angle) * v + sin(angle) * (cross(a, v)) + dot(a, v) * (1.0 - cos(angle)) * a;
+    float3 particle_render_texture = float3(0.0, 0.0, 0.0);//cos(angle) * v + sin(angle) * (cross(a, v)) + dot(a, v) * (1.0 - cos(angle)) * a;
   //  float2 result = float2(cos(angle) * )
     return particle_render_texture;
 }
@@ -106,8 +106,8 @@ float mod(float x, float y) {
 }
 
 // THIS MIGHT BE WRONG TOO!! COMPUTE GRID STUFF 11/18/20
-[numthreads(8,8,1)]
-void CSMain (uint3 id : SV_DispatchThreadID) {
+[numthreads(8, 8, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID) {
 
     uint idx = id.x + id.y * COMPUTE_GRID_WIDTH; // not sure if this is right 7/3/20
 
@@ -132,8 +132,8 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
     float alpha = red_green_blue_alpha[idx + 3];
 
     if (data_type == DEPOSIT_EMITTER) {
-        tex_deposit[uint2(x_normalized * world_width, 
-            y_normalized * world_height)] += float4(deposit_strength, deposit_strength, deposit_strength,1.0);// *particle_weight; // NOT ATOMIC! (not sure what particle weight is... maybe parameter?)
+        tex_deposit[uint2(x_normalized * world_width,
+            y_normalized * world_height)] += float4(deposit_strength, deposit_strength, deposit_strength, 1.0);// *particle_weight; // NOT ATOMIC! (not sure what particle weight is... maybe parameter?)
         return;
     }
 
@@ -202,11 +202,11 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
     float2 dp = float2(cos(theta), sin(theta)) * move_distance * (0.1 + 0.9 * distance_scaling_factor);
     x += dp.x;
     y += dp.y;
-    
+
     // Keep the particle inside environment
     x = fmod(x, world_width); // problem 7/28
     y = fmod(y, world_height);
-    
+
     // Update particle state
     x_y_theta_dataType[idx] = x; //particles_x[idx];
     x_y_theta_dataType[idx + 1] = y;// particles_y[idx];
@@ -223,8 +223,8 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
 
     // Update deposit and trace grids
     tex_deposit[uint2(x, y)] += float4(agent_deposit, 0.0, 0.0, 1.0); // NOT ATOMIC! // the trace is not blurred, trace is not food, but agents also leave deposit
-    //tex_trace[uint2(x, y)] += float4(distance_scaling_factor, abs(center_axis.x), abs(center_axis.y), 1.0); // NOT ATOMIC!
-    //float4(distance_scaling_factor/*actualtrace, abs(center_axis.x), abs(center_axis.y), abs(center_axis.z)/*direction of agents); // NOT ATOMIC!
+    tex_trace[uint2(x, y)] += float4(distance_scaling_factor, abs(center_axis.x), abs(center_axis.y), 1.0); // NOT ATOMIC!
+    float4(distance_scaling_factor/*actualtrace*/, abs(center_axis.x), abs(center_axis.y), abs(center_axis.z)/*direction of agents*/); // NOT ATOMIC!
 
 
     //particle_render_texture[id.xy] = float4(0.0, 1.0, 0.0, 1.0);//float4(id.x / 512.0, id.y / 512.0, 0.3, 1.0);
