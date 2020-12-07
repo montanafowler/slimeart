@@ -5,6 +5,7 @@
 // with cs.SetTexture
 RWTexture2D<float4> deposit_in;
 RWTexture2D<float4> deposit_out;
+RWTexture2D<float4> tex_trace;
 int pixelWidth;
 int pixelHeight;
 
@@ -32,10 +33,10 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     v /= w;
 
     // Decay the deposit by a constant factor
-    v *= 0.9;
+    v *= 0.95;
     deposit_out[p] = v;//deposit_in[p];
 
     // Decay the trace a little
-    //tex_trace[p] *= 0.995;
+    tex_trace[p] *= 0.995;
 
 }

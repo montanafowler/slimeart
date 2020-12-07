@@ -12,3 +12,8 @@ Cmd: preprocessCompute
 Cmd: compileComputeKernel
   error: 1 plat 4 at propegate.compute(101): implicit truncation of vector type
   api=4 insize=10950 outsize=5975 ok=1
+Cmd: preprocessCompute
+  insize=10947 outsize=10949 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at propegate.compute(101): implicit truncation of vector type
+  api=4 insize=10949 outsize=6180 ok=1

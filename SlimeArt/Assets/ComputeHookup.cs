@@ -448,6 +448,7 @@ public class ComputeHookup : MonoBehaviour
         int intPixHeight = (int)pixelHeight;
         decay.SetInt("pixelWidth", (int)pixelWidth);
         decay.SetInt("pixelHeight", (int)pixelHeight);
+        decay.SetTexture(decayKernel, "tex_trace", tex_trace);
 
         if (swap == 0) {
             decay.SetTexture(decayKernel, "deposit_in", deposit_in);
