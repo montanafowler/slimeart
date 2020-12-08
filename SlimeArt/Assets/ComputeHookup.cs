@@ -36,7 +36,8 @@ public class ComputeHookup : MonoBehaviour
     public RenderTexture particle_render_texture;
     public RenderTexture deposit_in;
     public RenderTexture deposit_out;
-    public RenderTexture tex_trace;
+    public RenderTexture tex_trace_in;
+    public RenderTexture tex_trace_out;
     public Material mat;
 
     public float half_sense_spread; // default = 15-30 degrees
@@ -90,9 +91,9 @@ public class ComputeHookup : MonoBehaviour
     private float DRAW_DEPOSIT_MODE = 3.0f;
     private float DRAW_DEPOSIT_EMITTERS_MODE = 1.0f;
     private float DRAW_PARTICLES_MODE = 0.0f;
-    private float PARTICLE_VIEW = 0.0f;
-    private float DEPOSIT_VIEW = 1.0f;
-    private float TRACE_VIEW = 2.0f;
+    private float PARTICLE_VIEW = 1.0f;
+    private float DEPOSIT_VIEW = 2.0f;
+    private float TRACE_VIEW = 0.0f;
 
     private float PARTICLE = 1.0f;
     private float DEPOSIT_EMITTER = 2.0f;
@@ -192,15 +193,17 @@ public class ComputeHookup : MonoBehaviour
 
         // deposit texture for propagate shader
         //tex_deposit = initializeRenderTexture();
-    }
-
-    void setupUI() {
         deposit_in = initializeRenderTexture();
         deposit_out = initializeRenderTexture();
         particle_render_texture = initializeRenderTexture();
 
         // trace texture for the propagate shader
-        tex_trace = initializeRenderTexture();
+        tex_trace_in = initializeRenderTexture();
+        tex_trace_out = initializeRenderTexture();
+    }
+
+    void setupUI() {
+       
 
         // other variables
         world_width = Screen.width;
@@ -218,8 +221,8 @@ public class ComputeHookup : MonoBehaviour
         depositStrengthSlider = GameObject.Find("DepositStrengthSlider").GetComponent<Slider>();
         agentDepositStrengthSlider = GameObject.Find("AgentDepositStrengthSlider").GetComponent<Slider>();
         brushSizeSlider = GameObject.Find("BrushSizeSlider").GetComponent<Slider>();
-        brushDensitySlider = GameObject.Find("BrushDensitySlider").GetComponent<Slider>();
-        lifetimeSlider = GameObject.Find("ParticleLifetimeSlider").GetComponent<Slider>();
+        //brushDensitySlider = GameObject.Find("BrushDensitySlider").GetComponent<Slider>();
+        //lifetimeSlider = GameObject.Find("ParticleLifetimeSlider").GetComponent<Slider>();
         particleRedChannelSlider = GameObject.Find("ParticleRedChannelSlider").GetComponent<Slider>();
         particleGreenChannelSlider = GameObject.Find("ParticleGreenChannelSlider").GetComponent<Slider>();
         particleBlueChannelSlider = GameObject.Find("ParticleBlueChannelSlider").GetComponent<Slider>();
@@ -251,13 +254,13 @@ public class ComputeHookup : MonoBehaviour
         brushSizeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushSizeSliderText, "brush size: ", brushSizeSlider.value); });
         updateSliderLabel(brushSizeSliderText, "brush size: ", brushSizeSlider.value);
 
-        brushDensitySliderText = GameObject.Find("BrushDensitySliderText").GetComponent<TextMeshProUGUI>();
-        brushDensitySlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushDensitySliderText, "brush density: ", brushDensitySlider.value); });
-        updateSliderLabel(brushDensitySliderText, "brush density: ", brushDensitySlider.value);
+        //brushDensitySliderText = GameObject.Find("BrushDensitySliderText").GetComponent<TextMeshProUGUI>();
+        //brushDensitySlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushDensitySliderText, "brush density: ", brushDensitySlider.value); });
+        //updateSliderLabel(brushDensitySliderText, "brush density: ", brushDensitySlider.value);
 
-        lifetimeSliderText = GameObject.Find("ParticleLifetimeSliderText").GetComponent<TextMeshProUGUI>();
-        lifetimeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value); });
-        updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value);
+        //lifetimeSliderText = GameObject.Find("ParticleLifetimeSliderText").GetComponent<TextMeshProUGUI>();
+        //lifetimeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value); });
+        //updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value);
 
         particleRedChannelSliderText = GameObject.Find("ParticleRedChannelSliderText").GetComponent<TextMeshProUGUI>();
         particleRedChannelSlider.onValueChanged.AddListener(delegate { updateSliderLabel(particleRedChannelSliderText, "Particle Red Channel: ", particleRedChannelSlider.value); });
@@ -282,8 +285,9 @@ public class ComputeHookup : MonoBehaviour
         viewDropdown = GameObject.Find("ViewDropdown").GetComponent<TMP_Dropdown>();
         //viewDropdown.onValueChanged.AddListener(delegate { changeMode(viewDropdown.value); });
 
-        Button playButton = GameObject.Find("PlayButton").GetComponent<Button>();
-        updatepropagateShaderVariables(deposit_in);
+        //Button playButton = GameObject.Find("PlayButton").GetComponent<Button>();
+        Button clearCanvasButton = GameObject.Find("ClearCanvasButton").GetComponent<Button>();
+        clearCanvasButton.onClick.AddListener(delegate { Debug.Log("clear"); setupBuffers(); /*updatepropagateShaderVariables(deposit_in);*/ });
     }
 
     void calculateGroupTheoryIncrement() {
@@ -312,7 +316,7 @@ public class ComputeHookup : MonoBehaviour
         return renderTexture;
     }
 
-    void updatepropagateShaderVariables(RenderTexture depositTexture) {
+    void updatepropagateShaderVariables(RenderTexture depositTexture, RenderTexture traceTexture) {
         sense_distance = senseDistanceSlider.value;
         move_distance = moveDistanceSlider.value;
         deposit_strength = depositStrengthSlider.value;
@@ -321,7 +325,7 @@ public class ComputeHookup : MonoBehaviour
         int propagateKernel = propagate.FindKernel("CSMain");
 
         propagate.SetTexture(propagateKernel, "tex_deposit", depositTexture);
-        propagate.SetTexture(propagateKernel, "tex_trace", tex_trace);
+        propagate.SetTexture(propagateKernel, "tex_trace", traceTexture);
         propagate.SetFloat("half_sense_spread", half_sense_spread); // 15 to 30 degrees default
       //  propagate.SetFloat("sense_distance", sense_distance); // in world-space units; default = about 1/100 of the world 'cube' size
         propagate.SetFloat("turn_angle", turn_angle); // 15.0 is default
@@ -398,7 +402,7 @@ public class ComputeHookup : MonoBehaviour
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex] = moveDistanceSlider.value;
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 1] = senseDistanceSlider.value;
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 2] = agentDepositStrengthSlider.value;
-                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 3] = lifetimeSlider.value;
+                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 3] = 1.0f;//lifetimeSlider.value;
 
                         red_green_blue_alpha_array[nextAvailableIndex] = particleRedChannelSlider.value;
                         red_green_blue_alpha_array[nextAvailableIndex + 1] = particleGreenChannelSlider.value;
@@ -448,17 +452,21 @@ public class ComputeHookup : MonoBehaviour
         int intPixHeight = (int)pixelHeight;
         decay.SetInt("pixelWidth", (int)pixelWidth);
         decay.SetInt("pixelHeight", (int)pixelHeight);
-        decay.SetTexture(decayKernel, "tex_trace", tex_trace);
+        
 
         if (swap == 0) {
             decay.SetTexture(decayKernel, "deposit_in", deposit_in);
             decay.SetTexture(decayKernel, "deposit_out", deposit_out);
-            updatepropagateShaderVariables(deposit_out);
+            decay.SetTexture(decayKernel, "tex_trace_in", tex_trace_in);
+            decay.SetTexture(decayKernel, "tex_trace_out", tex_trace_out);
+            updatepropagateShaderVariables(deposit_out, tex_trace_out);
             swap = 1;
         } else {
             decay.SetTexture(decayKernel, "deposit_in", deposit_out);
             decay.SetTexture(decayKernel, "deposit_out", deposit_in);
-            updatepropagateShaderVariables(deposit_in);
+            decay.SetTexture(decayKernel, "tex_trace_in", tex_trace_out);
+            decay.SetTexture(decayKernel, "tex_trace_out", tex_trace_in);
+            updatepropagateShaderVariables(deposit_in, tex_trace_in);
             swap = 0;
         }
         //blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
@@ -480,7 +488,11 @@ public class ComputeHookup : MonoBehaviour
         }
 
         if (viewDropdown.value == TRACE_VIEW) {
-            mat.mainTexture = tex_trace;
+            if (swap == 0) {
+                mat.mainTexture = tex_trace_in;
+            } else {
+                mat.mainTexture = tex_trace_out;
+            }
         }
 
         if (Input.GetMouseButton(0)) {
