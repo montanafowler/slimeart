@@ -45,6 +45,6 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     //tex_trace[p] *= 0.995;
     t *= 0.99;
     tex_trace_out[p] = t;
-    tex_trace_out[p] = tex_trace_in[p]* 0.9;
+    tex_trace_out[p] = tex_trace_in[p]* 0.99;
 
 }

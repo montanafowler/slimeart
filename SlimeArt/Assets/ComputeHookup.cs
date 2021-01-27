@@ -401,7 +401,7 @@ public class ComputeHookup : MonoBehaviour
 
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex] = moveDistanceSlider.value;
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 1] = senseDistanceSlider.value;
-                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 2] = agentDepositStrengthSlider.value;
+                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 2] = 0.0f;//agentDepositStrengthSlider.value;
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 3] = 1.0f;//lifetimeSlider.value;
 
                         red_green_blue_alpha_array[nextAvailableIndex] = particleRedChannelSlider.value;
