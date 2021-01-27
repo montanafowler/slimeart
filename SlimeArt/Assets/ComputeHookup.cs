@@ -91,9 +91,15 @@ public class ComputeHookup : MonoBehaviour
     private float DRAW_DEPOSIT_MODE = 3.0f;
     private float DRAW_DEPOSIT_EMITTERS_MODE = 1.0f;
     private float DRAW_PARTICLES_MODE = 0.0f;
+
     private float PARTICLE_VIEW = 1.0f;
     private float DEPOSIT_VIEW = 2.0f;
     private float TRACE_VIEW = 0.0f;
+
+    private float LOW_QUALITY_GRAPHICS = 0.0f;
+    private float MED_QUALITY_GRAPHICS = 1.0f;
+    private float HIGH_QUALITY_GRAPHICS = 2.0f;
+    private float ULTRA_QUALITY_GRAPHICS = 3.0f;
 
     private float PARTICLE = 1.0f;
     private float DEPOSIT_EMITTER = 2.0f;
@@ -203,8 +209,6 @@ public class ComputeHookup : MonoBehaviour
     }
 
     void setupUI() {
-       
-
         // other variables
         world_width = Screen.width;
         world_height = Screen.height;

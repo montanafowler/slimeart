@@ -7,3 +7,8 @@ Cmd: compileSnippet
 Cmd: preprocessCompute
   insize=1531 outsize=1530 ok=1
 Cmd: compileComputeKernel
+  error: 1 plat 14 at decay.compute(29): integer modulus may be much slower, try using uints if possible.
+  error: 1 plat 14 at decay.compute(30): integer modulus may be much slower, try using uints if possible.
+  api=14 insize=1530 outsize=2378 ok=1
+Cmd: translateComputeKernel
+  api=14 insize=2378 outsize=4019 ok=1
