@@ -122,7 +122,7 @@ public class ComputeHookup : MonoBehaviour
         propagateKernel = propagate.FindKernel("CSMain");
         pixelHeight = Screen.height;
         pixelWidth = Screen.width;
-        MAX_SPACE = pixelHeight * pixelWidth * 5;
+        MAX_SPACE = 100000;//pixelHeight * pixelWidth * 5;
         MAX_NUM_PARTICLES = MAX_SPACE / 4;
         
         Debug.Log("MAX_SPACE " + MAX_SPACE);
@@ -219,7 +219,7 @@ public class ComputeHookup : MonoBehaviour
         moveDistanceSlider = GameObject.Find("MoveDistanceSlider").GetComponent<Slider>();
         senseDistanceSlider = GameObject.Find("SenseDistanceSlider").GetComponent<Slider>();
         depositStrengthSlider = GameObject.Find("DepositStrengthSlider").GetComponent<Slider>();
-        agentDepositStrengthSlider = GameObject.Find("AgentDepositStrengthSlider").GetComponent<Slider>();
+        //agentDepositStrengthSlider = GameObject.Find("AgentDepositStrengthSlider").GetComponent<Slider>();
         brushSizeSlider = GameObject.Find("BrushSizeSlider").GetComponent<Slider>();
         //brushDensitySlider = GameObject.Find("BrushDensitySlider").GetComponent<Slider>();
         //lifetimeSlider = GameObject.Find("ParticleLifetimeSlider").GetComponent<Slider>();
@@ -231,7 +231,7 @@ public class ComputeHookup : MonoBehaviour
         move_distance = moveDistanceSlider.value;
         sense_distance = senseDistanceSlider.value;
         deposit_strength = depositStrengthSlider.value;
-        agent_deposit = agentDepositStrengthSlider.value;
+        //agent_deposit = agentDepositStrengthSlider.value;
         brush_size = brushSizeSlider.value;
 
         moveDistanceSliderText = GameObject.Find("MoveDistanceSliderText").GetComponent<TextMeshProUGUI>();
@@ -246,9 +246,9 @@ public class ComputeHookup : MonoBehaviour
         depositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value); });
         updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value);
 
-        agentDepositStrengthSliderText = GameObject.Find("AgentDepositStrengthSliderText").GetComponent<TextMeshProUGUI>();
-        agentDepositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value); });
-        updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value);
+        //agentDepositStrengthSliderText = GameObject.Find("AgentDepositStrengthSliderText").GetComponent<TextMeshProUGUI>();
+        //agentDepositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value); });
+        //updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value);
 
         brushSizeSliderText = GameObject.Find("BrushSizeSliderText").GetComponent<TextMeshProUGUI>();
         brushSizeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushSizeSliderText, "brush size: ", brushSizeSlider.value); });
@@ -320,7 +320,7 @@ public class ComputeHookup : MonoBehaviour
         sense_distance = senseDistanceSlider.value;
         move_distance = moveDistanceSlider.value;
         deposit_strength = depositStrengthSlider.value;
-        agent_deposit = agentDepositStrengthSlider.value;
+        //agent_deposit = agentDepositStrengthSlider.value;
 
         int propagateKernel = propagate.FindKernel("CSMain");
 
