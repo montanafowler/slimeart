@@ -121,6 +121,8 @@ public class ComputeHookup : MonoBehaviour
     private int group_theory_index = 0;
     private int propagateKernel;
 
+    public bool QUALITY_CHOSEN = false;
+
     //public Camera camera;
     // Start is called before the first frame update
     void Start() {
@@ -128,9 +130,40 @@ public class ComputeHookup : MonoBehaviour
         propagateKernel = propagate.FindKernel("CSMain");
         pixelHeight = Screen.height;
         pixelWidth = Screen.width;
+
+        TMP_Dropdown modeDropdown = GameObject.Find("GraphicsQualityDropdown").GetComponent<TMP_Dropdown>();
+        Canvas canvas = GameObject.Find("GraphicsPopupCanvas").GetComponent<Canvas>();
+        //canvas.SetActive(false);
+
         MAX_SPACE = 100000;//pixelHeight * pixelWidth * 5;
         MAX_NUM_PARTICLES = MAX_SPACE / 4;
-        
+
+        Debug.Log("MAX_SPACE " + MAX_SPACE);
+
+        COMPUTE_GRID_HEIGHT = 256;
+        COMPUTE_GRID_WIDTH = MAX_SPACE / COMPUTE_GRID_HEIGHT;
+        mat.mainTextureOffset = new Vector2(0.0f, 0.0f);
+
+        calculateGroupTheoryIncrement();
+        setupBuffers(); // sets up the buffers with their info.
+        setupUI();
+
+        blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
+        blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+
+    }
+
+    void setUpCanvas() {
+        // kernel is the propagate shader (initial spark)
+        propagateKernel = propagate.FindKernel("CSMain");
+        pixelHeight = Screen.height;
+        pixelWidth = Screen.width;
+
+        TMP_Dropdown modeDropdown = GameObject.Find("GraphicsQualityDropdown").GetComponent<TMP_Dropdown>();
+
+        MAX_SPACE = 100000;//pixelHeight * pixelWidth * 5;
+        MAX_NUM_PARTICLES = MAX_SPACE / 4;
+
         Debug.Log("MAX_SPACE " + MAX_SPACE);
 
         COMPUTE_GRID_HEIGHT = 256;
@@ -445,62 +478,79 @@ public class ComputeHookup : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
-        if (Input.GetKeyDown("escape")) {
-            Debug.Log("quit");
-            Application.Quit(); // Quits the game
-        }
-
-        int decayKernel = decay.FindKernel("CSMain");
-        int propagateKernel = propagate.FindKernel("CSMain");
-        int intPixWidth = (int)pixelWidth;
-        int intPixHeight = (int)pixelHeight;
-        decay.SetInt("pixelWidth", (int)pixelWidth);
-        decay.SetInt("pixelHeight", (int)pixelHeight);
-        
-
-        if (swap == 0) {
-            decay.SetTexture(decayKernel, "deposit_in", deposit_in);
-            decay.SetTexture(decayKernel, "deposit_out", deposit_out);
-            decay.SetTexture(decayKernel, "tex_trace_in", tex_trace_in);
-            decay.SetTexture(decayKernel, "tex_trace_out", tex_trace_out);
-            updatepropagateShaderVariables(deposit_out, tex_trace_out);
-            swap = 1;
-        } else {
-            decay.SetTexture(decayKernel, "deposit_in", deposit_out);
-            decay.SetTexture(decayKernel, "deposit_out", deposit_in);
-            decay.SetTexture(decayKernel, "tex_trace_in", tex_trace_out);
-            decay.SetTexture(decayKernel, "tex_trace_out", tex_trace_in);
-            updatepropagateShaderVariables(deposit_in, tex_trace_in);
-            swap = 0;
-        }
-        //blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
-        blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
-
-        decay.Dispatch(decayKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
-        propagate.Dispatch(propagateKernel,COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
-
-        if (viewDropdown.value == DEPOSIT_VIEW) {
-            if (swap == 0) {
-                mat.mainTexture = deposit_in;
-            } else {
-                mat.mainTexture = deposit_out;
+        if (QUALITY_CHOSEN) {
+            if (Input.GetKeyDown("escape"))
+            {
+                Debug.Log("quit");
+                Application.Quit(); // Quits the game
             }
-        } 
-        
-        if (viewDropdown.value == PARTICLE_VIEW) {
-            mat.mainTexture = particle_render_texture;
-        }
 
-        if (viewDropdown.value == TRACE_VIEW) {
-            if (swap == 0) {
-                mat.mainTexture = tex_trace_in;
-            } else {
-                mat.mainTexture = tex_trace_out;
+            int decayKernel = decay.FindKernel("CSMain");
+            int propagateKernel = propagate.FindKernel("CSMain");
+            int intPixWidth = (int)pixelWidth;
+            int intPixHeight = (int)pixelHeight;
+            decay.SetInt("pixelWidth", (int)pixelWidth);
+            decay.SetInt("pixelHeight", (int)pixelHeight);
+
+
+            if (swap == 0)
+            {
+                decay.SetTexture(decayKernel, "deposit_in", deposit_in);
+                decay.SetTexture(decayKernel, "deposit_out", deposit_out);
+                decay.SetTexture(decayKernel, "tex_trace_in", tex_trace_in);
+                decay.SetTexture(decayKernel, "tex_trace_out", tex_trace_out);
+                updatepropagateShaderVariables(deposit_out, tex_trace_out);
+                swap = 1;
             }
-        }
+            else
+            {
+                decay.SetTexture(decayKernel, "deposit_in", deposit_out);
+                decay.SetTexture(decayKernel, "deposit_out", deposit_in);
+                decay.SetTexture(decayKernel, "tex_trace_in", tex_trace_out);
+                decay.SetTexture(decayKernel, "tex_trace_out", tex_trace_in);
+                updatepropagateShaderVariables(deposit_in, tex_trace_in);
+                swap = 0;
+            }
+            //blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
+            blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
 
-        if (Input.GetMouseButton(0)) {
-            draw(Input.mousePosition.x, Input.mousePosition.y);   
+            decay.Dispatch(decayKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+            propagate.Dispatch(propagateKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+
+            if (viewDropdown.value == DEPOSIT_VIEW)
+            {
+                if (swap == 0)
+                {
+                    mat.mainTexture = deposit_in;
+                }
+                else
+                {
+                    mat.mainTexture = deposit_out;
+                }
+            }
+
+            if (viewDropdown.value == PARTICLE_VIEW)
+            {
+                mat.mainTexture = particle_render_texture;
+            }
+
+            if (viewDropdown.value == TRACE_VIEW)
+            {
+                if (swap == 0)
+                {
+                    mat.mainTexture = tex_trace_in;
+                }
+                else
+                {
+                    mat.mainTexture = tex_trace_out;
+                }
+            }
+
+            if (Input.GetMouseButton(0))
+            {
+                draw(Input.mousePosition.x, Input.mousePosition.y);
+            }
         }
     }
+        
 }
