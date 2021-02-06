@@ -96,10 +96,10 @@ public class ComputeHookup : MonoBehaviour
     private float DEPOSIT_VIEW = 2.0f;
     private float TRACE_VIEW = 0.0f;
 
-    private float LOW_QUALITY_GRAPHICS = 0.0f;
-    private float MED_QUALITY_GRAPHICS = 1.0f;
-    private float HIGH_QUALITY_GRAPHICS = 2.0f;
-    private float ULTRA_QUALITY_GRAPHICS = 3.0f;
+    public float LOW_QUALITY_GRAPHICS = 0.0f;
+    public float MED_QUALITY_GRAPHICS = 1.0f;
+    public float HIGH_QUALITY_GRAPHICS = 2.0f;
+    public float ULTRA_QUALITY_GRAPHICS = 3.0f;
 
     private float PARTICLE = 1.0f;
     private float DEPOSIT_EMITTER = 2.0f;
@@ -121,19 +121,21 @@ public class ComputeHookup : MonoBehaviour
     private int group_theory_index = 0;
     private int propagateKernel;
 
-    public bool QUALITY_CHOSEN = false;
+    //public bool QUALITY_CHOSEN = false;
+    public float SAVED_QUALITY;
 
     //public Camera camera;
     // Start is called before the first frame update
     void Start() {
+        Debug.Log("Chosen Quality Level canvas " + GraphicsQualityMenu.CHOSEN_QUALITY_LEVEL);
+        SAVED_QUALITY = GraphicsQualityMenu.CHOSEN_QUALITY_LEVEL;
+        //GraphicsQualityMenu.QUALITY_MENU_GAME_OBJECT.SetActive(false);
         // kernel is the propagate shader (initial spark)
         propagateKernel = propagate.FindKernel("CSMain");
         pixelHeight = Screen.height;
         pixelWidth = Screen.width;
 
-        TMP_Dropdown modeDropdown = GameObject.Find("GraphicsQualityDropdown").GetComponent<TMP_Dropdown>();
-        Canvas canvas = GameObject.Find("GraphicsPopupCanvas").GetComponent<Canvas>();
-        //canvas.SetActive(false);
+        
 
         MAX_SPACE = 100000;//pixelHeight * pixelWidth * 5;
         MAX_NUM_PARTICLES = MAX_SPACE / 4;
@@ -478,7 +480,7 @@ public class ComputeHookup : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
-        if (QUALITY_CHOSEN) {
+        
             if (Input.GetKeyDown("escape"))
             {
                 Debug.Log("quit");
@@ -551,6 +553,6 @@ public class ComputeHookup : MonoBehaviour
                 draw(Input.mousePosition.x, Input.mousePosition.y);
             }
         }
-    }
+
         
 }
