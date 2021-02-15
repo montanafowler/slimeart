@@ -2,6 +2,8 @@ ScriptsOnlyBuild:
   usedScripts:
     Assembly-CSharp.dll:
     - ComputeHookup
+    - GraphicsQualityMenu
+    - PopupBox
     Unity.2D.Animation.Editor.dll:
     - UnityEditor.U2D.Animation.BoneGizmo
     Unity.2D.Tilemap.Editor.dll:
@@ -72,7 +74,7 @@ ScriptsOnlyBuild:
     - UnityEngine.UI.Toggle
     - UnityEngine.UI.VerticalLayoutGroup
   sceneClasses:
-    Assets/Scenes/SampleScene.unity:
+    Assets/Scenes/CanvasScene.unity:
     - Class: 1
       Script: {instanceID: 0}
     - Class: 4
@@ -91,8 +93,6 @@ ScriptsOnlyBuild:
       Script: {instanceID: 0}
     - Class: 48
       Script: {instanceID: 0}
-    - Class: 49
-      Script: {instanceID: 0}
     - Class: 65
       Script: {instanceID: 0}
     - Class: 72
@@ -104,6 +104,79 @@ ScriptsOnlyBuild:
     - Class: 104
       Script: {instanceID: 0}
     - Class: 108
+      Script: {instanceID: 0}
+    - Class: 114
+      Script: {instanceID: 11378}
+    - Class: 114
+      Script: {instanceID: 11480}
+    - Class: 114
+      Script: {instanceID: 11854}
+    - Class: 114
+      Script: {instanceID: 11942}
+    - Class: 114
+      Script: {instanceID: 12016}
+    - Class: 114
+      Script: {instanceID: 12364}
+    - Class: 114
+      Script: {instanceID: 12466}
+    - Class: 114
+      Script: {instanceID: 12712}
+    - Class: 114
+      Script: {instanceID: 12978}
+    - Class: 114
+      Script: {instanceID: 13560}
+    - Class: 114
+      Script: {instanceID: 14092}
+    - Class: 114
+      Script: {instanceID: 14302}
+    - Class: 114
+      Script: {instanceID: 14598}
+    - Class: 114
+      Script: {instanceID: 15106}
+    - Class: 114
+      Script: {instanceID: 15270}
+    - Class: 114
+      Script: {instanceID: 15924}
+    - Class: 114
+      Script: {instanceID: 16300}
+    - Class: 114
+      Script: {instanceID: 16330}
+    - Class: 114
+      Script: {instanceID: 16372}
+    - Class: 115
+      Script: {instanceID: 0}
+    - Class: 128
+      Script: {instanceID: 0}
+    - Class: 157
+      Script: {instanceID: 0}
+    - Class: 196
+      Script: {instanceID: 0}
+    - Class: 213
+      Script: {instanceID: 0}
+    - Class: 222
+      Script: {instanceID: 0}
+    - Class: 223
+      Script: {instanceID: 0}
+    - Class: 224
+      Script: {instanceID: 0}
+    Assets/Scenes/MenuScene.unity:
+    - Class: 1
+      Script: {instanceID: 0}
+    - Class: 4
+      Script: {instanceID: 0}
+    - Class: 20
+      Script: {instanceID: 0}
+    - Class: 21
+      Script: {instanceID: 0}
+    - Class: 28
+      Script: {instanceID: 0}
+    - Class: 48
+      Script: {instanceID: 0}
+    - Class: 49
+      Script: {instanceID: 0}
+    - Class: 81
+      Script: {instanceID: 0}
+    - Class: 104
       Script: {instanceID: 0}
     - Class: 109
       Script: {instanceID: 0}
@@ -126,15 +199,9 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 12014}
     - Class: 114
-      Script: {instanceID: 12016}
-    - Class: 114
       Script: {instanceID: 12196}
     - Class: 114
       Script: {instanceID: 12232}
-    - Class: 114
-      Script: {instanceID: 12364}
-    - Class: 114
-      Script: {instanceID: 12466}
     - Class: 114
       Script: {instanceID: 12712}
     - Class: 114
@@ -188,27 +255,27 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 15740}
     - Class: 114
-      Script: {instanceID: 15924}
+      Script: {instanceID: 15926}
     - Class: 114
-      Script: {instanceID: 15980}
+      Script: {instanceID: 15982}
     - Class: 114
-      Script: {instanceID: 16036}
+      Script: {instanceID: 16038}
     - Class: 114
-      Script: {instanceID: 16250}
+      Script: {instanceID: 16252}
     - Class: 114
-      Script: {instanceID: 16254}
+      Script: {instanceID: 16256}
     - Class: 114
-      Script: {instanceID: 16298}
-    - Class: 114
-      Script: {instanceID: 16328}
+      Script: {instanceID: 16300}
     - Class: 114
       Script: {instanceID: 16330}
     - Class: 114
-      Script: {instanceID: 16370}
+      Script: {instanceID: 16332}
     - Class: 114
-      Script: {instanceID: 16482}
+      Script: {instanceID: 16484}
     - Class: 114
-      Script: {instanceID: 16488}
+      Script: {instanceID: 16490}
+    - Class: 114
+      Script: {instanceID: 27212}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -474,7 +541,7 @@ ScriptsOnlyBuild:
     className: AnimationTrack
   - hash:
       serializedVersion: 2
-      Hash: 765f610de3c8601e70ec17a76b565d62
+      Hash: 61e8dc50896c185300daf0d7d62c3f61
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: ComputeHookup
@@ -1170,6 +1237,12 @@ ScriptsOnlyBuild:
     className: ShadowCaster2D
   - hash:
       serializedVersion: 2
+      Hash: 25d6cf40a4aca4c4c0cc870e80019be2
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: PopupBox
+  - hash:
+      serializedVersion: 2
       Hash: 8d35f16c5022311c6f4d9432be73bfcf
     assemblyName: Unity.RenderPipelines.Core.Runtime.dll
     namespaceName: UnityEngine.Rendering.UI
@@ -1384,7 +1457,14 @@ ScriptsOnlyBuild:
     assemblyName: Unity.Timeline.dll
     namespaceName: UnityEngine.Timeline
     className: PlayableTrack
+  - hash:
+      serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: GraphicsQualityMenu
   platform: 2
   scenePathNames:
-  - Assets/Scenes/SampleScene.unity
-  playerPath: D:/slimeart-exports.app
+  - Assets/Scenes/MenuScene.unity
+  - Assets/Scenes/CanvasScene.unity
+  playerPath: D:/slime_art_executables/2_6_3_46_PM_MAC_XCODE_VERSION.xcodeproj

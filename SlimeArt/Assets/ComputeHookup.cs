@@ -135,9 +135,20 @@ public class ComputeHookup : MonoBehaviour
         pixelHeight = Screen.height;
         pixelWidth = Screen.width;
 
-        
+        if (SAVED_QUALITY == 0.0f) {
+            MAX_SPACE = 100000;
+        }
 
-        MAX_SPACE = 100000;//pixelHeight * pixelWidth * 5;
+        if (SAVED_QUALITY == 1.0f) {
+            MAX_SPACE = 1000000;
+        }
+
+        if (SAVED_QUALITY == 2.0f)
+        {
+            MAX_SPACE = 5000000;
+        }
+
+        //MAX_SPACE = 100000;//pixelHeight * pixelWidth * 5;
         MAX_NUM_PARTICLES = MAX_SPACE / 4;
 
         Debug.Log("MAX_SPACE " + MAX_SPACE);
