@@ -269,7 +269,7 @@ public class ComputeHookup : MonoBehaviour
         moveDistanceSlider = GameObject.Find("MoveDistanceSlider").GetComponent<Slider>();
         senseDistanceSlider = GameObject.Find("SenseDistanceSlider").GetComponent<Slider>();
         depositStrengthSlider = GameObject.Find("DepositStrengthSlider").GetComponent<Slider>();
-        //agentDepositStrengthSlider = GameObject.Find("AgentDepositStrengthSlider").GetComponent<Slider>();
+        agentDepositStrengthSlider = GameObject.Find("AgentDepositStrengthSlider").GetComponent<Slider>();
         brushSizeSlider = GameObject.Find("BrushSizeSlider").GetComponent<Slider>();
         //brushDensitySlider = GameObject.Find("BrushDensitySlider").GetComponent<Slider>();
         //lifetimeSlider = GameObject.Find("ParticleLifetimeSlider").GetComponent<Slider>();
@@ -280,7 +280,7 @@ public class ComputeHookup : MonoBehaviour
 
         move_distance = moveDistanceSlider.value;
         sense_distance = senseDistanceSlider.value;
-        deposit_strength = depositStrengthSlider.value;
+        //deposit_strength = depositStrengthSlider.value;
         //agent_deposit = agentDepositStrengthSlider.value;
         brush_size = brushSizeSlider.value;
 
