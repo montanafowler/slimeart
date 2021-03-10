@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
+using HSVPicker;
 
 public class ComputeHookup : MonoBehaviour
 { 
@@ -84,6 +84,7 @@ public class ComputeHookup : MonoBehaviour
     private TextMeshProUGUI particleGreenChannelSliderText;
     private TextMeshProUGUI particleBlueChannelSliderText;
     private TextMeshProUGUI particleAlphaChannelSliderText;
+    private ColorPicker colorPicker;
 
     private TMP_Dropdown modeDropdown;
     private TMP_Dropdown viewDropdown;
@@ -277,6 +278,7 @@ public class ComputeHookup : MonoBehaviour
         particleGreenChannelSlider = GameObject.Find("ParticleGreenChannelSlider").GetComponent<Slider>();
         particleBlueChannelSlider = GameObject.Find("ParticleBlueChannelSlider").GetComponent<Slider>();
         particleAlphaChannelSlider = GameObject.Find("ParticleAlphaChannelSlider").GetComponent<Slider>();
+        colorPicker = GameObject.Find("Picker").GetComponent<ColorPicker>();
 
         move_distance = moveDistanceSlider.value;
         sense_distance = senseDistanceSlider.value;
@@ -287,7 +289,7 @@ public class ComputeHookup : MonoBehaviour
         moveDistanceSliderText = GameObject.Find("MoveDistanceSliderText").GetComponent<TextMeshProUGUI>();
         moveDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(moveDistanceSliderText, "move distance: ", moveDistanceSlider.value); });
         updateSliderLabel(moveDistanceSliderText, "move distance: ", moveDistanceSlider.value);
-
+        
         senseDistanceSliderText = GameObject.Find("SenseDistanceSliderText").GetComponent<TextMeshProUGUI>();
         senseDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(senseDistanceSliderText, "sense distance: ", senseDistanceSlider.value); });
         updateSliderLabel(senseDistanceSliderText, "sense distance: ", senseDistanceSlider.value);
@@ -419,6 +421,8 @@ public class ComputeHookup : MonoBehaviour
         }
         return available_data_index;
     }
+
+
 
     void draw(float x, float y) {
         // TODODODODODODOD GET THE OFFSET RIGHT, somehow the width of the UI cube

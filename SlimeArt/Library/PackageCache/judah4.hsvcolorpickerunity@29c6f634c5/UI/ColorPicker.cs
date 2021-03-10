@@ -3,7 +3,6 @@ namespace HSVPicker
 {
     public class ColorPicker : MonoBehaviour
     {
-
         private float _hue = 0;
         private float _saturation = 0;
         private float _brightness = 0;

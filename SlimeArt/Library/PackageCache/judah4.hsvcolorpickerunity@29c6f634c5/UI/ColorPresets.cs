@@ -25,7 +25,7 @@ namespace HSVPicker
 
             if (_colors.Colors.Count < picker.Setup.DefaultPresetColors.Length)
             {
-                _colors.UpdateList(picker.Setup.DefaultPresetColors);
+                //_colors.UpdateList(picker.Setup.DefaultPresetColors);
             }
 
             _colors.OnColorsUpdated += OnColorsUpdate;
