@@ -62,7 +62,7 @@ public class ComputeHookup : MonoBehaviour
     public Vector2[] linePositions;
 
     private Slider moveDistanceSlider;
-    private Slider senseDistanceSlider;
+    private Slider scaleSlider;
     private Slider depositStrengthSlider;
     private Slider agentDepositStrengthSlider;
     private Slider brushSizeSlider;
@@ -71,7 +71,7 @@ public class ComputeHookup : MonoBehaviour
     
 
     private TextMeshProUGUI moveDistanceSliderText;
-    private TextMeshProUGUI senseDistanceSliderText;
+    private TextMeshProUGUI scaleSliderText;
     private TextMeshProUGUI depositStrengthSliderText;
     private TextMeshProUGUI agentDepositStrengthSliderText;
     private TextMeshProUGUI brushSizeSliderText;
@@ -121,6 +121,10 @@ public class ComputeHookup : MonoBehaviour
 
     //public bool QUALITY_CHOSEN = false;
     public float SAVED_QUALITY;
+
+    //values to adjust scale and speed sliders
+    private const int SCALE = 0;
+    private const int SPEED = 1;
 
     //public Camera camera;
     // Start is called before the first frame update
@@ -265,7 +269,7 @@ public class ComputeHookup : MonoBehaviour
         normalization_factor = 2.0f;
 
         moveDistanceSlider = GameObject.Find("MoveDistanceSlider").GetComponent<Slider>();
-        senseDistanceSlider = GameObject.Find("SenseDistanceSlider").GetComponent<Slider>();
+        scaleSlider = GameObject.Find("ScaleSlider").GetComponent<Slider>();
         depositStrengthSlider = GameObject.Find("DepositStrengthSlider").GetComponent<Slider>();
         agentDepositStrengthSlider = GameObject.Find("AgentDepositStrengthSlider").GetComponent<Slider>();
         brushSizeSlider = GameObject.Find("BrushSizeSlider").GetComponent<Slider>();
@@ -275,18 +279,18 @@ public class ComputeHookup : MonoBehaviour
         Debug.Log(colorPicker.CurrentColor.r);
 
         move_distance = moveDistanceSlider.value;
-        sense_distance = senseDistanceSlider.value;
+        sense_distance = scaleSlider.value;
         //deposit_strength = depositStrengthSlider.value;
         //agent_deposit = agentDepositStrengthSlider.value;
         brush_size = brushSizeSlider.value;
 
         moveDistanceSliderText = GameObject.Find("MoveDistanceSliderText").GetComponent<TextMeshProUGUI>();
-        moveDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(moveDistanceSliderText, "move distance: ", moveDistanceSlider.value); });
-        updateSliderLabel(moveDistanceSliderText, "move distance: ", moveDistanceSlider.value);
+        moveDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(moveDistanceSliderText, "speed: ", moveDistanceSlider.value); });
+        updateSliderLabel(moveDistanceSliderText, "speed: ", moveDistanceSlider.value);
         
-        senseDistanceSliderText = GameObject.Find("SenseDistanceSliderText").GetComponent<TextMeshProUGUI>();
-        senseDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(senseDistanceSliderText, "sense distance: ", senseDistanceSlider.value); });
-        updateSliderLabel(senseDistanceSliderText, "sense distance: ", senseDistanceSlider.value);
+        scaleSliderText = GameObject.Find("ScaleSliderText").GetComponent<TextMeshProUGUI>();
+        scaleSlider.onValueChanged.AddListener(delegate { updateSliderLabel(scaleSliderText, "scale: ", scaleSlider.value); });
+        updateSliderLabel(scaleSliderText, "scale: ", scaleSlider.value);
 
         depositStrengthSliderText = GameObject.Find("DepositStrengthSliderText").GetComponent<TextMeshProUGUI>();
         depositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value); });
@@ -319,6 +323,8 @@ public class ComputeHookup : MonoBehaviour
         clearCanvasButton.onClick.AddListener(delegate { Debug.Log("clear"); setupBuffers(); /*updatepropagateShaderVariables(deposit_in);*/ });
     }
 
+    
+
     void calculateGroupTheoryIncrement() {
         group_theory_increment = 3;
         while (MAX_SPACE % group_theory_increment == 0) {
@@ -346,7 +352,7 @@ public class ComputeHookup : MonoBehaviour
     }
 
     void updatepropagateShaderVariables(RenderTexture depositTexture, RenderTexture traceTexture) {
-        sense_distance = senseDistanceSlider.value;
+        sense_distance = scaleSlider.value;
         move_distance = moveDistanceSlider.value;
         deposit_strength = depositStrengthSlider.value;
         //agent_deposit = agentDepositStrengthSlider.value;
@@ -355,9 +361,9 @@ public class ComputeHookup : MonoBehaviour
 
         propagate.SetTexture(propagateKernel, "tex_deposit", depositTexture);
         propagate.SetTexture(propagateKernel, "tex_trace", traceTexture);
-        propagate.SetFloat("half_sense_spread", half_sense_spread); // 15 to 30 degrees default
-      //  propagate.SetFloat("sense_distance", sense_distance); // in world-space units; default = about 1/100 of the world 'cube' size
-        propagate.SetFloat("turn_angle", turn_angle); // 15.0 is default
+        propagate.SetFloat("half_sense_spread", scaleSlider.value * (90.0f-20.0f) + 20.0f); // 15 to 30 degrees default
+                                                                                            //  propagate.SetFloat("sense_distance", sense_distance); // in world-space units; default = about 1/100 of the world 'cube' size
+        propagate.SetFloat("turn_angle", (1.0f - scaleSlider.value) * (45.0f - 10.0f) + 10.0f) ; // 15.0 is default
       //  propagate.SetFloat("move_distance", move_distance);//worldHeight / 100.0f / 4.0f); //  in world-space units; default = about 1/5--1/3 of sense_distance
        // propagate.SetFloat("agent_deposit", agent_deposit); // 15.0 is default
         propagate.SetFloat("world_width", (float)world_width);
@@ -431,8 +437,8 @@ public class ComputeHookup : MonoBehaviour
                         x_y_theta_dataType_array[nextAvailableIndex + 2] = Random.Range(-PI, PI); //random Theta
 
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex] = moveDistanceSlider.value;
-                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 1] = senseDistanceSlider.value;
-                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 2] = 0.0f;//agentDepositStrengthSlider.value;
+                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 1] = moveDistanceSlider.value * 2.0f;//sense distance
+                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 2] = 5.0f;//agentDepositStrengthSlider.value;
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 3] = 1.0f;//lifetimeSlider.value;
                        
                         red_green_blue_alpha_array[nextAvailableIndex] = colorPicker.CurrentColor.r;//particleRedChannelSlider.value;
