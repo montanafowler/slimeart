@@ -68,10 +68,7 @@ public class ComputeHookup : MonoBehaviour
     private Slider brushSizeSlider;
     private Slider brushDensitySlider;
     private Slider lifetimeSlider;
-    private Slider particleRedChannelSlider;
-    private Slider particleGreenChannelSlider;
-    private Slider particleBlueChannelSlider;
-    private Slider particleAlphaChannelSlider;
+    
 
     private TextMeshProUGUI moveDistanceSliderText;
     private TextMeshProUGUI senseDistanceSliderText;
@@ -274,11 +271,8 @@ public class ComputeHookup : MonoBehaviour
         brushSizeSlider = GameObject.Find("BrushSizeSlider").GetComponent<Slider>();
         //brushDensitySlider = GameObject.Find("BrushDensitySlider").GetComponent<Slider>();
         //lifetimeSlider = GameObject.Find("ParticleLifetimeSlider").GetComponent<Slider>();
-        particleRedChannelSlider = GameObject.Find("ParticleRedChannelSlider").GetComponent<Slider>();
-        particleGreenChannelSlider = GameObject.Find("ParticleGreenChannelSlider").GetComponent<Slider>();
-        particleBlueChannelSlider = GameObject.Find("ParticleBlueChannelSlider").GetComponent<Slider>();
-        particleAlphaChannelSlider = GameObject.Find("ParticleAlphaChannelSlider").GetComponent<Slider>();
         colorPicker = GameObject.Find("Picker").GetComponent<ColorPicker>();
+        Debug.Log(colorPicker.CurrentColor.r);
 
         move_distance = moveDistanceSlider.value;
         sense_distance = senseDistanceSlider.value;
@@ -312,24 +306,7 @@ public class ComputeHookup : MonoBehaviour
 
         //lifetimeSliderText = GameObject.Find("ParticleLifetimeSliderText").GetComponent<TextMeshProUGUI>();
         //lifetimeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value); });
-        //updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value);
-
-        particleRedChannelSliderText = GameObject.Find("ParticleRedChannelSliderText").GetComponent<TextMeshProUGUI>();
-        particleRedChannelSlider.onValueChanged.AddListener(delegate { updateSliderLabel(particleRedChannelSliderText, "Particle Red Channel: ", particleRedChannelSlider.value); });
-        updateSliderLabel(particleRedChannelSliderText, "Particle Red Channel: ", particleRedChannelSlider.value);
-
-        particleGreenChannelSliderText = GameObject.Find("ParticleGreenChannelSliderText").GetComponent<TextMeshProUGUI>();
-        particleGreenChannelSlider.onValueChanged.AddListener(delegate { updateSliderLabel(particleGreenChannelSliderText, "Particle Green Channel: ", particleGreenChannelSlider.value); });
-        updateSliderLabel(particleGreenChannelSliderText, "Particle Green Channel: ", particleGreenChannelSlider.value);
-
-        particleBlueChannelSliderText = GameObject.Find("ParticleBlueChannelSliderText").GetComponent<TextMeshProUGUI>();
-        particleBlueChannelSlider.onValueChanged.AddListener(delegate { updateSliderLabel(particleBlueChannelSliderText, "Particle Blue Channel: ", particleBlueChannelSlider.value); });
-        updateSliderLabel(particleBlueChannelSliderText, "Particle Blue Channel: ", particleBlueChannelSlider.value);
-
-        particleAlphaChannelSliderText = GameObject.Find("ParticleAlphaChannelSliderText").GetComponent<TextMeshProUGUI>();
-        particleAlphaChannelSlider.onValueChanged.AddListener(delegate { updateSliderLabel(particleAlphaChannelSliderText, "Particle Alpha Channel: ", particleAlphaChannelSlider.value); });
-        updateSliderLabel(particleAlphaChannelSliderText, "Particle Alpha Channel: ", particleAlphaChannelSlider.value);
-
+        //updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value);   
 
         modeDropdown = GameObject.Find("ModeDropdown").GetComponent<TMP_Dropdown>();
         //modeDropdown.onValueChanged.AddListener(delegate { changeMode(modeDropdown.value);  });
@@ -457,12 +434,15 @@ public class ComputeHookup : MonoBehaviour
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 1] = senseDistanceSlider.value;
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 2] = 0.0f;//agentDepositStrengthSlider.value;
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 3] = 1.0f;//lifetimeSlider.value;
-
-                        red_green_blue_alpha_array[nextAvailableIndex] = particleRedChannelSlider.value;
-                        red_green_blue_alpha_array[nextAvailableIndex + 1] = particleGreenChannelSlider.value;
-                        red_green_blue_alpha_array[nextAvailableIndex + 2] = particleBlueChannelSlider.value;
-                        red_green_blue_alpha_array[nextAvailableIndex + 3] = particleAlphaChannelSlider.value;
-
+                       
+                        red_green_blue_alpha_array[nextAvailableIndex] = colorPicker.CurrentColor.r;//particleRedChannelSlider.value;
+                        red_green_blue_alpha_array[nextAvailableIndex + 1] = colorPicker.CurrentColor.g;//particleGreenChannelSlider.value;
+                        red_green_blue_alpha_array[nextAvailableIndex + 2] = colorPicker.CurrentColor.b;//particleBlueChannelSlider.value;
+                        red_green_blue_alpha_array[nextAvailableIndex + 3] = colorPicker.CurrentColor.a;//particleAlphaChannelSlider.value;
+                        //Debug.Log(colorPicker.CurrentColor.r);
+                       // Debug.Log(colorPicker.CurrentColor.g);
+                       // Debug.Log(colorPicker.CurrentColor.b);
+                       // Debug.Log("--");
                         if (modeDropdown.value == DRAW_DEPOSIT_MODE) {
                             // draw temporary deposit that dissolves
                             x_y_theta_dataType_array[nextAvailableIndex + 3] = DEPOSIT;

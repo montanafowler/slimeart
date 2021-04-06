@@ -1,2 +1,12 @@
 Base path: 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data', plugins path 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data/PlaybackEngines'
 Cmd: initializeCompiler
+Cmd: compileComputeKernel
+  error: 1 plat 4 at propegate.compute(101): implicit truncation of vector type
+  error: 2 plat 4 at propegate.compute(133): syntax error: unexpected token ';'
+  error: 1 plat 4 at propegate.compute(133): implicit truncation of vector type
+  api=4 insize=11358 outsize=0 ok=0
+Cmd: compileComputeKernel
+  error: 1 plat 14 at propegate.compute(101): implicit truncation of vector type
+  api=14 insize=11348 outsize=2036 ok=1
+Cmd: translateComputeKernel
+  api=14 insize=2036 outsize=2339 ok=1

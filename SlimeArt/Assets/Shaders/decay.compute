@@ -29,13 +29,16 @@ void CSMain (uint3 id : SV_DispatchThreadID)
             txcoord.x = txcoord.x % pixelWidth;
             txcoord.y = txcoord.y % pixelHeight;
             v += weight * deposit_in[txcoord];
-           // t += weight * tex_trace_in[txcoord];
+            t += weight * tex_trace_in[txcoord];
             w += weight;
-            
+            //t.x += weight * tex_trace_in[txcoord].x;
+            //t.y += weight * tex_trace_in[txcoord].y;
+            //t.z += weight * tex_trace_in[txcoord].z;
+           // t.w += weight * tex_trace_in[txcoord].w;
         }
     }
     v /= w;
-   // t /= w;
+    t /= w;
 
     // Decay the deposit by a constant factor
     v *= 0.95;
@@ -43,8 +46,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
     // Decay the trace a little
     //tex_trace[p] *= 0.995;
-    t *= 0.99;
+    t *= 0.999;
     tex_trace_out[p] = t;
-    tex_trace_out[p] = tex_trace_in[p]* 0.99;
-
+    //tex_trace_out[p] = tex_trace_in[p]* 0.99;
 }

@@ -130,7 +130,8 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
     float green = red_green_blue_alpha[idx + 1];
     float blue = red_green_blue_alpha[idx + 2];
     float alpha = red_green_blue_alpha[idx + 3];
-
+    tex_trace[uint2(x, y)] = float4(red, green, blue, alpha);
+    //return;
     if (data_type == DEPOSIT_EMITTER) {
         tex_deposit[uint2(x_normalized * world_width,
             y_normalized * world_height)] += float4(deposit_strength, deposit_strength, deposit_strength, 1.0);// *particle_weight; // NOT ATOMIC! (not sure what particle weight is... maybe parameter?)
@@ -225,7 +226,7 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
     tex_deposit[uint2(x, y)] += float4(agent_deposit, 0.0, 0.0, 1.0); // NOT ATOMIC! // the trace is not blurred, trace is not food, but agents also leave deposit
     
     float trace_calc = 1.0 - exp(3.0 * distance_scaling_factor);
-    tex_trace[uint2(x, y)] += //float4(trace_calc, trace_calc, trace_calc, 1.0);
+    tex_trace[uint2(x, y)] = //float4(trace_calc, trace_calc, trace_calc, 1.0);
         float4(red, green, blue, alpha);
                               
         //float4(distance_scaling_factor * red, distance_scaling_factor * green, distance_scaling_factor * blue, 1.0);
