@@ -13,6 +13,7 @@ RWTexture2D<float4> particle_render_texture;
 RWStructuredBuffer<float> x_y_theta_dataType;
 RWStructuredBuffer<float> moveDist_SenseDist_particleDepositStrength_lifetime;
 RWStructuredBuffer<float> red_green_blue_alpha;
+RWStructuredBuffer<float> turn_sense_angles;
 //RWStructuredBuffer<string> particle_id_buffer;
 //RWStructuredBuffer<float4> moveDist_SenseDist_particleDepositStrength_lifetime;
 //RWTexture2D<float4> moveDist_SenseDist_particleDepositStrength_lifetime;
@@ -27,9 +28,9 @@ RWStructuredBuffer<float> red_green_blue_alpha;
 RWTexture2D<float4> tex_deposit;
 RWTexture2D<float4> tex_trace;
 
-float half_sense_spread; // default = 15-30 degrees
+//float half_sense_spread; // default = 15-30 degrees
 //float sense_distance; // in world-space units; default = about 1/100 of the world 'cube' size
-float turn_angle; // default = 15 degrees
+//float turn_angle; // default = 15 degrees
 //float move_distance; // in world-space units; default = about 1/5--1/3 of sense_distance
 //float agent_deposit; // 0 for data-driven fitting, >0 for self-reinforcing behavior
 float world_width; //
@@ -130,6 +131,8 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
     float green = red_green_blue_alpha[idx + 1];
     float blue = red_green_blue_alpha[idx + 2];
     float alpha = red_green_blue_alpha[idx + 3];
+    float turn_angle = turn_sense_angles[idx];
+    float half_sense_spread = turn_sense_angles[idx + 1];
     tex_trace[uint2(x, y)] = float4(red, green, blue, alpha);
     //return;
     if (data_type == DEPOSIT_EMITTER) {

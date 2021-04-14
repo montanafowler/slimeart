@@ -1,6 +1,4 @@
 Base path: 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data', plugins path 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data/PlaybackEngines'
 Cmd: initializeCompiler
-Cmd: compileComputeKernel
-  error: 1 plat 4 at decay.compute(29): integer modulus may be much slower, try using uints if possible.
-  error: 1 plat 4 at decay.compute(30): integer modulus may be much slower, try using uints if possible.
-  api=4 insize=1734 outsize=1830 ok=1
+
+Quitting shader compiler process

@@ -32,6 +32,7 @@ public class ComputeHookup : MonoBehaviour
     public ComputeBuffer x_y_theta_dataType_buffer;
     public ComputeBuffer moveDist_SenseDist_particleDepositStrength_lifetime_buffer;
     public ComputeBuffer red_green_blue_alpha_buffer;
+    public ComputeBuffer turn_sense_angles_buffer;
 
     public RenderTexture particle_render_texture;
     public RenderTexture deposit_in;
@@ -82,6 +83,16 @@ public class ComputeHookup : MonoBehaviour
     private TextMeshProUGUI particleBlueChannelSliderText;
     private TextMeshProUGUI particleAlphaChannelSliderText;
     private ColorPicker colorPicker;
+
+    //test ones
+    private TextMeshProUGUI moveDistanceSliderTestText;
+    private TextMeshProUGUI senseDistanceSliderText;
+    private TextMeshProUGUI turnAngleSliderText;
+    private TextMeshProUGUI senseAngleSliderText;
+    private Slider moveDistanceSliderTest;
+    private Slider senseDistanceSlider;
+    private Slider turnAngleSlider;
+    private Slider senseAngleSlider;
 
     private TMP_Dropdown modeDropdown;
     private TMP_Dropdown viewDropdown;
@@ -218,6 +229,7 @@ public class ComputeHookup : MonoBehaviour
         float[] x_y_theta_dataType_array = new float[MAX_SPACE];
         float[] moveDist_SenseDist_particleDepositStrength_lifetime_array = new float[MAX_SPACE];
         float[] red_green_blue_alpha_array = new float[MAX_SPACE];
+        float[] turn_sense_angles_array = new float[MAX_SPACE];
         //attractedTo
         //repelledBy
 
@@ -242,6 +254,8 @@ public class ComputeHookup : MonoBehaviour
 
         //red,green,blue,alpha
         red_green_blue_alpha_buffer = initializeComputeBuffer(red_green_blue_alpha_array, "red_green_blue_alpha", propagateKernel);
+
+        turn_sense_angles_buffer = initializeComputeBuffer(turn_sense_angles_array, "turn_sense_angles", propagateKernel);
 
         blank_canvas = initializeComputeBuffer(blankCanvas, "blank_canvas", blank_canvas_shader.FindKernel("CSMain"));
 
@@ -276,7 +290,10 @@ public class ComputeHookup : MonoBehaviour
         //brushDensitySlider = GameObject.Find("BrushDensitySlider").GetComponent<Slider>();
         //lifetimeSlider = GameObject.Find("ParticleLifetimeSlider").GetComponent<Slider>();
         colorPicker = GameObject.Find("Picker").GetComponent<ColorPicker>();
-        Debug.Log(colorPicker.CurrentColor.r);
+        moveDistanceSliderTest = GameObject.Find("MoveDistanceSliderTest").GetComponent<Slider>();
+        turnAngleSlider = GameObject.Find("TurnAngleSlider").GetComponent<Slider>();
+        senseAngleSlider = GameObject.Find("SenseAngleSlider").GetComponent<Slider>();
+        senseDistanceSlider = GameObject.Find("SenseDistanceSlider").GetComponent<Slider>();
 
         move_distance = moveDistanceSlider.value;
         sense_distance = scaleSlider.value;
@@ -310,7 +327,25 @@ public class ComputeHookup : MonoBehaviour
 
         //lifetimeSliderText = GameObject.Find("ParticleLifetimeSliderText").GetComponent<TextMeshProUGUI>();
         //lifetimeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value); });
-        //updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value);   
+        //updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value);
+
+
+        //TEST SLIDERS TRYING TO FIND GOOD VALUES
+        turnAngleSliderText = GameObject.Find("TurnAngleSliderText").GetComponent<TextMeshProUGUI>();
+        turnAngleSlider.onValueChanged.AddListener(delegate { updateSliderLabel(turnAngleSliderText, "test turn angle: ", turnAngleSlider.value); });
+        updateSliderLabel(turnAngleSliderText, "test turn angle: ", turnAngleSlider.value);
+
+        senseAngleSliderText = GameObject.Find("SenseAngleSliderText").GetComponent<TextMeshProUGUI>();
+        senseAngleSlider.onValueChanged.AddListener(delegate { updateSliderLabel(senseAngleSliderText, "test sense angle: ", senseAngleSlider.value); });
+        updateSliderLabel(senseAngleSliderText, "test sense angle: ", senseAngleSlider.value);
+
+        moveDistanceSliderTestText = GameObject.Find("MoveDistanceSliderTestText").GetComponent<TextMeshProUGUI>();
+        moveDistanceSliderTest.onValueChanged.AddListener(delegate { updateSliderLabel(moveDistanceSliderTestText, "test move distance: ", moveDistanceSliderTest.value); });
+        updateSliderLabel(moveDistanceSliderTestText, "test move distance: ", moveDistanceSliderTest.value);
+
+        senseDistanceSliderText = GameObject.Find("SenseDistanceSliderText").GetComponent<TextMeshProUGUI>();
+        senseDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(senseDistanceSliderText, "test sense distance: ", senseDistanceSlider.value); });
+        updateSliderLabel(senseDistanceSliderText, "test sense distance: ", senseDistanceSlider.value);
 
         modeDropdown = GameObject.Find("ModeDropdown").GetComponent<TMP_Dropdown>();
         //modeDropdown.onValueChanged.AddListener(delegate { changeMode(modeDropdown.value);  });
@@ -409,7 +444,7 @@ public class ComputeHookup : MonoBehaviour
 
     void draw(float x, float y) {
         // TODODODODODODOD GET THE OFFSET RIGHT, somehow the width of the UI cube
-        float centerX = pixelWidth - x - pixelWidth*4/19;// + (mat.mainTextureOffset.x * pixelWidth * mat.mainTextureScale.x);
+        float centerX = pixelWidth - x;// - pixelWidth*4/19;// + (mat.mainTextureOffset.x * pixelWidth * mat.mainTextureScale.x);
         float centerY = pixelHeight - y;
         
         if (modeDropdown.value != OBSERVE_MODE)  {
@@ -417,9 +452,11 @@ public class ComputeHookup : MonoBehaviour
             float[] x_y_theta_dataType_array = new float[MAX_SPACE];
             float[] moveDist_SenseDist_particleDepositStrength_lifetime_array = new float[MAX_SPACE];
             float[] red_green_blue_alpha_array = new float[MAX_SPACE];
+            float[] turn_sense_angles_array = new float[MAX_SPACE];
             x_y_theta_dataType_buffer.GetData(x_y_theta_dataType_array);
             moveDist_SenseDist_particleDepositStrength_lifetime_buffer.GetData(moveDist_SenseDist_particleDepositStrength_lifetime_array);
             red_green_blue_alpha_buffer.GetData(red_green_blue_alpha_array);
+            turn_sense_angles_buffer.GetData(turn_sense_angles_array);
 
             float newX, newY;
             brush_size = (brushSizeSlider.value + 1)/2;
@@ -436,8 +473,8 @@ public class ComputeHookup : MonoBehaviour
                         x_y_theta_dataType_array[nextAvailableIndex + 1] = centerY + dy; //Y
                         x_y_theta_dataType_array[nextAvailableIndex + 2] = Random.Range(-PI, PI); //random Theta
 
-                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex] = moveDistanceSlider.value;
-                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 1] = moveDistanceSlider.value * 2.0f;//sense distance
+                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex] = moveDistanceSliderTest.value;//moveDistanceSlider.value;
+                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 1] = senseDistanceSlider.value;//moveDistanceSlider.value * 2.0f;//sense distance
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 2] = 5.0f;//agentDepositStrengthSlider.value;
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 3] = 1.0f;//lifetimeSlider.value;
                        
@@ -445,10 +482,16 @@ public class ComputeHookup : MonoBehaviour
                         red_green_blue_alpha_array[nextAvailableIndex + 1] = colorPicker.CurrentColor.g;//particleGreenChannelSlider.value;
                         red_green_blue_alpha_array[nextAvailableIndex + 2] = colorPicker.CurrentColor.b;//particleBlueChannelSlider.value;
                         red_green_blue_alpha_array[nextAvailableIndex + 3] = colorPicker.CurrentColor.a;//particleAlphaChannelSlider.value;
+
+                        turn_sense_angles_array[nextAvailableIndex] = turnAngleSlider.value;
+                        turn_sense_angles_array[nextAvailableIndex + 1] = senseAngleSlider.value;
+                        turn_sense_angles_array[nextAvailableIndex + 2] = 0.0f;
+                        turn_sense_angles_array[nextAvailableIndex + 3] = 0.0f;
+
                         //Debug.Log(colorPicker.CurrentColor.r);
-                       // Debug.Log(colorPicker.CurrentColor.g);
-                       // Debug.Log(colorPicker.CurrentColor.b);
-                       // Debug.Log("--");
+                        // Debug.Log(colorPicker.CurrentColor.g);
+                        // Debug.Log(colorPicker.CurrentColor.b);
+                        // Debug.Log("--");
                         if (modeDropdown.value == DRAW_DEPOSIT_MODE) {
                             // draw temporary deposit that dissolves
                             x_y_theta_dataType_array[nextAvailableIndex + 3] = DEPOSIT;
@@ -476,84 +519,89 @@ public class ComputeHookup : MonoBehaviour
             //red,green,blue,alpha
             red_green_blue_alpha_buffer = initializeComputeBuffer(red_green_blue_alpha_array, "red_green_blue_alpha", propagateKernel);
 
+            //turn and sense angles
+            turn_sense_angles_buffer = initializeComputeBuffer(turn_sense_angles_array, "turn_sense_angles", propagateKernel);
+
         }
     }
 
     // Update is called once per frame
-    void Update() {
-        
-            if (Input.GetKeyDown("escape"))
-            {
-                Debug.Log("quit");
-                Application.Quit(); // Quits the game
-            }
+    void Update()
+    {
 
-            int decayKernel = decay.FindKernel("CSMain");
-            int propagateKernel = propagate.FindKernel("CSMain");
-            int intPixWidth = (int)pixelWidth;
-            int intPixHeight = (int)pixelHeight;
-            decay.SetInt("pixelWidth", (int)pixelWidth);
-            decay.SetInt("pixelHeight", (int)pixelHeight);
+        if (Input.GetKeyDown("escape"))
+        {
+            Debug.Log("quit");
+            Application.Quit(); // Quits the game
+        }
+
+        int decayKernel = decay.FindKernel("CSMain");
+        int propagateKernel = propagate.FindKernel("CSMain");
+        int intPixWidth = (int)pixelWidth;
+        int intPixHeight = (int)pixelHeight;
+        decay.SetInt("pixelWidth", (int)pixelWidth);
+        decay.SetInt("pixelHeight", (int)pixelHeight);
 
 
+        if (swap == 0)
+        {
+            decay.SetTexture(decayKernel, "deposit_in", deposit_in);
+            decay.SetTexture(decayKernel, "deposit_out", deposit_out);
+            decay.SetTexture(decayKernel, "tex_trace_in", tex_trace_in);
+            decay.SetTexture(decayKernel, "tex_trace_out", tex_trace_out);
+            updatepropagateShaderVariables(deposit_out, tex_trace_out);
+            swap = 1;
+        }
+        else
+        {
+            decay.SetTexture(decayKernel, "deposit_in", deposit_out);
+            decay.SetTexture(decayKernel, "deposit_out", deposit_in);
+            decay.SetTexture(decayKernel, "tex_trace_in", tex_trace_out);
+            decay.SetTexture(decayKernel, "tex_trace_out", tex_trace_in);
+            updatepropagateShaderVariables(deposit_in, tex_trace_in);
+            swap = 0;
+        }
+        //blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
+        blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+
+        decay.Dispatch(decayKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+        propagate.Dispatch(propagateKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+
+        if (viewDropdown.value == DEPOSIT_VIEW)
+        {
             if (swap == 0)
             {
-                decay.SetTexture(decayKernel, "deposit_in", deposit_in);
-                decay.SetTexture(decayKernel, "deposit_out", deposit_out);
-                decay.SetTexture(decayKernel, "tex_trace_in", tex_trace_in);
-                decay.SetTexture(decayKernel, "tex_trace_out", tex_trace_out);
-                updatepropagateShaderVariables(deposit_out, tex_trace_out);
-                swap = 1;
+                mat.mainTexture = deposit_in;
             }
             else
             {
-                decay.SetTexture(decayKernel, "deposit_in", deposit_out);
-                decay.SetTexture(decayKernel, "deposit_out", deposit_in);
-                decay.SetTexture(decayKernel, "tex_trace_in", tex_trace_out);
-                decay.SetTexture(decayKernel, "tex_trace_out", tex_trace_in);
-                updatepropagateShaderVariables(deposit_in, tex_trace_in);
-                swap = 0;
+                mat.mainTexture = deposit_out;
             }
-            //blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
-            blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+        }
 
-            decay.Dispatch(decayKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
-            propagate.Dispatch(propagateKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+        if (viewDropdown.value == PARTICLE_VIEW)
+        {
+            mat.mainTexture = particle_render_texture;
+        }
 
-            if (viewDropdown.value == DEPOSIT_VIEW)
+        if (viewDropdown.value == TRACE_VIEW)
+        {
+            if (swap == 0)
             {
-                if (swap == 0)
-                {
-                    mat.mainTexture = deposit_in;
-                }
-                else
-                {
-                    mat.mainTexture = deposit_out;
-                }
+                mat.mainTexture = tex_trace_in;
             }
-
-            if (viewDropdown.value == PARTICLE_VIEW)
+            else
             {
-                mat.mainTexture = particle_render_texture;
+                mat.mainTexture = tex_trace_out;
             }
-
-            if (viewDropdown.value == TRACE_VIEW)
-            {
-                if (swap == 0)
-                {
-                    mat.mainTexture = tex_trace_in;
-                }
-                else
-                {
-                    mat.mainTexture = tex_trace_out;
-                }
-            }
-
-            if (Input.GetMouseButton(0))
+        }
+        GameObject uiBox = GameObject.Find("CubeUI");
+        if (Input.GetMouseButton(0))
             {
                 draw(Input.mousePosition.x, Input.mousePosition.y);
             }
         }
+    
 
         
 }

@@ -4,12 +4,20 @@ ScriptsOnlyBuild:
     - ComputeHookup
     - GraphicsQualityMenu
     - PopupBox
+    HSVPicker.dll:
+    - HSVPicker.BoxSlider
+    - HSVPicker.ColorImage
+    - HSVPicker.ColorLabel
+    - HSVPicker.ColorPicker
+    - HSVPicker.ColorPresets
+    - HSVPicker.ColorSlider
+    - HSVPicker.ColorSliderImage
+    - HSVPicker.HexColorField
+    - HSVPicker.SVBoxSlider
     Unity.2D.Animation.Editor.dll:
     - UnityEditor.U2D.Animation.BoneGizmo
     Unity.2D.Tilemap.Editor.dll:
     - UnityEditor.Tilemaps.GridPaintingState
-    - UnityEditor.Tilemaps.GridPaletteBrushes
-    - UnityEditor.Tilemaps.GridPalettes
     - UnityEditor.Tilemaps.SceneViewGridManager
     - UnityEditor.Tilemaps.TileDragAndDropManager
     Unity.RenderPipelines.Core.Runtime.dll:
@@ -58,6 +66,7 @@ ScriptsOnlyBuild:
     UnityEngine.UI.dll:
     - UnityEngine.EventSystems.EventSystem
     - UnityEngine.EventSystems.StandaloneInputModule
+    - UnityEngine.UI.AspectRatioFitter
     - UnityEngine.UI.Button
     - UnityEngine.UI.CanvasScaler
     - UnityEngine.UI.ContentSizeFitter
@@ -66,6 +75,8 @@ ScriptsOnlyBuild:
     - UnityEngine.UI.Image
     - UnityEngine.UI.LayoutElement
     - UnityEngine.UI.Mask
+    - UnityEngine.UI.Outline
+    - UnityEngine.UI.RawImage
     - UnityEngine.UI.RectMask2D
     - UnityEngine.UI.ScrollRect
     - UnityEngine.UI.Scrollbar
@@ -108,41 +119,73 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 11378}
     - Class: 114
-      Script: {instanceID: 11480}
+      Script: {instanceID: 11482}
     - Class: 114
       Script: {instanceID: 11854}
     - Class: 114
-      Script: {instanceID: 11942}
+      Script: {instanceID: 11860}
     - Class: 114
-      Script: {instanceID: 12016}
+      Script: {instanceID: 11948}
     - Class: 114
-      Script: {instanceID: 12364}
+      Script: {instanceID: 12022}
     - Class: 114
-      Script: {instanceID: 12466}
+      Script: {instanceID: 12070}
     - Class: 114
-      Script: {instanceID: 12712}
+      Script: {instanceID: 12204}
     - Class: 114
-      Script: {instanceID: 12978}
+      Script: {instanceID: 12240}
     - Class: 114
-      Script: {instanceID: 13560}
+      Script: {instanceID: 12372}
     - Class: 114
-      Script: {instanceID: 14092}
+      Script: {instanceID: 12408}
     - Class: 114
-      Script: {instanceID: 14302}
+      Script: {instanceID: 12474}
     - Class: 114
-      Script: {instanceID: 14598}
+      Script: {instanceID: 12722}
     - Class: 114
-      Script: {instanceID: 15106}
+      Script: {instanceID: 12990}
     - Class: 114
-      Script: {instanceID: 15270}
+      Script: {instanceID: 13574}
     - Class: 114
-      Script: {instanceID: 15924}
+      Script: {instanceID: 13774}
     - Class: 114
-      Script: {instanceID: 16300}
+      Script: {instanceID: 14108}
     - Class: 114
-      Script: {instanceID: 16330}
+      Script: {instanceID: 14112}
     - Class: 114
-      Script: {instanceID: 16372}
+      Script: {instanceID: 14158}
+    - Class: 114
+      Script: {instanceID: 14320}
+    - Class: 114
+      Script: {instanceID: 14464}
+    - Class: 114
+      Script: {instanceID: 14494}
+    - Class: 114
+      Script: {instanceID: 14616}
+    - Class: 114
+      Script: {instanceID: 14620}
+    - Class: 114
+      Script: {instanceID: 14928}
+    - Class: 114
+      Script: {instanceID: 15132}
+    - Class: 114
+      Script: {instanceID: 15144}
+    - Class: 114
+      Script: {instanceID: 15298}
+    - Class: 114
+      Script: {instanceID: 15956}
+    - Class: 114
+      Script: {instanceID: 15966}
+    - Class: 114
+      Script: {instanceID: 15978}
+    - Class: 114
+      Script: {instanceID: 16184}
+    - Class: 114
+      Script: {instanceID: 16336}
+    - Class: 114
+      Script: {instanceID: 16366}
+    - Class: 114
+      Script: {instanceID: 16408}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -183,99 +226,99 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 11378}
     - Class: 114
-      Script: {instanceID: 11480}
+      Script: {instanceID: 11482}
     - Class: 114
-      Script: {instanceID: 11530}
+      Script: {instanceID: 11532}
     - Class: 114
-      Script: {instanceID: 11682}
+      Script: {instanceID: 11684}
     - Class: 114
-      Script: {instanceID: 11712}
-    - Class: 114
-      Script: {instanceID: 11848}
+      Script: {instanceID: 11716}
     - Class: 114
       Script: {instanceID: 11854}
     - Class: 114
-      Script: {instanceID: 11942}
+      Script: {instanceID: 11860}
     - Class: 114
-      Script: {instanceID: 12014}
+      Script: {instanceID: 11948}
     - Class: 114
-      Script: {instanceID: 12196}
+      Script: {instanceID: 12020}
     - Class: 114
-      Script: {instanceID: 12232}
+      Script: {instanceID: 12204}
     - Class: 114
-      Script: {instanceID: 12712}
+      Script: {instanceID: 12240}
     - Class: 114
-      Script: {instanceID: 12812}
+      Script: {instanceID: 12722}
     - Class: 114
-      Script: {instanceID: 12978}
+      Script: {instanceID: 12824}
     - Class: 114
-      Script: {instanceID: 13064}
+      Script: {instanceID: 12990}
     - Class: 114
-      Script: {instanceID: 13132}
+      Script: {instanceID: 13076}
     - Class: 114
-      Script: {instanceID: 13422}
+      Script: {instanceID: 13146}
     - Class: 114
-      Script: {instanceID: 13478}
+      Script: {instanceID: 13436}
     - Class: 114
-      Script: {instanceID: 13560}
+      Script: {instanceID: 13492}
     - Class: 114
-      Script: {instanceID: 13714}
+      Script: {instanceID: 13574}
     - Class: 114
-      Script: {instanceID: 14092}
+      Script: {instanceID: 13728}
     - Class: 114
-      Script: {instanceID: 14126}
+      Script: {instanceID: 14108}
     - Class: 114
-      Script: {instanceID: 14302}
+      Script: {instanceID: 14144}
     - Class: 114
-      Script: {instanceID: 14504}
+      Script: {instanceID: 14320}
     - Class: 114
-      Script: {instanceID: 14594}
+      Script: {instanceID: 14526}
     - Class: 114
-      Script: {instanceID: 14598}
+      Script: {instanceID: 14616}
     - Class: 114
-      Script: {instanceID: 14618}
+      Script: {instanceID: 14620}
     - Class: 114
-      Script: {instanceID: 14624}
+      Script: {instanceID: 14640}
     - Class: 114
-      Script: {instanceID: 14784}
+      Script: {instanceID: 14646}
     - Class: 114
-      Script: {instanceID: 14830}
+      Script: {instanceID: 14660}
     - Class: 114
-      Script: {instanceID: 14842}
+      Script: {instanceID: 14808}
     - Class: 114
-      Script: {instanceID: 15106}
+      Script: {instanceID: 14854}
     - Class: 114
-      Script: {instanceID: 15250}
+      Script: {instanceID: 14866}
     - Class: 114
-      Script: {instanceID: 15270}
+      Script: {instanceID: 15132}
     - Class: 114
-      Script: {instanceID: 15346}
+      Script: {instanceID: 15278}
     - Class: 114
-      Script: {instanceID: 15674}
+      Script: {instanceID: 15298}
     - Class: 114
-      Script: {instanceID: 15740}
+      Script: {instanceID: 15374}
     - Class: 114
-      Script: {instanceID: 15926}
+      Script: {instanceID: 15704}
     - Class: 114
-      Script: {instanceID: 15982}
+      Script: {instanceID: 15770}
     - Class: 114
-      Script: {instanceID: 16038}
+      Script: {instanceID: 15958}
     - Class: 114
-      Script: {instanceID: 16252}
+      Script: {instanceID: 16018}
     - Class: 114
-      Script: {instanceID: 16256}
+      Script: {instanceID: 16074}
     - Class: 114
-      Script: {instanceID: 16300}
+      Script: {instanceID: 16288}
     - Class: 114
-      Script: {instanceID: 16330}
+      Script: {instanceID: 16292}
     - Class: 114
-      Script: {instanceID: 16332}
+      Script: {instanceID: 16336}
     - Class: 114
-      Script: {instanceID: 16484}
+      Script: {instanceID: 16366}
     - Class: 114
-      Script: {instanceID: 16490}
+      Script: {instanceID: 16368}
     - Class: 114
-      Script: {instanceID: 27212}
+      Script: {instanceID: 16522}
+    - Class: 114
+      Script: {instanceID: 16528}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -403,6 +446,12 @@ ScriptsOnlyBuild:
     className: Renderer2DData
   - hash:
       serializedVersion: 2
+      Hash: a05f8ee8b82ae06c84687fea66396f27
+    assemblyName: HSVPicker.dll
+    namespaceName: HSVPicker.Examples
+    className: ColorPickerTester
+  - hash:
+      serializedVersion: 2
       Hash: 72712369a7c681ad84fc255a5ec0b333
     assemblyName: UnityEngine.UI.dll
     namespaceName: UnityEngine.UI
@@ -479,6 +528,12 @@ ScriptsOnlyBuild:
     assemblyName: Unity.TextMeshPro.dll
     namespaceName: TMPro
     className: TMP_InputField
+  - hash:
+      serializedVersion: 2
+      Hash: f4862fe0c27aae6474acfb6ff81d190b
+    assemblyName: HSVPicker.dll
+    namespaceName: HSVPicker
+    className: ColorLabel
   - hash:
       serializedVersion: 2
       Hash: 7ab0e790220bdca831fdd886b339039d
@@ -599,6 +654,12 @@ ScriptsOnlyBuild:
     assemblyName: Unity.2D.PixelPerfect.dll
     namespaceName: UnityEngine.U2D
     className: PixelPerfectCamera
+  - hash:
+      serializedVersion: 2
+      Hash: a72b59fc029116362b3317d54b5ec7e0
+    assemblyName: HSVPicker.dll
+    namespaceName: HSVPicker.Examples
+    className: TiltWindow
   - hash:
       serializedVersion: 2
       Hash: 5ab533713adae59372fb3e10a585c186
@@ -799,6 +860,12 @@ ScriptsOnlyBuild:
     className: VertexJitter
   - hash:
       serializedVersion: 2
+      Hash: e80052be6f994349516ef119502d9146
+    assemblyName: HSVPicker.dll
+    namespaceName: HSVPicker
+    className: SVBoxSlider
+  - hash:
+      serializedVersion: 2
       Hash: d6fc8d3165070298511ec776ea575626
     assemblyName: Unity.Postprocessing.Runtime.dll
     namespaceName: UnityEngine.Rendering.PostProcessing
@@ -853,6 +920,12 @@ ScriptsOnlyBuild:
     className: Button
   - hash:
       serializedVersion: 2
+      Hash: f130dc80e4c8745d4ce7390b6750fb8f
+    assemblyName: HSVPicker.dll
+    namespaceName: HSVPicker
+    className: ColorPicker
+  - hash:
+      serializedVersion: 2
       Hash: 0c9920fb850aff7b5ec756815b7a6fc1
     assemblyName: Unity.RenderPipelines.Universal.Runtime.dll
     namespaceName: UnityEngine.Rendering.Universal
@@ -905,6 +978,18 @@ ScriptsOnlyBuild:
     assemblyName: Unity.RenderPipelines.Universal.Runtime.dll
     namespaceName: UnityEngine.Rendering.Universal
     className: MotionBlur
+  - hash:
+      serializedVersion: 2
+      Hash: 6dc80a2cb403bd2371a3d2e8e52bcb67
+    assemblyName: HSVPicker.dll
+    namespaceName: HSVPicker
+    className: BoxSlider
+  - hash:
+      serializedVersion: 2
+      Hash: fc01441e5d5b69ef149be4f22a897c42
+    assemblyName: HSVPicker.dll
+    namespaceName: HSVPicker
+    className: ColorSliderImage
   - hash:
       serializedVersion: 2
       Hash: 11319334e5365797f8056694f9b5dae4
@@ -991,6 +1076,12 @@ ScriptsOnlyBuild:
     className: Physics2DRaycaster
   - hash:
       serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: GraphicsQualityMenu
+  - hash:
+      serializedVersion: 2
       Hash: 62fef86270a167c41a606cfca1ecc156
     assemblyName: Assembly-CSharp.dll
     namespaceName: TMPro.Examples
@@ -1057,6 +1148,12 @@ ScriptsOnlyBuild:
     className: Tonemapping
   - hash:
       serializedVersion: 2
+      Hash: e483bf600be1c0c43c778f81975cd000
+    assemblyName: HSVPicker.dll
+    namespaceName: HSVPicker
+    className: HexColorField
+  - hash:
+      serializedVersion: 2
       Hash: 23b81d05a0ad0499613fc3e1a4a0501b
     assemblyName: Unity.RenderPipelines.Universal.Runtime.dll
     namespaceName: UnityEngine.Rendering.Universal
@@ -1091,6 +1188,12 @@ ScriptsOnlyBuild:
     assemblyName: Unity.TextMeshPro.dll
     namespaceName: TMPro
     className: TextMeshProUGUI
+  - hash:
+      serializedVersion: 2
+      Hash: e80052be6f994349516ef119502d9146
+    assemblyName: HSVPicker.dll
+    namespaceName: HSVPicker
+    className: ColorImage
   - hash:
       serializedVersion: 2
       Hash: 6f29b049d6b6b18bee23aaf2fe273e02
@@ -1247,6 +1350,18 @@ ScriptsOnlyBuild:
     assemblyName: Unity.RenderPipelines.Core.Runtime.dll
     namespaceName: UnityEngine.Rendering.UI
     className: DebugUIHandlerEnumHistory
+  - hash:
+      serializedVersion: 2
+      Hash: 4bc3701a5a0528400fe2743c92380ca2
+    assemblyName: HSVPicker.dll
+    namespaceName: HSVPicker
+    className: ColorSlider
+  - hash:
+      serializedVersion: 2
+      Hash: 3dfaa02886b930262fc04c4f05a0301a
+    assemblyName: HSVPicker.dll
+    namespaceName: HSVPicker
+    className: ColorPresets
   - hash:
       serializedVersion: 2
       Hash: d5630f96bd5a6a6eed7e1754c3fb8703
@@ -1457,14 +1572,8 @@ ScriptsOnlyBuild:
     assemblyName: Unity.Timeline.dll
     namespaceName: UnityEngine.Timeline
     className: PlayableTrack
-  - hash:
-      serializedVersion: 2
-      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
-    assemblyName: Assembly-CSharp.dll
-    namespaceName: 
-    className: GraphicsQualityMenu
   platform: 19
   scenePathNames:
   - Assets/Scenes/MenuScene.unity
   - Assets/Scenes/CanvasScene.unity
-  playerPath: D:/slime_art_executables/2_6_2021_3_30_PM/SlimeArt.exe
+  playerPath: D:/slime_art_executables/4.9.try2/SlimeArt.exe
