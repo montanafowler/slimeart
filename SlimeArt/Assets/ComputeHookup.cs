@@ -596,9 +596,16 @@ public class ComputeHookup : MonoBehaviour
             }
         }
         GameObject uiBox = GameObject.Find("CubeUI");
-        if (Input.GetMouseButton(0))
+        Debug.Log(uiBox.transform.lossyScale);
+        GameObject drawingCanvas = GameObject.Find("DrawingCanvas");
+        Debug.Log(drawingCanvas.transform.lossyScale);
+        Debug.Log("pixelWidth " + pixelWidth + "pixelHeight " + pixelHeight);
+        if (Input.GetMouseButton(0)) //&& Input.mousePosition.x > 0.0 && Input.mousePosition.y > 0.0 && Input.mousePosition.x < pixelWidth - pixelWidth*4 && Input.mousePosition.y < pixelHeight)
             {
-                draw(Input.mousePosition.x, Input.mousePosition.y);
+            Debug.Log("mouseposition " + Input.mousePosition);
+            Debug.Log("viewportPoint " + Camera.main.ScreenToViewportPoint(Input.mousePosition));
+            Vector3 screenToWorld = Input.mousePosition;
+                draw(screenToWorld.x, screenToWorld.y);
             }
         }
     
