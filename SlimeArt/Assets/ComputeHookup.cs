@@ -460,8 +460,8 @@ public class ComputeHookup : MonoBehaviour
 
             float newX, newY;
             brush_size = (brushSizeSlider.value + 1)/2;
-            for (int dx = (int)-brush_size; dx < (int)brush_size; dx++) {
-                for(int dy = (int)-brush_size; dy < (int)brush_size; dy++) {
+            for (int dx = (int)-brush_size; dx < (int)brush_size; dx+=2) {
+                for(int dy = (int)-brush_size; dy < (int)brush_size; dy+=2) {
                     newX = centerX + dx;
                     newY = centerY + dy;
 
@@ -596,17 +596,27 @@ public class ComputeHookup : MonoBehaviour
             }
         }
         GameObject uiBox = GameObject.Find("CubeUI");
-        Debug.Log(uiBox.transform.lossyScale);
+       // Debug.Log(uiBox.transform.lossyScale);
         GameObject drawingCanvas = GameObject.Find("DrawingCanvas");
-        Debug.Log(drawingCanvas.transform.lossyScale);
-        Debug.Log("pixelWidth " + pixelWidth + "pixelHeight " + pixelHeight);
+       // Debug.Log(drawingCanvas.transform.lossyScale);
+       // Debug.Log("pixelWidth " + pixelWidth + "pixelHeight " + pixelHeight);
         if (Input.GetMouseButton(0)) //&& Input.mousePosition.x > 0.0 && Input.mousePosition.y > 0.0 && Input.mousePosition.x < pixelWidth - pixelWidth*4 && Input.mousePosition.y < pixelHeight)
             {
             Debug.Log("mouseposition " + Input.mousePosition);
             Debug.Log("viewportPoint " + Camera.main.ScreenToViewportPoint(Input.mousePosition));
-            Vector3 screenToWorld = Input.mousePosition;
-                draw(screenToWorld.x, screenToWorld.y);
+            float x = Camera.main.ScreenToViewportPoint(Input.mousePosition).x * pixelWidth;
+            float y = Camera.main.ScreenToViewportPoint(Input.mousePosition).y * pixelHeight;
+            Debug.Log("x " + x + " y " + y);
+            Debug.Log("mousePosition.xy " + Input.mousePosition);
+            if(Input.mousePosition.x < drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * pixelWidth)
+            {
+                //draw(x, y);
+                Debug.Log("draw");
+                draw(Input.mousePosition.x - drawingCanvas.transform.position.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * pixelWidth, Input.mousePosition.y);
             }
+            Debug.Log("------------------------------------");
+            Vector3 screenToWorld = Input.mousePosition;
+                           }
         }
     
 
