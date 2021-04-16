@@ -287,7 +287,7 @@ public class ComputeHookup : MonoBehaviour
         depositStrengthSlider = GameObject.Find("DepositStrengthSlider").GetComponent<Slider>();
         agentDepositStrengthSlider = GameObject.Find("AgentDepositStrengthSlider").GetComponent<Slider>();
         brushSizeSlider = GameObject.Find("BrushSizeSlider").GetComponent<Slider>();
-        //brushDensitySlider = GameObject.Find("BrushDensitySlider").GetComponent<Slider>();
+        brushDensitySlider = GameObject.Find("BrushDensitySlider").GetComponent<Slider>();
         //lifetimeSlider = GameObject.Find("ParticleLifetimeSlider").GetComponent<Slider>();
         colorPicker = GameObject.Find("Picker").GetComponent<ColorPicker>();
         moveDistanceSliderTest = GameObject.Find("MoveDistanceSliderTest").GetComponent<Slider>();
@@ -313,17 +313,17 @@ public class ComputeHookup : MonoBehaviour
         depositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value); });
         updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value);
 
-        //agentDepositStrengthSliderText = GameObject.Find("AgentDepositStrengthSliderText").GetComponent<TextMeshProUGUI>();
-        //agentDepositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value); });
-        //updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value);
+        agentDepositStrengthSliderText = GameObject.Find("AgentDepositStrengthSliderText").GetComponent<TextMeshProUGUI>();
+        agentDepositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value); });
+        updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value);
 
         brushSizeSliderText = GameObject.Find("BrushSizeSliderText").GetComponent<TextMeshProUGUI>();
         brushSizeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushSizeSliderText, "brush size: ", brushSizeSlider.value); });
         updateSliderLabel(brushSizeSliderText, "brush size: ", brushSizeSlider.value);
 
-        //brushDensitySliderText = GameObject.Find("BrushDensitySliderText").GetComponent<TextMeshProUGUI>();
-        //brushDensitySlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushDensitySliderText, "brush density: ", brushDensitySlider.value); });
-        //updateSliderLabel(brushDensitySliderText, "brush density: ", brushDensitySlider.value);
+        brushDensitySliderText = GameObject.Find("BrushDensitySliderText").GetComponent<TextMeshProUGUI>();
+        brushDensitySlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushDensitySliderText, "brush density: ", 50-brushDensitySlider.value); });
+        updateSliderLabel(brushDensitySliderText, "brush density: ", brushDensitySlider.value);
 
         //lifetimeSliderText = GameObject.Find("ParticleLifetimeSliderText").GetComponent<TextMeshProUGUI>();
         //lifetimeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value); });
@@ -460,8 +460,13 @@ public class ComputeHookup : MonoBehaviour
 
             float newX, newY;
             brush_size = (brushSizeSlider.value + 1)/2;
-            for (int dx = (int)-brush_size; dx < (int)brush_size; dx+=2) {
-                for(int dy = (int)-brush_size; dy < (int)brush_size; dy+=2) {
+            int brush_density = (int)brushDensitySlider.value;
+            if (brush_density > brush_size / 3)
+            {
+                brush_density = (int)brush_size / 3;
+            }
+            for (int dx = (int)-brush_size; dx < (int)brush_size; dx+=brush_density) {
+                for(int dy = (int)-brush_size; dy < (int)brush_size; dy+=brush_density) {
                     newX = centerX + dx;
                     newY = centerY + dy;
 
@@ -596,11 +601,11 @@ public class ComputeHookup : MonoBehaviour
             }
         }
         GameObject uiBox = GameObject.Find("CubeUI");
-       // Debug.Log(uiBox.transform.lossyScale);
+        // Debug.Log(uiBox.transform.lossyScale);
         GameObject drawingCanvas = GameObject.Find("DrawingCanvas");
-       // Debug.Log(drawingCanvas.transform.lossyScale);
-       // Debug.Log("pixelWidth " + pixelWidth + "pixelHeight " + pixelHeight);
-        if (Input.GetMouseButton(0)) //&& Input.mousePosition.x > 0.0 && Input.mousePosition.y > 0.0 && Input.mousePosition.x < pixelWidth - pixelWidth*4 && Input.mousePosition.y < pixelHeight)
+        // Debug.Log(drawingCanvas.transform.lossyScale);
+        // Debug.Log("pixelWidth " + pixelWidth + "pixelHeight " + pixelHeight);
+        /*if (Input.GetMouseButton(0)) //&& Input.mousePosition.x > 0.0 && Input.mousePosition.y > 0.0 && Input.mousePosition.x < pixelWidth - pixelWidth*4 && Input.mousePosition.y < pixelHeight)
             {
             Debug.Log("mouseposition " + Input.mousePosition);
             Debug.Log("viewportPoint " + Camera.main.ScreenToViewportPoint(Input.mousePosition));
@@ -610,15 +615,38 @@ public class ComputeHookup : MonoBehaviour
             Debug.Log("mousePosition.xy " + Input.mousePosition);
             if(Input.mousePosition.x < drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * pixelWidth)
             {
-                //draw(x, y);
+                //draw(x, y); screen point to ray function
                 Debug.Log("draw");
                 draw(Input.mousePosition.x - drawingCanvas.transform.position.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * pixelWidth, Input.mousePosition.y);
             }
-            Debug.Log("------------------------------------");
-            Vector3 screenToWorld = Input.mousePosition;
+            /*
+             * 
+             
+            //Debug.Log("------------------------------------");
+           // Vector3 screenToWorld = Input.mousePosition;
                            }
-        }
-    
+      //  }*/
 
-        
+        if (Input.GetMouseButtonDown(0))
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out hit, 100.0f))
+            {
+                if (hit.transform.name == "DrawingCanvas")
+                {
+                    draw(Camera.main.WorldToScreenPoint(hit.point).x, Camera.main.WorldToScreenPoint(hit.point).y) ;
+                    // Debug.Log("Test");
+                    //Debug.Log("position " + hit.transform.position);
+                    Debug.Log("world to screen " + Camera.main.WorldToScreenPoint(hit.transform.position));
+                    //.main.WorldToScreenPoint(hit.transform.position);
+
+                }
+            }
+        }
+
+
+    }
+
+
 }
