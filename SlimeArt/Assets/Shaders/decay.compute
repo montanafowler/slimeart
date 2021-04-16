@@ -22,6 +22,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float4 v = float4(0.0, 0.0, 0.0, 0.0);
     float4 t = float4(0.0, 0.0, 0.0, 0.0);
     float w = 0.0;
+
+    //tex_trace_out[p] = tex_trace_in[p] * 0.995;
+
     for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
             float weight = (all(int2(dx,dy)) == 0)? 1.0 : 1.0 / sqrt(float(abs(dx) + abs(dy)));
@@ -46,7 +49,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
     // Decay the trace a little
     //tex_trace[p] *= 0.995;
-    t *= 0.999;
+    t *= 0.9999;
     tex_trace_out[p] = t;
-    //tex_trace_out[p] = tex_trace_in[p]* 0.99;
+   // tex_trace_out[p] = tex_trace_in[p]* 0.995;
 }

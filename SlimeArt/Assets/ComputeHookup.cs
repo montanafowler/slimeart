@@ -401,7 +401,7 @@ public class ComputeHookup : MonoBehaviour
         sense_distance = scaleSlider.value;
         move_distance = moveDistanceSlider.value;
         deposit_strength = depositStrengthSlider.value;
-        //agent_deposit = agentDepositStrengthSlider.value;
+        agent_deposit = agentDepositStrengthSlider.value;
 
         int propagateKernel = propagate.FindKernel("CSMain");
 
@@ -493,7 +493,7 @@ public class ComputeHookup : MonoBehaviour
 
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex] = moveDistanceSliderTest.value;//moveDistanceSlider.value;
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 1] = senseDistanceSlider.value;//moveDistanceSlider.value * 2.0f;//sense distance
-                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 2] = 5.0f;//agentDepositStrengthSlider.value;
+                        moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 2] = agentDepositStrengthSlider.value;
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 3] = 1.0f;//lifetimeSlider.value;
                        
                         red_green_blue_alpha_array[nextAvailableIndex] = colorPicker.CurrentColor.r;//particleRedChannelSlider.value;
@@ -512,12 +512,15 @@ public class ComputeHookup : MonoBehaviour
                         // Debug.Log("--");
                         if (modeDropdown.value == DRAW_DEPOSIT_MODE) {
                             // draw temporary deposit that dissolves
+                            Debug.Log("DRAW DEPOSIT");
                             x_y_theta_dataType_array[nextAvailableIndex + 3] = DEPOSIT;
                         } else if (modeDropdown.value == DRAW_DEPOSIT_EMITTERS_MODE) {
                             // draw deposit emitters that continuously emit deposit
                             x_y_theta_dataType_array[nextAvailableIndex + 3] = DEPOSIT_EMITTER;
+                            Debug.Log("DRAW DEPOSIT EMITTERS");
                         } else if (modeDropdown.value == DRAW_PARTICLES_MODE) {
                             // draw particles
+                            Debug.Log("DRAW PARTICLES");
                             x_y_theta_dataType_array[nextAvailableIndex + 3] = PARTICLE;
                         }
                     }
