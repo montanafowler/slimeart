@@ -137,6 +137,8 @@ public class ComputeHookup : MonoBehaviour
     private const int SCALE = 0;
     private const int SPEED = 1;
 
+    private Vector3 previousMousePosition; 
+
     //public Camera camera;
     // Start is called before the first frame update
     void Start() {
@@ -145,8 +147,11 @@ public class ComputeHookup : MonoBehaviour
         //GraphicsQualityMenu.QUALITY_MENU_GAME_OBJECT.SetActive(false);
         // kernel is the propagate shader (initial spark)
         propagateKernel = propagate.FindKernel("CSMain");
+        GameObject uiBox = GameObject.Find("CubeUI");
+        GameObject drawingCanvas = GameObject.Find("DrawingCanvas");
+        pixelWidth = (int)(drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width);
         pixelHeight = Screen.height;
-        pixelWidth = Screen.width;
+        //pixelWidth = Screen.width;
 
         if (SAVED_QUALITY == 0.0f) {
             MAX_SPACE = 100000;
@@ -177,6 +182,7 @@ public class ComputeHookup : MonoBehaviour
         blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
         blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
 
+        previousMousePosition = new Vector3(0.0f, 0.0f, 0.0f);
     }
 
     void setUpCanvas() {
@@ -184,6 +190,11 @@ public class ComputeHookup : MonoBehaviour
         propagateKernel = propagate.FindKernel("CSMain");
         pixelHeight = Screen.height;
         pixelWidth = Screen.width;
+        GameObject uiBox = GameObject.Find("CubeUI");
+        // Debug.Log(uiBox.transform.lossyScale);
+        GameObject drawingCanvas = GameObject.Find("DrawingCanvas");
+        float pixelWidthDrawingCanvas = drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * pixelWidth;
+
 
         TMP_Dropdown modeDropdown = GameObject.Find("GraphicsQualityDropdown").GetComponent<TMP_Dropdown>();
 
@@ -444,8 +455,10 @@ public class ComputeHookup : MonoBehaviour
 
     void draw(float x, float y) {
         // TODODODODODODOD GET THE OFFSET RIGHT, somehow the width of the UI cube
-        float centerX = pixelWidth - x;// - pixelWidth*4/19;// + (mat.mainTextureOffset.x * pixelWidth * mat.mainTextureScale.x);
+        float centerX = Screen.width - x;///Screen.width - x;// - pixelWidth*4/19;// + (mat.mainTextureOffset.x * pixelWidth * mat.mainTextureScale.x);
         float centerY = pixelHeight - y;
+        Debug.Log("centerX " + centerX);
+        Debug.Log("centerY " + centerY);
         
         if (modeDropdown.value != OBSERVE_MODE)  {
 
@@ -603,6 +616,7 @@ public class ComputeHookup : MonoBehaviour
         GameObject uiBox = GameObject.Find("CubeUI");
         // Debug.Log(uiBox.transform.lossyScale);
         GameObject drawingCanvas = GameObject.Find("DrawingCanvas");
+        float pixelWidthDrawingCanvas = drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * pixelWidth;
         // Debug.Log(drawingCanvas.transform.lossyScale);
         // Debug.Log("pixelWidth " + pixelWidth + "pixelHeight " + pixelHeight);
         /*if (Input.GetMouseButton(0)) //&& Input.mousePosition.x > 0.0 && Input.mousePosition.y > 0.0 && Input.mousePosition.x < pixelWidth - pixelWidth*4 && Input.mousePosition.y < pixelHeight)
@@ -627,18 +641,34 @@ public class ComputeHookup : MonoBehaviour
                            }
       //  }*/
 
-        if (Input.GetMouseButtonDown(0))
+
+        if (Input.GetMouseButton(0) && Vector3.Distance(previousMousePosition, Input.mousePosition) > 20.0f)
         {
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            previousMousePosition = Input.mousePosition;
             if (Physics.Raycast(ray, out hit, 100.0f))
             {
                 if (hit.transform.name == "DrawingCanvas")
                 {
-                    draw(Camera.main.WorldToScreenPoint(hit.point).x, Camera.main.WorldToScreenPoint(hit.point).y) ;
+                    float drawingCanvasShift = drawingCanvas.transform.position.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width;
+                    float uiBoxWidth = uiBox.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width;
+                    //draw(Camera.main.WorldToScreenPoint(hit.point).x, Camera.main.WorldToScreenPoint(hit.point).y) ;
+                    //draw(Camera.main.WorldToScreenPoint(hit.point).x - drawingCanvasShift + uiBoxWidth, Camera.main.WorldToScreenPoint(hit.point).y);
+                    draw(Camera.main.WorldToScreenPoint(hit.point).x + uiBoxWidth*1.2f, Camera.main.WorldToScreenPoint(hit.point).y);
+
                     // Debug.Log("Test");
-                    //Debug.Log("position " + hit.transform.position);
-                    Debug.Log("world to screen " + Camera.main.WorldToScreenPoint(hit.transform.position));
+                   /* Debug.Log("hit.point " + hit.point);
+                    Debug.Log("world to screen of hit.point " + Camera.main.WorldToScreenPoint(hit.point));
+                    Debug.Log("Screen.width " + Screen.width);
+                    Debug.Log("drawingCanvas.transform.position.x " + drawingCanvas.transform.position.x);
+                    Debug.Log("drawingCanvas.transform.lossyScale.x " + drawingCanvas.transform.lossyScale.x);
+                    Debug.Log("uiBox.transform.lossyScale.x " + uiBox.transform.lossyScale.x);
+                    Debug.Log("pixelWidth " + pixelWidth);
+                    Debug.Log("pixel width calcualtion " + (drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width));
+                   */ 
+                    //Debug.Log("world to screen " + Camera.main.WorldToScreenPoint(hit.transform.position));
+                    //Debug.Log("world to screen " + Camera.main.WorldToScreenPoint(hit.transform.position));
                     //.main.WorldToScreenPoint(hit.transform.position);
 
                 }
