@@ -457,8 +457,8 @@ public class ComputeHookup : MonoBehaviour
         // TODODODODODODOD GET THE OFFSET RIGHT, somehow the width of the UI cube
         float centerX = Screen.width - x;///Screen.width - x;// - pixelWidth*4/19;// + (mat.mainTextureOffset.x * pixelWidth * mat.mainTextureScale.x);
         float centerY = pixelHeight - y;
-        Debug.Log("centerX " + centerX);
-        Debug.Log("centerY " + centerY);
+        //Debug.Log("centerX " + centerX);
+      //  Debug.Log("centerY " + centerY);
         
         if (modeDropdown.value != OBSERVE_MODE)  {
 
@@ -512,15 +512,15 @@ public class ComputeHookup : MonoBehaviour
                         // Debug.Log("--");
                         if (modeDropdown.value == DRAW_DEPOSIT_MODE) {
                             // draw temporary deposit that dissolves
-                            Debug.Log("DRAW DEPOSIT");
+                           // Debug.Log("DRAW DEPOSIT");
                             x_y_theta_dataType_array[nextAvailableIndex + 3] = DEPOSIT;
                         } else if (modeDropdown.value == DRAW_DEPOSIT_EMITTERS_MODE) {
                             // draw deposit emitters that continuously emit deposit
                             x_y_theta_dataType_array[nextAvailableIndex + 3] = DEPOSIT_EMITTER;
-                            Debug.Log("DRAW DEPOSIT EMITTERS");
+                          //  Debug.Log("DRAW DEPOSIT EMITTERS");
                         } else if (modeDropdown.value == DRAW_PARTICLES_MODE) {
                             // draw particles
-                            Debug.Log("DRAW PARTICLES");
+                        //    Debug.Log("DRAW PARTICLES");
                             x_y_theta_dataType_array[nextAvailableIndex + 3] = PARTICLE;
                         }
                     }
@@ -654,22 +654,31 @@ public class ComputeHookup : MonoBehaviour
             {
                 if (hit.transform.name == "DrawingCanvas")
                 {
-                    float drawingCanvasShift = drawingCanvas.transform.position.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width;
+                    float drawingCanvasWidth= drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width;
                     float uiBoxWidth = uiBox.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width;
                     //draw(Camera.main.WorldToScreenPoint(hit.point).x, Camera.main.WorldToScreenPoint(hit.point).y) ;
                     //draw(Camera.main.WorldToScreenPoint(hit.point).x - drawingCanvasShift + uiBoxWidth, Camera.main.WorldToScreenPoint(hit.point).y);
-                    draw(Camera.main.WorldToScreenPoint(hit.point).x + uiBoxWidth*1.2f, Camera.main.WorldToScreenPoint(hit.point).y);
+                    float fraction = (Camera.main.WorldToScreenPoint(hit.point).x /*+ uiBoxWidth * 1.2f*/) / drawingCanvasWidth;// - 0.5f;
+                    float newX = Camera.main.WorldToScreenPoint(hit.point).x + uiBoxWidth * (1.2f + -1.0f * (fraction - 0.5f)/2.0f);
+                    Debug.Log("fraction " + fraction);
+                    Debug.Log("drawingCanvasWidth " + drawingCanvasWidth);
+                    Debug.Log("ui box width " + uiBoxWidth);
+                    Debug.Log("Camera.main.WorldToScreenPoint(hit.point).x " + Camera.main.WorldToScreenPoint(hit.point).x);
+                    Debug.Log("uiBoxWidth * 1.2f " + uiBoxWidth * 1.2f);
+
+                    //draw(Camera.main.WorldToScreenPoint(hit.point).x + uiBoxWidth*1.2f, Camera.main.WorldToScreenPoint(hit.point).y);
+                    draw(newX, Camera.main.WorldToScreenPoint(hit.point).y);
 
                     // Debug.Log("Test");
-                   /* Debug.Log("hit.point " + hit.point);
-                    Debug.Log("world to screen of hit.point " + Camera.main.WorldToScreenPoint(hit.point));
-                    Debug.Log("Screen.width " + Screen.width);
-                    Debug.Log("drawingCanvas.transform.position.x " + drawingCanvas.transform.position.x);
-                    Debug.Log("drawingCanvas.transform.lossyScale.x " + drawingCanvas.transform.lossyScale.x);
-                    Debug.Log("uiBox.transform.lossyScale.x " + uiBox.transform.lossyScale.x);
-                    Debug.Log("pixelWidth " + pixelWidth);
-                    Debug.Log("pixel width calcualtion " + (drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width));
-                   */ 
+                    /* Debug.Log("hit.point " + hit.point);
+                     Debug.Log("world to screen of hit.point " + Camera.main.WorldToScreenPoint(hit.point));
+                     Debug.Log("Screen.width " + Screen.width);
+                     Debug.Log("drawingCanvas.transform.position.x " + drawingCanvas.transform.position.x);
+                     Debug.Log("drawingCanvas.transform.lossyScale.x " + drawingCanvas.transform.lossyScale.x);
+                     Debug.Log("uiBox.transform.lossyScale.x " + uiBox.transform.lossyScale.x);
+                     Debug.Log("pixelWidth " + pixelWidth);
+                     Debug.Log("pixel width calcualtion " + (drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width));
+                    */
                     //Debug.Log("world to screen " + Camera.main.WorldToScreenPoint(hit.transform.position));
                     //Debug.Log("world to screen " + Camera.main.WorldToScreenPoint(hit.transform.position));
                     //.main.WorldToScreenPoint(hit.transform.position);
