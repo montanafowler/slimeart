@@ -1,2 +1,14 @@
 Base path: 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data', plugins path 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data/PlaybackEngines'
 Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=1795 outsize=1794 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at decay.compute(32): integer modulus may be much slower, try using uints if possible.
+  error: 1 plat 4 at decay.compute(33): integer modulus may be much slower, try using uints if possible.
+  api=4 insize=1794 outsize=1718 ok=1
+Cmd: preprocessCompute
+  insize=1794 outsize=1793 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at decay.compute(32): integer modulus may be much slower, try using uints if possible.
+  error: 1 plat 4 at decay.compute(33): integer modulus may be much slower, try using uints if possible.
+  api=4 insize=1793 outsize=1718 ok=1
