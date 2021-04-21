@@ -133,6 +133,7 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
     float alpha = red_green_blue_alpha[idx + 3];
     float turn_angle = turn_sense_angles[idx];
     float half_sense_spread = turn_sense_angles[idx + 1];
+    float tex_trace_decay = turn_sense_angles[idx + 2];
     tex_trace[uint2(x, y)] = float4(red, green, blue, alpha);
     //return;
     if (data_type == DEPOSIT_EMITTER) {
@@ -230,7 +231,7 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
     
     float trace_calc = 1.0 - exp(3.0 * distance_scaling_factor);
     tex_trace[uint2(x, y)] = //float4(trace_calc, trace_calc, trace_calc, 1.0);
-        float4(red, green, blue, alpha);
+        float4(red, green, blue, tex_trace_decay);
                               
         //float4(distance_scaling_factor * red, distance_scaling_factor * green, distance_scaling_factor * blue, 1.0);
         //float4(distance_scaling_factor, abs(center_axis.x), abs(center_axis.y), 1.0); // NOT ATOMIC!

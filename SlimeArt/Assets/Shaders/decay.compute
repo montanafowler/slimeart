@@ -11,6 +11,7 @@ int pixelWidth;
 int pixelHeight;
 
 
+
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
@@ -23,7 +24,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float4 t = float4(0.0, 0.0, 0.0, 0.0);
     float w = 0.0;
 
-    //tex_trace_out[p] = tex_trace_in[p] * 0.995;
+    tex_trace_out[p] = float4(0.0, 0.0, 0.0, 1.0);
 
     for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
@@ -32,7 +33,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
             txcoord.x = txcoord.x % pixelWidth;
             txcoord.y = txcoord.y % pixelHeight;
             v += weight * deposit_in[txcoord];
-            t += weight * tex_trace_in[txcoord];
+           // t += weight * tex_trace_in[txcoord];
             w += weight;
             //t.x += weight * tex_trace_in[txcoord].x;
             //t.y += weight * tex_trace_in[txcoord].y;
@@ -41,7 +42,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         }
     }
     v /= w;
-    t /= w;
+    //t /= w;
 
     // Decay the deposit by a constant factor
     v *= 0.9995;
@@ -49,7 +50,12 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
     // Decay the trace a little
     //tex_trace[p] *= 0.995;
-    t *= 0.999;
-    tex_trace_out[p] = t;
-    tex_trace_out[p] = tex_trace_in[p]* 0.995;
+  //  t *= 0.999;
+    //tex_trace_out[p] = t;
+    tex_trace_out[p] = float4(0.0, 0.0, 0.0, 1.0);
+    tex_trace_out[p] += tex_trace_in[p]* tex_trace_in[p].w;
+    if (tex_trace_out[p].x < 0.2) {
+        tex_trace_out[p] = float4(tex_trace_in[p].w, 0.0, 0.0, 1.0);
+    }
+   // tex_trace_out[p] = float4(0.0, 1.0, 0.0, 1.0);
 }

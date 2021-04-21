@@ -69,6 +69,7 @@ public class ComputeHookup : MonoBehaviour
     private Slider brushSizeSlider;
     private Slider brushDensitySlider;
     private Slider lifetimeSlider;
+    private Slider traceDecaySlider;
     
 
     private TextMeshProUGUI moveDistanceSliderText;
@@ -82,6 +83,7 @@ public class ComputeHookup : MonoBehaviour
     private TextMeshProUGUI particleGreenChannelSliderText;
     private TextMeshProUGUI particleBlueChannelSliderText;
     private TextMeshProUGUI particleAlphaChannelSliderText;
+    private TextMeshProUGUI traceDecaySliderText;
     private ColorPicker colorPicker;
 
     //test ones
@@ -305,6 +307,7 @@ public class ComputeHookup : MonoBehaviour
         turnAngleSlider = GameObject.Find("TurnAngleSlider").GetComponent<Slider>();
         senseAngleSlider = GameObject.Find("SenseAngleSlider").GetComponent<Slider>();
         senseDistanceSlider = GameObject.Find("SenseDistanceSlider").GetComponent<Slider>();
+        traceDecaySlider = GameObject.Find("TraceDecaySlider").GetComponent<Slider>();
 
         move_distance = moveDistanceSlider.value;
         sense_distance = scaleSlider.value;
@@ -334,7 +337,11 @@ public class ComputeHookup : MonoBehaviour
 
         brushDensitySliderText = GameObject.Find("BrushDensitySliderText").GetComponent<TextMeshProUGUI>();
         brushDensitySlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushDensitySliderText, "brush density: ", 50-brushDensitySlider.value); });
-        updateSliderLabel(brushDensitySliderText, "brush density: ", brushDensitySlider.value);
+        updateSliderLabel(brushDensitySliderText, "brush density: ", 50 - brushDensitySlider.value);
+
+        traceDecaySliderText = GameObject.Find("TraceDecaySliderText").GetComponent<TextMeshProUGUI>();
+        traceDecaySlider.onValueChanged.AddListener(delegate { updateSliderLabel(traceDecaySliderText, "Trace Decay: ", 50 - traceDecaySlider.value); });
+        updateSliderLabel(traceDecaySliderText, "Trace Decay: ", traceDecaySlider.value);
 
         //lifetimeSliderText = GameObject.Find("ParticleLifetimeSliderText").GetComponent<TextMeshProUGUI>();
         //lifetimeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value); });
@@ -503,7 +510,7 @@ public class ComputeHookup : MonoBehaviour
 
                         turn_sense_angles_array[nextAvailableIndex] = turnAngleSlider.value;
                         turn_sense_angles_array[nextAvailableIndex + 1] = senseAngleSlider.value;
-                        turn_sense_angles_array[nextAvailableIndex + 2] = 0.0f;
+                        turn_sense_angles_array[nextAvailableIndex + 2] = traceDecaySlider.value;
                         turn_sense_angles_array[nextAvailableIndex + 3] = 0.0f;
 
                         //Debug.Log(colorPicker.CurrentColor.r);
@@ -570,6 +577,8 @@ public class ComputeHookup : MonoBehaviour
             decay.SetTexture(decayKernel, "deposit_out", deposit_out);
             decay.SetTexture(decayKernel, "tex_trace_in", tex_trace_in);
             decay.SetTexture(decayKernel, "tex_trace_out", tex_trace_out);
+            blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", tex_trace_out);
+
             updatepropagateShaderVariables(deposit_out, tex_trace_out);
             swap = 1;
         }
@@ -579,10 +588,14 @@ public class ComputeHookup : MonoBehaviour
             decay.SetTexture(decayKernel, "deposit_out", deposit_in);
             decay.SetTexture(decayKernel, "tex_trace_in", tex_trace_out);
             decay.SetTexture(decayKernel, "tex_trace_out", tex_trace_in);
+            blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", tex_trace_in);
+
             updatepropagateShaderVariables(deposit_in, tex_trace_in);
             swap = 0;
         }
-        //blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
+     //  blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
+       // blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+       // blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
         blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
 
         decay.Dispatch(decayKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
@@ -660,11 +673,11 @@ public class ComputeHookup : MonoBehaviour
                     //draw(Camera.main.WorldToScreenPoint(hit.point).x - drawingCanvasShift + uiBoxWidth, Camera.main.WorldToScreenPoint(hit.point).y);
                     float fraction = (Camera.main.WorldToScreenPoint(hit.point).x /*+ uiBoxWidth * 1.2f*/) / drawingCanvasWidth;// - 0.5f;
                     float newX = Camera.main.WorldToScreenPoint(hit.point).x + uiBoxWidth * (1.2f + -1.0f * (fraction - 0.5f)/2.0f);
-                    Debug.Log("fraction " + fraction);
+                   /* Debug.Log("fraction " + fraction);
                     Debug.Log("drawingCanvasWidth " + drawingCanvasWidth);
                     Debug.Log("ui box width " + uiBoxWidth);
                     Debug.Log("Camera.main.WorldToScreenPoint(hit.point).x " + Camera.main.WorldToScreenPoint(hit.point).x);
-                    Debug.Log("uiBoxWidth * 1.2f " + uiBoxWidth * 1.2f);
+                    Debug.Log("uiBoxWidth * 1.2f " + uiBoxWidth * 1.2f);*/
 
                     //draw(Camera.main.WorldToScreenPoint(hit.point).x + uiBoxWidth*1.2f, Camera.main.WorldToScreenPoint(hit.point).y);
                     draw(newX, Camera.main.WorldToScreenPoint(hit.point).y);
