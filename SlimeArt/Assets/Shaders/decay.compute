@@ -9,6 +9,7 @@ RWTexture2D<float4> tex_trace_in;
 RWTexture2D<float4> tex_trace_out;
 int pixelWidth;
 int pixelHeight;
+float trace_decay_value;
 
 
 
@@ -53,9 +54,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
   //  t *= 0.999;
     //tex_trace_out[p] = t;
     tex_trace_out[p] = float4(0.0, 0.0, 0.0, 1.0);
-    tex_trace_out[p] += tex_trace_in[p]* tex_trace_in[p].w;
+    tex_trace_out[p] += tex_trace_in[p] * trace_decay_value;
     if (tex_trace_out[p].x < 0.2) {
-        tex_trace_out[p] = float4(tex_trace_in[p].w, 0.0, 0.0, 1.0);
+        tex_trace_out[p] = float4(0.0, 0.0, 0.0, 1.0);
     }
    // tex_trace_out[p] = float4(0.0, 1.0, 0.0, 1.0);
 }

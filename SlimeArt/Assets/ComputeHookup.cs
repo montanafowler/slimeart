@@ -160,12 +160,12 @@ public class ComputeHookup : MonoBehaviour
         }
 
         if (SAVED_QUALITY == 1.0f) {
-            MAX_SPACE = 1000000;
+            MAX_SPACE = 900000;
         }
 
         if (SAVED_QUALITY == 2.0f)
         {
-            MAX_SPACE = 5000000;
+            MAX_SPACE = 2000000;
         }
 
         //MAX_SPACE = 100000;//pixelHeight * pixelWidth * 5;
@@ -336,11 +336,11 @@ public class ComputeHookup : MonoBehaviour
         updateSliderLabel(brushSizeSliderText, "brush size: ", brushSizeSlider.value);
 
         brushDensitySliderText = GameObject.Find("BrushDensitySliderText").GetComponent<TextMeshProUGUI>();
-        brushDensitySlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushDensitySliderText, "brush density: ", 50-brushDensitySlider.value); });
-        updateSliderLabel(brushDensitySliderText, "brush density: ", 50 - brushDensitySlider.value);
+        brushDensitySlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushDensitySliderText, "brush density: ", 50+brushDensitySlider.value); });
+        updateSliderLabel(brushDensitySliderText, "brush density: ", 50 + brushDensitySlider.value);
 
         traceDecaySliderText = GameObject.Find("TraceDecaySliderText").GetComponent<TextMeshProUGUI>();
-        traceDecaySlider.onValueChanged.AddListener(delegate { updateSliderLabel(traceDecaySliderText, "Trace Decay: ", 50 - traceDecaySlider.value); });
+        traceDecaySlider.onValueChanged.AddListener(delegate { updateSliderLabel(traceDecaySliderText, "Trace Decay: ", traceDecaySlider.value); });
         updateSliderLabel(traceDecaySliderText, "Trace Decay: ", traceDecaySlider.value);
 
         //lifetimeSliderText = GameObject.Find("ParticleLifetimeSliderText").GetComponent<TextMeshProUGUI>();
@@ -480,11 +480,16 @@ public class ComputeHookup : MonoBehaviour
 
             float newX, newY;
             brush_size = (brushSizeSlider.value + 1)/2;
-            int brush_density = (int)brushDensitySlider.value;
-            if (brush_density > brush_size / 3)
-            {
+            int brush_density = (int)brushDensitySlider.value*-1;
+
+            if(SAVED_QUALITY == 0.0f && brush_density < 5) {
+                brush_density = 5;
+            }
+
+            if (brush_density > brush_size / 3) {
                 brush_density = (int)brush_size / 3;
             }
+
             for (int dx = (int)-brush_size; dx < (int)brush_size; dx+=brush_density) {
                 for(int dy = (int)-brush_size; dy < (int)brush_size; dy+=brush_density) {
                     newX = centerX + dx;
@@ -510,7 +515,7 @@ public class ComputeHookup : MonoBehaviour
 
                         turn_sense_angles_array[nextAvailableIndex] = turnAngleSlider.value;
                         turn_sense_angles_array[nextAvailableIndex + 1] = senseAngleSlider.value;
-                        turn_sense_angles_array[nextAvailableIndex + 2] = traceDecaySlider.value;
+                        turn_sense_angles_array[nextAvailableIndex + 2] = 0.0f;//traceDecaySlider.value;
                         turn_sense_angles_array[nextAvailableIndex + 3] = 0.0f;
 
                         //Debug.Log(colorPicker.CurrentColor.r);
@@ -569,7 +574,7 @@ public class ComputeHookup : MonoBehaviour
         int intPixHeight = (int)pixelHeight;
         decay.SetInt("pixelWidth", (int)pixelWidth);
         decay.SetInt("pixelHeight", (int)pixelHeight);
-
+        decay.SetFloat("trace_decay_value", traceDecaySlider.value);
 
         if (swap == 0)
         {
@@ -577,7 +582,7 @@ public class ComputeHookup : MonoBehaviour
             decay.SetTexture(decayKernel, "deposit_out", deposit_out);
             decay.SetTexture(decayKernel, "tex_trace_in", tex_trace_in);
             decay.SetTexture(decayKernel, "tex_trace_out", tex_trace_out);
-            blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", tex_trace_out);
+           // blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", tex_trace_out);
 
             updatepropagateShaderVariables(deposit_out, tex_trace_out);
             swap = 1;
@@ -588,14 +593,14 @@ public class ComputeHookup : MonoBehaviour
             decay.SetTexture(decayKernel, "deposit_out", deposit_in);
             decay.SetTexture(decayKernel, "tex_trace_in", tex_trace_out);
             decay.SetTexture(decayKernel, "tex_trace_out", tex_trace_in);
-            blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", tex_trace_in);
+          //  blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", tex_trace_in);
 
             updatepropagateShaderVariables(deposit_in, tex_trace_in);
             swap = 0;
         }
-     //  blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
-       // blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
-       // blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
+        blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
+        // blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+        // blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
         blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
 
         decay.Dispatch(decayKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
