@@ -504,6 +504,7 @@ public class ComputeHookup : MonoBehaviour
                         x_y_theta_dataType_array[nextAvailableIndex + 2] = Random.Range(-PI, PI); //random Theta
 
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex] = moveDistanceSliderTest.value;//moveDistanceSlider.value;
+
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 1] = senseDistanceSlider.value;//moveDistanceSlider.value * 2.0f;//sense distance
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 2] = agentDepositStrengthSlider.value;
                         moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 3] = 1.0f;//lifetimeSlider.value;
@@ -513,8 +514,8 @@ public class ComputeHookup : MonoBehaviour
                         red_green_blue_alpha_array[nextAvailableIndex + 2] = colorPicker.CurrentColor.b;//particleBlueChannelSlider.value;
                         red_green_blue_alpha_array[nextAvailableIndex + 3] = colorPicker.CurrentColor.a;//particleAlphaChannelSlider.value;
 
-                        turn_sense_angles_array[nextAvailableIndex] = turnAngleSlider.value;
-                        turn_sense_angles_array[nextAvailableIndex + 1] = senseAngleSlider.value;
+                        turn_sense_angles_array[nextAvailableIndex] = scaleSlider.value; //turnAngleSlider.value;
+                        turn_sense_angles_array[nextAvailableIndex + 1] = scaleSlider.value * 2.0f; //senseAngleSlider.value;
                         turn_sense_angles_array[nextAvailableIndex + 2] = 0.0f;//traceDecaySlider.value;
                         turn_sense_angles_array[nextAvailableIndex + 3] = 0.0f;
 
