@@ -134,7 +134,7 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
     float turn_angle = turn_sense_angles[idx];
     float half_sense_spread = turn_sense_angles[idx + 1];
     //float tex_trace_decay = turn_sense_angles[idx + 2];
-    tex_trace[uint2(x, y)] = float4(red, green, blue, alpha);
+    
     //return;
     if (data_type == DEPOSIT_EMITTER) {
         tex_deposit[uint2(x_normalized * world_width,
@@ -158,6 +158,7 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
         wang_hash(359 * idx),
         wang_hash(uint(x * y))
     );
+    tex_trace[uint2(x, y)] = float4(red, green, blue, alpha);
 
     // Get vector which points in the current particle's direction
     float2 center_axis = float2(cos(theta), sin(theta));
