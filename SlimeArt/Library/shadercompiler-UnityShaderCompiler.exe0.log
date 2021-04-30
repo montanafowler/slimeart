@@ -1,2 +1,63 @@
 Base path: 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data', plugins path 'C:/Program Files/Unity/Hub/Editor/2019.3.8f1/Editor/Data/PlaybackEngines'
 Cmd: initializeCompiler
+Cmd: preprocessCompute
+  insize=2390 outsize=2389 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at decay.compute(34): integer modulus may be much slower, try using uints if possible.
+  error: 1 plat 4 at decay.compute(35): integer modulus may be much slower, try using uints if possible.
+  api=4 insize=2389 outsize=2079 ok=1
+Cmd: preprocessCompute
+  insize=2396 outsize=2395 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at decay.compute(34): integer modulus may be much slower, try using uints if possible.
+  error: 1 plat 4 at decay.compute(35): integer modulus may be much slower, try using uints if possible.
+  api=4 insize=2395 outsize=1771 ok=1
+Cmd: preprocessCompute
+  insize=2428 outsize=2427 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at decay.compute(67): 'ceil': no matching 2 parameter intrinsic function; Possible intrinsic functions are: ceil(float|half|min10float|min16float)
+  api=4 insize=2427 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=2557 outsize=2556 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at decay.compute(67): 'ceil': no matching 2 parameter intrinsic function; Possible intrinsic functions are: ceil(float|half|min10float|min16float)
+  api=4 insize=2556 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=2554 outsize=2553 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at decay.compute(34): integer modulus may be much slower, try using uints if possible.
+  error: 1 plat 4 at decay.compute(35): integer modulus may be much slower, try using uints if possible.
+  error: 2 plat 4 at decay.compute(67): typed UAV stores must write all declared components.
+  error: 2 plat 4 at decay.compute(68): typed UAV stores must write all declared components.
+  error: 2 plat 4 at decay.compute(69): typed UAV stores must write all declared components.
+  api=4 insize=2553 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=2591 outsize=2590 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at decay.compute(34): integer modulus may be much slower, try using uints if possible.
+  error: 1 plat 4 at decay.compute(35): integer modulus may be much slower, try using uints if possible.
+  api=4 insize=2590 outsize=1678 ok=1
+Cmd: preprocessCompute
+  insize=2602 outsize=2601 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at decay.compute(67): 'ceil': no matching 2 parameter intrinsic function; Possible intrinsic functions are: ceil(float|half|min10float|min16float)
+  api=4 insize=2601 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=2831 outsize=2830 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at decay.compute(34): integer modulus may be much slower, try using uints if possible.
+  error: 1 plat 4 at decay.compute(35): integer modulus may be much slower, try using uints if possible.
+  api=4 insize=2830 outsize=1826 ok=1
+Cmd: preprocessCompute
+  insize=2864 outsize=2863 ok=1
+Cmd: compileComputeKernel
+  error: 2 plat 4 at decay.compute(67): undeclared identifier 'tex_trace_decay'
+  api=4 insize=2863 outsize=0 ok=0
+Cmd: preprocessCompute
+  insize=2870 outsize=2869 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at decay.compute(34): integer modulus may be much slower, try using uints if possible.
+  error: 1 plat 4 at decay.compute(35): integer modulus may be much slower, try using uints if possible.
+  api=4 insize=2869 outsize=1863 ok=1
+
+Quitting shader compiler process

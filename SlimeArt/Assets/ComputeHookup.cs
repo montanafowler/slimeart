@@ -253,17 +253,22 @@ public class ComputeHookup : MonoBehaviour
         //data_types = initializeComputeBuffer(dataTypes, "data_types", propagateKernel);
 
         //x,y,theta,data
+      //  x_y_theta_dataType_buffer.Release();
         x_y_theta_dataType_buffer = initializeComputeBuffer(x_y_theta_dataType_array, "x_y_theta_dataType", propagateKernel);
 
         //moveDist,senseDist,particleDepositStrength,lifetime
+      //  moveDist_SenseDist_particleDepositStrength_lifetime_buffer.Release();
         moveDist_SenseDist_particleDepositStrength_lifetime_buffer = initializeComputeBuffer(moveDist_SenseDist_particleDepositStrength_lifetime_array, 
             "moveDist_SenseDist_particleDepositStrength_lifetime", propagateKernel);
 
         //red,green,blue,alpha
+       // red_green_blue_alpha_buffer.Release();
         red_green_blue_alpha_buffer = initializeComputeBuffer(red_green_blue_alpha_array, "red_green_blue_alpha", propagateKernel);
 
+      //  turn_sense_angles_buffer.Release();
         turn_sense_angles_buffer = initializeComputeBuffer(turn_sense_angles_array, "turn_sense_angles", propagateKernel);
 
+       // blank_canvas.Release();
         blank_canvas = initializeComputeBuffer(blankCanvas, "blank_canvas", blank_canvas_shader.FindKernel("CSMain"));
 
         // deposit texture for propagate shader
@@ -393,7 +398,9 @@ public class ComputeHookup : MonoBehaviour
             agentDepositStrengthSlider.interactable = true;
             senseDistanceSlider.enabled = true;
             senseDistanceSlider.interactable = true;
-            if(viewDropdown.value == (int)DEPOSIT_VIEW)
+            depositStrengthSlider.enabled = false;
+            depositStrengthSlider.interactable = false;
+            if (viewDropdown.value == (int)DEPOSIT_VIEW)
             {
                 viewDropdown.value = (int)TRACE_VIEW;
             }
@@ -412,6 +419,8 @@ public class ComputeHookup : MonoBehaviour
             agentDepositStrengthSlider.interactable = false;
             senseDistanceSlider.enabled = false;
             senseDistanceSlider.interactable = false;
+            depositStrengthSlider.enabled = true;
+            depositStrengthSlider.interactable = true;
             viewDropdown.value = (int)DEPOSIT_VIEW;
         }
     }
@@ -619,6 +628,10 @@ public class ComputeHookup : MonoBehaviour
         if (Input.GetKeyDown("escape"))
         {
             Debug.Log("quit");
+            x_y_theta_dataType_buffer.Release();
+            moveDist_SenseDist_particleDepositStrength_lifetime_buffer.Release();
+            red_green_blue_alpha_buffer.Release();
+            turn_sense_angles_buffer.Release();
             Application.Quit(); // Quits the game
         }
 
