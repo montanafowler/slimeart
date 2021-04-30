@@ -97,6 +97,8 @@ public class ComputeHookup : MonoBehaviour
     private Slider senseAngleSlider;
 
     private TMP_Dropdown modeDropdown;
+    private Button particleBrushButton;
+    private Button depositBrushButton;
     private TMP_Dropdown viewDropdown;
     private float OBSERVE_MODE = 2.0f;
     private float DRAW_DEPOSIT_MODE = 3.0f;
@@ -366,6 +368,12 @@ public class ComputeHookup : MonoBehaviour
         updateSliderLabel(senseDistanceSliderText, "test sense distance: ", senseDistanceSlider.value);
 
         modeDropdown = GameObject.Find("ModeDropdown").GetComponent<TMP_Dropdown>();
+        particleBrushButton = GameObject.Find("ParticleBrushButton").GetComponent<Button>();
+        depositBrushButton = GameObject.Find("DepositBrushButton").GetComponent<Button>();
+        particleBrushButton.onClick.AddListener(delegate { brushSwitch(true); }); 
+        depositBrushButton.onClick.AddListener(delegate { brushSwitch(false); });
+        brushSwitch(true); // set particle brush to be selected first
+
         //modeDropdown.onValueChanged.AddListener(delegate { changeMode(modeDropdown.value);  });
 
         viewDropdown = GameObject.Find("ViewDropdown").GetComponent<TMP_Dropdown>();
@@ -376,7 +384,22 @@ public class ComputeHookup : MonoBehaviour
         clearCanvasButton.onClick.AddListener(delegate { Debug.Log("clear"); setupBuffers(); /*updatepropagateShaderVariables(deposit_in);*/ });
     }
 
-    
+    void brushSwitch(bool particleBrush) {
+        if (particleBrush)
+        {
+            particleBrushButton.interactable = false; 
+            depositBrushButton.interactable = true;
+            moveDistanceSlider.enabled = true;
+       
+            moveDistanceSlider.interactable = true;
+        } else
+        {
+            particleBrushButton.interactable = true;
+            depositBrushButton.interactable = false;
+            moveDistanceSlider.enabled = false;
+            moveDistanceSlider.interactable = false;
+        }
+    }
 
     void calculateGroupTheoryIncrement() {
         group_theory_increment = 3;
@@ -530,7 +553,7 @@ public class ComputeHookup : MonoBehaviour
                         } else if (modeDropdown.value == DRAW_DEPOSIT_EMITTERS_MODE) {
                             // draw deposit emitters that continuously emit deposit
                             x_y_theta_dataType_array[nextAvailableIndex + 3] = DEPOSIT_EMITTER;
-                          //  Debug.Log("DRAW DEPOSIT EMITTERS");
+                            Debug.Log("DRAW DEPOSIT EMITTERS");
                         } else if (modeDropdown.value == DRAW_PARTICLES_MODE) {
                             // draw particles
                         //    Debug.Log("DRAW PARTICLES");

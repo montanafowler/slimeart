@@ -54,10 +54,20 @@ void CSMain (uint3 id : SV_DispatchThreadID)
   //  t *= 0.999;
     //tex_trace_out[p] = t;
     tex_trace_out[p] = float4(0.0, 0.0, 0.0, 1.0);
-    tex_trace_out[p] += tex_trace_in[p] * trace_decay_value;
-    if (tex_trace_out[p].x < 0.2) {
-        tex_trace_out[p] = float4(0.0, 0.0, 0.0, 1.0);
+    if (trace_decay_value < 0.98) {
+        trace_decay_value = 0.97;
     }
+    if (trace_decay_value >= 0.98 && trace_decay_value < 0.99) {
+        trace_decay_value = 0.98;
+    }
+    if (trace_decay_value >= 0.99 && trace_decay_value < 1.0) {
+        trace_decay_value = 0.99;
+    }
+
+    tex_trace_out[p] += tex_trace_in[p] * 0.995;//trace_decay_value;
+    //if (tex_trace_out[p].x < 0.2) {
+      //  tex_trace_out[p] = float4(0.0, 0.0, 0.0, 1.0);
+    //}
     //tex_trace_out[p] = tex_trace_in[p];
    // tex_trace_out[p] = float4(0.0, 1.0, 0.0, 1.0);
 }
