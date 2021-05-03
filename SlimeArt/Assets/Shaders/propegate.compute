@@ -228,7 +228,7 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
     red_green_blue_alpha[idx + 3] = alpha;
 
     // Update deposit and trace grids
-    tex_deposit[uint2(x, y)] += float4(agent_deposit, 0.0, 0.0, 1.0); // NOT ATOMIC! // the trace is not blurred, trace is not food, but agents also leave deposit
+    tex_deposit[uint2(x, y)] += float4(agent_deposit, agent_deposit, agent_deposit, 1.0); // NOT ATOMIC! // the trace is not blurred, trace is not food, but agents also leave deposit
     
     float trace_calc = 1.0 - exp(3.0 * distance_scaling_factor);
     tex_trace[uint2(x, y)] = //float4(trace_calc, trace_calc, trace_calc, 1.0);

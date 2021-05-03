@@ -327,8 +327,8 @@ public class ComputeHookup : MonoBehaviour
         updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value);
 
         agentDepositStrengthSliderText = GameObject.Find("AgentDepositStrengthSliderText").GetComponent<TextMeshProUGUI>();
-        agentDepositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value); });
-        updateSliderLabel(agentDepositStrengthSliderText, "agent deposit strength: ", agentDepositStrengthSlider.value);
+        agentDepositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(agentDepositStrengthSliderText, "particle deposit strength: ", agentDepositStrengthSlider.value); });
+        updateSliderLabel(agentDepositStrengthSliderText, "particle deposit strength: ", agentDepositStrengthSlider.value);
 
         brushSizeSliderText = GameObject.Find("BrushSizeSliderText").GetComponent<TextMeshProUGUI>();
         brushSizeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushSizeSliderText, "brush size: ", brushSizeSlider.value); });
