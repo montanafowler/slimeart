@@ -85,6 +85,8 @@ public class ComputeHookup : MonoBehaviour
     private TextMeshProUGUI particleAlphaChannelSliderText;
     private TextMeshProUGUI traceDecaySliderText;
     private ColorPicker colorPicker;
+    private TextMeshProUGUI depositSettingsTitle;
+    private TextMeshProUGUI particleSettingsTitle;
 
     //test ones
     private TextMeshProUGUI senseDistanceSliderText;
@@ -314,6 +316,9 @@ public class ComputeHookup : MonoBehaviour
         //agent_deposit = agentDepositStrengthSlider.value;
         brush_size = brushSizeSlider.value;
 
+        particleSettingsTitle = GameObject.Find("ParticleSettingsTitle").GetComponent<TextMeshProUGUI>();
+        depositSettingsTitle = GameObject.Find("DepositSettingsTitle0").GetComponent<TextMeshProUGUI>();
+
         moveDistanceSliderText = GameObject.Find("MoveDistanceSliderText").GetComponent<TextMeshProUGUI>();
         moveDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(moveDistanceSliderText, "speed: ", moveDistanceSlider.value); });
         updateSliderLabel(moveDistanceSliderText, "speed: ", moveDistanceSlider.value);
@@ -390,16 +395,34 @@ public class ComputeHookup : MonoBehaviour
 
             moveDistanceSlider.enabled = true;
             moveDistanceSlider.interactable = true;
+            moveDistanceSlider.gameObject.SetActive(true);
+
             scaleSlider.enabled = true;
             scaleSlider.interactable = true;
+            scaleSlider.gameObject.SetActive(true);
+
             traceDecaySlider.enabled = true;
             traceDecaySlider.interactable = true;
+            traceDecaySlider.gameObject.SetActive(true);
+
             agentDepositStrengthSlider.enabled = true;
             agentDepositStrengthSlider.interactable = true;
+            agentDepositStrengthSlider.gameObject.SetActive(true);
+
             senseDistanceSlider.enabled = true;
             senseDistanceSlider.interactable = true;
+            senseDistanceSlider.gameObject.SetActive(true);
+
+            colorPicker.gameObject.SetActive(true);
+
+            particleSettingsTitle.gameObject.SetActive(true);
+
             depositStrengthSlider.enabled = false;
             depositStrengthSlider.interactable = false;
+            //depositStrengthSlider.gameObject.GetComponent<Renderer>().enabled = false;
+            depositStrengthSlider.gameObject.SetActive(false);
+            depositSettingsTitle.gameObject.SetActive(false);
+
             if (viewDropdown.value == (int)DEPOSIT_VIEW)
             {
                 viewDropdown.value = (int)TRACE_VIEW;
@@ -407,20 +430,35 @@ public class ComputeHookup : MonoBehaviour
             
         } else
         {
+
+            particleSettingsTitle.GetComponent<TextMeshProUGUI>().gameObject.SetActive(false);
+           // Debug.Log(GameObject.Find("DepositSettingsTitle0"));
+           // Debug.Log(GameObject.Find("DepositSettingsTitle0").GetComponent<TextMeshProUGUI>());
+            depositSettingsTitle.GetComponent<TextMeshProUGUI>().gameObject.SetActive(true);
+            colorPicker.gameObject.SetActive(false);
+
+
             particleBrushButton.interactable = true;
             depositBrushButton.interactable = false;
             moveDistanceSlider.enabled = false;
             moveDistanceSlider.interactable = false;
+            moveDistanceSlider.gameObject.SetActive(false);
             scaleSlider.enabled = false;
             scaleSlider.interactable = false;
+            scaleSlider.gameObject.SetActive(false);
             traceDecaySlider.enabled = false;
             traceDecaySlider.interactable = false;
+            traceDecaySlider.gameObject.SetActive(false);
             agentDepositStrengthSlider.enabled = false;
             agentDepositStrengthSlider.interactable = false;
+            agentDepositStrengthSlider.gameObject.SetActive(false);
             senseDistanceSlider.enabled = false;
             senseDistanceSlider.interactable = false;
+            senseDistanceSlider.gameObject.SetActive(false);
+
             depositStrengthSlider.enabled = true;
             depositStrengthSlider.interactable = true;
+            depositStrengthSlider.gameObject.SetActive(true);
             viewDropdown.value = (int)DEPOSIT_VIEW;
         }
     }
