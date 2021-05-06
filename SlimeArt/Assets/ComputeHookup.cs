@@ -95,6 +95,8 @@ public class ComputeHookup : MonoBehaviour
 
     private Button particleBrushButton;
     private Button depositBrushButton;
+    private Button pauseButton;
+    private Button playButton;
     private TMP_Dropdown viewDropdown;
     private float OBSERVE_MODE = 2.0f;
     private float DRAW_DEPOSIT_MODE = 3.0f;
@@ -137,7 +139,8 @@ public class ComputeHookup : MonoBehaviour
     private const int SCALE = 0;
     private const int SPEED = 1;
 
-    private Vector3 previousMousePosition; 
+    private Vector3 previousMousePosition;
+    private int playingOrPausing; // 0 if playing 1 if paused
 
     //public Camera camera;
     // Start is called before the first frame update
@@ -376,9 +379,15 @@ public class ComputeHookup : MonoBehaviour
         depositBrushButton.onClick.AddListener(delegate { brushSwitch(false); });
         brushSwitch(true); // set particle brush to be selected first
 
+        playButton = GameObject.Find("Play").GetComponent<Button>();
+        pauseButton = GameObject.Find("Pause").GetComponent<Button>();
+        playButton.onClick.AddListener(delegate { pausePlaySwitch(true); });
+        pauseButton.onClick.AddListener(delegate { pausePlaySwitch(false); });
+        pausePlaySwitch(true);
+
         //modeDropdown.onValueChanged.AddListener(delegate { changeMode(modeDropdown.value);  });
 
-        
+
         //viewDropdown.onValueChanged.AddListener(delegate { changeMode(viewDropdown.value); });
 
         //Button playButton = GameObject.Find("PlayButton").GetComponent<Button>();
@@ -463,6 +472,19 @@ public class ComputeHookup : MonoBehaviour
         }
     }
 
+    void pausePlaySwitch(bool play)
+    {
+        playButton.interactable = !play; //false if play button was pushed
+        pauseButton.interactable = play; //true of play button was pushed
+        if (play)
+        {
+            playingOrPausing = 0; //play
+        } else
+        {
+            playingOrPausing = 1; //pause
+        }
+    }
+
     void calculateGroupTheoryIncrement() {
         group_theory_increment = 3;
         while (MAX_SPACE % group_theory_increment == 0) {
@@ -514,6 +536,7 @@ public class ComputeHookup : MonoBehaviour
         propagate.SetTexture(propagateKernel, "particle_render_texture", particle_render_texture);
         propagate.SetFloat("COMPUTE_GRID_WIDTH", (float)COMPUTE_GRID_WIDTH);
         propagate.SetFloat("COMPUTE_GRID_HEIGHT", (float)COMPUTE_GRID_HEIGHT);
+        propagate.SetInt("playingOrPausing", playingOrPausing);
     }
 
     int getNextAvailableIndex() {
@@ -706,10 +729,13 @@ public class ComputeHookup : MonoBehaviour
         blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
         // blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
         // blank_canvas_shader.SetTexture(blank_canvas_shader.FindKernel("CSMain"), "Result", particle_render_texture);
-        blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+        
 
+        blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
         decay.Dispatch(decayKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
         propagate.Dispatch(propagateKernel, COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
+        
+        
 
         if (viewDropdown.value == DEPOSIT_VIEW)
         {
@@ -740,33 +766,9 @@ public class ComputeHookup : MonoBehaviour
             }
         }
         GameObject uiBox = GameObject.Find("CubeUI");
-        // Debug.Log(uiBox.transform.lossyScale);
         GameObject drawingCanvas = GameObject.Find("DrawingCanvas");
         float pixelWidthDrawingCanvas = drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * pixelWidth;
-        // Debug.Log(drawingCanvas.transform.lossyScale);
-        // Debug.Log("pixelWidth " + pixelWidth + "pixelHeight " + pixelHeight);
-        /*if (Input.GetMouseButton(0)) //&& Input.mousePosition.x > 0.0 && Input.mousePosition.y > 0.0 && Input.mousePosition.x < pixelWidth - pixelWidth*4 && Input.mousePosition.y < pixelHeight)
-            {
-            Debug.Log("mouseposition " + Input.mousePosition);
-            Debug.Log("viewportPoint " + Camera.main.ScreenToViewportPoint(Input.mousePosition));
-            float x = Camera.main.ScreenToViewportPoint(Input.mousePosition).x * pixelWidth;
-            float y = Camera.main.ScreenToViewportPoint(Input.mousePosition).y * pixelHeight;
-            Debug.Log("x " + x + " y " + y);
-            Debug.Log("mousePosition.xy " + Input.mousePosition);
-            if(Input.mousePosition.x < drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * pixelWidth)
-            {
-                //draw(x, y); screen point to ray function
-                Debug.Log("draw");
-                draw(Input.mousePosition.x - drawingCanvas.transform.position.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * pixelWidth, Input.mousePosition.y);
-            }
-            /*
-             * 
-             
-            //Debug.Log("------------------------------------");
-           // Vector3 screenToWorld = Input.mousePosition;
-                           }
-      //  }*/
-
+        
 
         if (Input.GetMouseButton(0) && Vector3.Distance(previousMousePosition, Input.mousePosition) > 20.0f)
         {
@@ -779,32 +781,10 @@ public class ComputeHookup : MonoBehaviour
                 {
                     float drawingCanvasWidth= drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width;
                     float uiBoxWidth = uiBox.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width;
-                    //draw(Camera.main.WorldToScreenPoint(hit.point).x, Camera.main.WorldToScreenPoint(hit.point).y) ;
-                    //draw(Camera.main.WorldToScreenPoint(hit.point).x - drawingCanvasShift + uiBoxWidth, Camera.main.WorldToScreenPoint(hit.point).y);
                     float fraction = (Camera.main.WorldToScreenPoint(hit.point).x /*+ uiBoxWidth * 1.2f*/) / drawingCanvasWidth;// - 0.5f;
                     float newX = Camera.main.WorldToScreenPoint(hit.point).x + uiBoxWidth * (1.2f + -1.0f * (fraction - 0.5f)/2.0f);
-                   /* Debug.Log("fraction " + fraction);
-                    Debug.Log("drawingCanvasWidth " + drawingCanvasWidth);
-                    Debug.Log("ui box width " + uiBoxWidth);
-                    Debug.Log("Camera.main.WorldToScreenPoint(hit.point).x " + Camera.main.WorldToScreenPoint(hit.point).x);
-                    Debug.Log("uiBoxWidth * 1.2f " + uiBoxWidth * 1.2f);*/
-
-                    //draw(Camera.main.WorldToScreenPoint(hit.point).x + uiBoxWidth*1.2f, Camera.main.WorldToScreenPoint(hit.point).y);
                     draw(newX, Camera.main.WorldToScreenPoint(hit.point).y);
 
-                    // Debug.Log("Test");
-                    /* Debug.Log("hit.point " + hit.point);
-                     Debug.Log("world to screen of hit.point " + Camera.main.WorldToScreenPoint(hit.point));
-                     Debug.Log("Screen.width " + Screen.width);
-                     Debug.Log("drawingCanvas.transform.position.x " + drawingCanvas.transform.position.x);
-                     Debug.Log("drawingCanvas.transform.lossyScale.x " + drawingCanvas.transform.lossyScale.x);
-                     Debug.Log("uiBox.transform.lossyScale.x " + uiBox.transform.lossyScale.x);
-                     Debug.Log("pixelWidth " + pixelWidth);
-                     Debug.Log("pixel width calcualtion " + (drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width));
-                    */
-                    //Debug.Log("world to screen " + Camera.main.WorldToScreenPoint(hit.transform.position));
-                    //Debug.Log("world to screen " + Camera.main.WorldToScreenPoint(hit.transform.position));
-                    //.main.WorldToScreenPoint(hit.transform.position);
 
                 }
             }
