@@ -5,6 +5,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using HSVPicker;
+#if UNITY_EDITOR
+    using UnityEditor;
+#endif
+using System.IO;
 
 public class ComputeHookup : MonoBehaviour
 { 
@@ -187,6 +191,27 @@ public class ComputeHookup : MonoBehaviour
         blank_canvas_shader.Dispatch(blank_canvas_shader.FindKernel("CSMain"), COMPUTE_GRID_WIDTH, COMPUTE_GRID_HEIGHT, 1);
 
         previousMousePosition = new Vector3(0.0f, 0.0f, 0.0f);
+
+#if UNITY_EDITOR
+            //string path = "Assets/Resources/data.txt";
+            string dir = Application.dataPath + "/../";
+            string txtname = "data.txt";
+            string textPath = Path.Combine(dir, txtname);
+
+                //Write some text to the test.txt file
+              // // StreamWriter writer = new StreamWriter(dir, false);
+              //  writer.WriteLine("Test from compute hookup2");
+              //  writer.Close();
+
+                //Re-import the file to update the reference in the editor
+               // AssetDatabase.ImportAsset(path);
+              //  TextAsset asset = Resources.Load<TextAsset>("data");
+
+                //Print the text from the file
+             //   Debug.Log(asset.text);
+       // Debug.Log("wrote into " + dir);
+#endif
+
     }
 
     void setUpCanvas() {
