@@ -432,7 +432,7 @@ public class ComputeHookup : MonoBehaviour
         pauseButton.onClick.AddListener(delegate { pausePlaySwitch(false); userClickData["Pause"].Add(new UIClickData(Time.time, "pause button click", 1.0f)); });
         pausePlaySwitch(true);
 
-        picker.onValueChanged.AddListener(color =>
+        colorPicker.onValueChanged.AddListener(color =>
         {
             userClickData["Picker"].Add(new UIClickData(Time.time, "red", color.r, "green", color.g, "blue", color.b));
         });
