@@ -147,7 +147,8 @@ public class ComputeHookup : MonoBehaviour
     private Vector3 previousMousePosition;
     private int playingOrPausing; // 0 if playing 1 if paused
 
-    private Dictionary<string, float[]> userData = new Dictionary<string, float[]>();
+    private Dictionary<string, List<UIClickData>> userClickData 
+        = new Dictionary<string, List<UIClickData>>();
 
     //public Camera camera;
     // Start is called before the first frame update
@@ -328,6 +329,22 @@ public class ComputeHookup : MonoBehaviour
         move_sense_coef = 1.0f;
         normalization_factor = 2.0f;
 
+        userClickData.Add("ViewDropdown", new List<UIClickData>());
+        userClickData.Add("Play", new List<UIClickData>());
+        userClickData.Add("Pause", new List<UIClickData>());
+        userClickData.Add("ClearCanvasButton", new List<UIClickData>());
+        userClickData.Add("ParticleBrushButton", new List<UIClickData>());
+        userClickData.Add("DepositBrushButton", new List<UIClickData>());
+        userClickData.Add("BrushSizeSlider", new List<UIClickData>());
+        userClickData.Add("BrushDensitySlider", new List<UIClickData>());
+        userClickData.Add("MoveDistanceSlider", new List<UIClickData>());
+        userClickData.Add("ScaleSlider", new List<UIClickData>());
+        userClickData.Add("DepositStrengthSlider", new List<UIClickData>());
+        userClickData.Add("AgentDepositStrengthSlider", new List<UIClickData>());
+        userClickData.Add("Picker", new List<UIClickData>());
+        userClickData.Add("SenseDistanceSlider", new List<UIClickData>());
+        userClickData.Add("TraceDecaySlider", new List<UIClickData>());
+
         moveDistanceSlider = GameObject.Find("MoveDistanceSlider").GetComponent<Slider>();
         scaleSlider = GameObject.Find("ScaleSlider").GetComponent<Slider>();
         depositStrengthSlider = GameObject.Find("DepositStrengthSlider").GetComponent<Slider>();
@@ -352,31 +369,31 @@ public class ComputeHookup : MonoBehaviour
         depositSettingsTitle = GameObject.Find("DepositSettingsTitle0").GetComponent<TextMeshProUGUI>();
 
         moveDistanceSliderText = GameObject.Find("MoveDistanceSliderText").GetComponent<TextMeshProUGUI>();
-        moveDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(moveDistanceSliderText, "speed: ", moveDistanceSlider.value); });
+        moveDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(moveDistanceSliderText, "speed: ", moveDistanceSlider.value); userClickData["MoveDistanceSlider"].Add(new UIClickData(Time.time, "speed", moveDistanceSlider.value)); });
         updateSliderLabel(moveDistanceSliderText, "speed: ", moveDistanceSlider.value);
         
         scaleSliderText = GameObject.Find("ScaleSliderText").GetComponent<TextMeshProUGUI>();
-        scaleSlider.onValueChanged.AddListener(delegate { updateSliderLabel(scaleSliderText, "field of view: ", scaleSlider.value); });
+        scaleSlider.onValueChanged.AddListener(delegate { updateSliderLabel(scaleSliderText, "field of view: ", scaleSlider.value); userClickData["ScaleSlider"].Add(new UIClickData(Time.time, "field of view", scaleSlider.value)); });
         updateSliderLabel(scaleSliderText, "field of view: ", scaleSlider.value);
 
         depositStrengthSliderText = GameObject.Find("DepositStrengthSliderText").GetComponent<TextMeshProUGUI>();
-        depositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value); });
+        depositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value); userClickData["DepositStrengthSlider"].Add(new UIClickData(Time.time, "deposit strength", depositStrengthSlider.value)); });
         updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value);
 
         agentDepositStrengthSliderText = GameObject.Find("AgentDepositStrengthSliderText").GetComponent<TextMeshProUGUI>();
-        agentDepositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(agentDepositStrengthSliderText, "particle deposit strength: ", agentDepositStrengthSlider.value); });
+        agentDepositStrengthSlider.onValueChanged.AddListener(delegate { updateSliderLabel(agentDepositStrengthSliderText, "particle deposit strength: ", agentDepositStrengthSlider.value); userClickData["AgentDepositStrengthSlider"].Add(new UIClickData(Time.time, "particle deposit strength", agentDepositStrengthSlider.value)); });
         updateSliderLabel(agentDepositStrengthSliderText, "particle deposit strength: ", agentDepositStrengthSlider.value);
 
         brushSizeSliderText = GameObject.Find("BrushSizeSliderText").GetComponent<TextMeshProUGUI>();
-        brushSizeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushSizeSliderText, "brush size: ", brushSizeSlider.value); });
+        brushSizeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushSizeSliderText, "brush size: ", brushSizeSlider.value); userClickData["BrushSizeSlider"].Add(new UIClickData(Time.time, "brush size", brushSizeSlider.value)); });
         updateSliderLabel(brushSizeSliderText, "brush size: ", brushSizeSlider.value);
 
         brushDensitySliderText = GameObject.Find("BrushDensitySliderText").GetComponent<TextMeshProUGUI>();
-        brushDensitySlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushDensitySliderText, "brush density: ", 50+brushDensitySlider.value); });
+        brushDensitySlider.onValueChanged.AddListener(delegate { updateSliderLabel(brushDensitySliderText, "brush density: ", 50+brushDensitySlider.value); userClickData["BrushDensitySlider"].Add(new UIClickData(Time.time, "brush density", 50 + brushDensitySlider.value)); });
         updateSliderLabel(brushDensitySliderText, "brush density: ", 50 + brushDensitySlider.value);
 
         traceDecaySliderText = GameObject.Find("TraceDecaySliderText").GetComponent<TextMeshProUGUI>();
-        traceDecaySlider.onValueChanged.AddListener(delegate { updateSliderLabel(traceDecaySliderText, "trace decay: ", traceDecaySlider.value); });
+        traceDecaySlider.onValueChanged.AddListener(delegate { updateSliderLabel(traceDecaySliderText, "trace decay: ", traceDecaySlider.value); userClickData["TraceDecaySlider"].Add(new UIClickData(Time.time, "trace decay", traceDecaySlider.value)); });
         updateSliderLabel(traceDecaySliderText, "trace decay: ", traceDecaySlider.value);
 
         //lifetimeSliderText = GameObject.Find("ParticleLifetimeSliderText").GetComponent<TextMeshProUGUI>();
@@ -398,21 +415,27 @@ public class ComputeHookup : MonoBehaviour
      //   updateSliderLabel(moveDistanceSliderTestText, "test move distance: ", moveDistanceSliderTest.value);
 
         senseDistanceSliderText = GameObject.Find("SenseDistanceSliderText").GetComponent<TextMeshProUGUI>();
-        senseDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(senseDistanceSliderText, "visibility distance: ", senseDistanceSlider.value); });
+        senseDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(senseDistanceSliderText, "visibility distance: ", senseDistanceSlider.value); userClickData["SenseDistanceSlider"].Add(new UIClickData(Time.time, "visibility distance", senseDistanceSlider.value)); });
         updateSliderLabel(senseDistanceSliderText, "visibility distance: ", senseDistanceSlider.value);
 
         viewDropdown = GameObject.Find("ViewDropdown").GetComponent<TMP_Dropdown>();
+        viewDropdown.onValueChanged.AddListener(delegate { userClickData["ViewDropdown"].Add(new UIClickData(Time.time, "view", viewDropdown.value)); });
         particleBrushButton = GameObject.Find("ParticleBrushButton").GetComponent<Button>();
         depositBrushButton = GameObject.Find("DepositBrushButton").GetComponent<Button>();
-        particleBrushButton.onClick.AddListener(delegate { brushSwitch(true); }); 
-        depositBrushButton.onClick.AddListener(delegate { brushSwitch(false); });
+        particleBrushButton.onClick.AddListener(delegate { brushSwitch(true); userClickData["ParticleBrushButton"].Add(new UIClickData(Time.time, "particle brush button click", 1.0f)); }); 
+        depositBrushButton.onClick.AddListener(delegate { brushSwitch(false); userClickData["DepositBrushButton"].Add(new UIClickData(Time.time, "deposit brush button click", 1.0f)); });
         brushSwitch(true); // set particle brush to be selected first
 
         playButton = GameObject.Find("Play").GetComponent<Button>();
         pauseButton = GameObject.Find("Pause").GetComponent<Button>();
-        playButton.onClick.AddListener(delegate { pausePlaySwitch(true); });
-        pauseButton.onClick.AddListener(delegate { pausePlaySwitch(false); });
+        playButton.onClick.AddListener(delegate { pausePlaySwitch(true); userClickData["Play"].Add(new UIClickData(Time.time, "play button click", 1.0f)); });
+        pauseButton.onClick.AddListener(delegate { pausePlaySwitch(false); userClickData["Pause"].Add(new UIClickData(Time.time, "pause button click", 1.0f)); });
         pausePlaySwitch(true);
+
+        picker.onValueChanged.AddListener(color =>
+        {
+            userClickData["Picker"].Add(new UIClickData(Time.time, "red", color.r, "green", color.g, "blue", color.b));
+        });
 
         //modeDropdown.onValueChanged.AddListener(delegate { changeMode(modeDropdown.value);  });
 
@@ -423,7 +446,8 @@ public class ComputeHookup : MonoBehaviour
         Button clearCanvasButton = GameObject.Find("ClearCanvasButton").GetComponent<Button>();
         clearCanvasButton.onClick.AddListener(delegate { Debug.Log("clear"); setupBuffers(); /*updatepropagateShaderVariables(deposit_in);*/ });
 
-        userData.Add
+        
+        
     }
 
     void brushSwitch(bool particleBrush) {
