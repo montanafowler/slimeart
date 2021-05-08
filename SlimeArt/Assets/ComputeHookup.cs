@@ -9,6 +9,7 @@ using HSVPicker;
     using UnityEditor;
 #endif
 using System.IO;
+using System.Text;
 
 public class ComputeHookup : MonoBehaviour
 { 
@@ -145,6 +146,8 @@ public class ComputeHookup : MonoBehaviour
 
     private Vector3 previousMousePosition;
     private int playingOrPausing; // 0 if playing 1 if paused
+
+    private Dictionary<string, float[]> userData = new Dictionary<string, float[]>();
 
     //public Camera camera;
     // Start is called before the first frame update
@@ -419,6 +422,8 @@ public class ComputeHookup : MonoBehaviour
         //Button playButton = GameObject.Find("PlayButton").GetComponent<Button>();
         Button clearCanvasButton = GameObject.Find("ClearCanvasButton").GetComponent<Button>();
         clearCanvasButton.onClick.AddListener(delegate { Debug.Log("clear"); setupBuffers(); /*updatepropagateShaderVariables(deposit_in);*/ });
+
+        userData.Add
     }
 
     void brushSwitch(bool particleBrush) {
@@ -719,6 +724,7 @@ public class ComputeHookup : MonoBehaviour
             moveDist_SenseDist_particleDepositStrength_lifetime_buffer.Release();
             red_green_blue_alpha_buffer.Release();
             turn_sense_angles_buffer.Release();
+            SaveDataFile();
             Application.Quit(); // Quits the game
         }
 
@@ -817,6 +823,31 @@ public class ComputeHookup : MonoBehaviour
         }
 
 
+    }
+
+
+    public void SaveDataFile()
+    {
+        string destination = Application.persistentDataPath + "/dataFile" + Random.Range(0, 1000) + ".csv";
+        FileStream file;
+        Debug.Log("destination " + destination);
+
+        if (File.Exists(destination)) file = File.OpenWrite(destination);
+        else file = File.Create(destination);
+        AddText(file, "testing add text method,hello");
+        file.Close();
+    }
+
+    void OnApplicationQuit()
+    {
+        SaveDataFile();
+        Debug.Log("Application ending after " + Time.time + " seconds");
+    }
+
+    private static void AddText(FileStream fs, string value)
+    {
+        byte[] info = new UTF8Encoding(true).GetBytes(value);
+        fs.Write(info, 0, info.Length);
     }
 
 

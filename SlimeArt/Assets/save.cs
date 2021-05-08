@@ -6,7 +6,7 @@ using TMPro;
 using HSVPicker;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-
+using System.Text;
 public class save : MonoBehaviour
 {
 
@@ -16,8 +16,8 @@ public class save : MonoBehaviour
 
     void Start()
     {
-        SaveFile();
-        LoadFile();
+      //  SaveFile();
+      //  LoadFile();
     }
 
     public void SaveFile()
@@ -33,7 +33,14 @@ public class save : MonoBehaviour
         GameData data = new GameData(currentScore, currentName, currentTimePlayed);
         BinaryFormatter bf = new BinaryFormatter();
         bf.Serialize(file, data);
+        AddText(file, "testing add text method");
         file.Close();
+    }
+
+    private static void AddText(FileStream fs, string value)
+    {
+        byte[] info = new UTF8Encoding(true).GetBytes(value);
+        fs.Write(info, 0, info.Length);
     }
 
     public void LoadFile()
