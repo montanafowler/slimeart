@@ -155,6 +155,7 @@ public class ComputeHookup : MonoBehaviour
         pixelWidth = (int)(drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width);
         pixelHeight = Screen.height;
         //pixelWidth = Screen.width;
+        Debug.Log("pixelWidth, height " + Screen.width + " " + Screen.height);
 
         if (SAVED_QUALITY == 0.0f) {
             MAX_SPACE = 100000;
