@@ -674,7 +674,6 @@ public class ComputeHookup : MonoBehaviour
                     x_y_theta_dataType_array[nextAvailableIndex + 2] = Random.Range(-PI, PI); //random Theta
 
                     moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex] = moveDistanceSlider.value;
-
                     moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 1] = senseDistanceSlider.value * pixelWidth/3.0f;//moveDistanceSlider.value * 2.0f;//sense distance
                     moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 2] = agentDepositStrengthSlider.value;
                     moveDist_SenseDist_particleDepositStrength_lifetime_array[nextAvailableIndex + 3] = 1.0f;//lifetimeSlider.value;
@@ -872,7 +871,7 @@ public class ComputeHookup : MonoBehaviour
 
         if (File.Exists(destination)) file = File.OpenWrite(destination);
         else file = File.Create(destination);
-        string csvLineToAdd = "total time using application," + Time.time + "\n";
+        string csvLineToAdd = "total time using application," + Time.time + ",MAX_SPACE," + MAX_SPACE + ",resolution width," + Screen.width + ",resolution height," + Screen.height + "\n";
         AddText(file, csvLineToAdd);
         AddText(file, "UI Component,Time,Value 1 Name,Value 1, Value 2 Name, Value 2, Value 3 Name, Value 3\n");
         float previousTime = -2.0f;
