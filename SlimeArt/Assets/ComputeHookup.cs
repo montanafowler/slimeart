@@ -915,11 +915,11 @@ public class ComputeHookup : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        TMP_Dropdown saveDataDropdown = GameObject.Find("SaveDataDropdown").GetComponent<TMP_Dropdown>();
-        if (saveDataDropdown.value == SAVE_DATA)
-        {
+        //TMP_Dropdown saveDataDropdown = GameObject.Find("SaveDataDropdown").GetComponent<TMP_Dropdown>();
+        //if (saveDataDropdown.value == SAVE_DATA)
+        //{
             SaveDataFile();
-        }
+       // }
         Debug.Log("Application ending after " + Time.time + " seconds");
     }
 
