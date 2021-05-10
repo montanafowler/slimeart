@@ -143,6 +143,8 @@ public class ComputeHookup : MonoBehaviour
     //values to adjust scale and speed sliders
     private const int SCALE = 0;
     private const int SPEED = 1;
+    private const int SAVE_DATA = 0;
+    private const int DO_NOT_SAVE_DATA = 1;
 
     private Vector3 previousMousePosition;
     private int playingOrPausing; // 0 if playing 1 if paused
@@ -847,6 +849,19 @@ public class ComputeHookup : MonoBehaviour
                     {
                         Debug.Log("get mouse button down");
                         userClickData["DrawMouseDown"].Add(new UIClickData(Time.time, "x", newX, "y", Camera.main.WorldToScreenPoint(hit.point).y));
+                        userClickData["ViewDropdown"].Add(new UIClickData(Time.time, "drawing view", viewDropdown.value));
+                        userClickData["Play"].Add(new UIClickData(Time.time, "drawing play=0pause=1", playingOrPausing));
+                        userClickData["Pause"].Add(new UIClickData(Time.time, "drawing play=0pause=1", playingOrPausing));
+                        userClickData["BrushSizeSlider"].Add(new UIClickData(Time.time, "drawing brush size", brushSizeSlider.value));
+                        userClickData["BrushDensitySlider"].Add(new UIClickData(Time.time, "drawing brush density", brushDensitySlider.value + 50));
+                        userClickData["MoveDistanceSlider"].Add(new UIClickData(Time.time, "drawing speed", moveDistanceSlider.value));
+                        userClickData["ScaleSlider"].Add(new UIClickData(Time.time, "drawing visibility distance", scaleSlider.value));
+                        userClickData["DepositStrengthSlider"].Add(new UIClickData(Time.time, "drawing deposit strength", depositStrengthSlider.value));
+                        userClickData["AgentDepositStrengthSlider"].Add(new UIClickData(Time.time, "drawing particle deposit strength", agentDepositStrengthSlider.value));
+                        userClickData["Picker"].Add(new UIClickData(Time.time, "drawing red", colorPicker.CurrentColor.r, "drawing green", colorPicker.CurrentColor.g, "drawing blue", colorPicker.CurrentColor.b));
+                        userClickData["SenseDistanceSlider"].Add(new UIClickData(Time.time, "drawing sense distance ", senseDistanceSlider.value));
+                        userClickData["TraceDecaySlider"].Add(new UIClickData(Time.time, "drawing trace decay ", traceDecaySlider.value));
+            
                     }
                 }
             }
@@ -865,7 +880,7 @@ public class ComputeHookup : MonoBehaviour
 
     public void SaveDataFile()
     {
-        string destination = Application.persistentDataPath + "/dataFile" + Random.Range(0, 1000) + ".csv";
+        string destination = Application.persistentDataPath + "/dataFile" + Random.Range(0, 10000) + ".csv";
         FileStream file;
         Debug.Log("destination " + destination);
 
@@ -900,7 +915,11 @@ public class ComputeHookup : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        SaveDataFile();
+        TMP_Dropdown saveDataDropdown = GameObject.Find("SaveDataDropdown").GetComponent<TMP_Dropdown>();
+        if (saveDataDropdown.value == SAVE_DATA)
+        {
+            SaveDataFile();
+        }
         Debug.Log("Application ending after " + Time.time + " seconds");
     }
 
