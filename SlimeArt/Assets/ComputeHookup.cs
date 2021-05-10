@@ -146,7 +146,7 @@ public class ComputeHookup : MonoBehaviour
 
     private Vector3 previousMousePosition;
     private int playingOrPausing; // 0 if playing 1 if paused
-
+    private bool drawing = false;
     private Dictionary<string, List<UIClickData>> userClickData 
         = new Dictionary<string, List<UIClickData>>();
 
@@ -344,6 +344,8 @@ public class ComputeHookup : MonoBehaviour
         userClickData.Add("Picker", new List<UIClickData>());
         userClickData.Add("SenseDistanceSlider", new List<UIClickData>());
         userClickData.Add("TraceDecaySlider", new List<UIClickData>());
+        userClickData.Add("DrawMouseDown", new List<UIClickData>());
+        userClickData.Add("DrawMouseUp", new List<UIClickData>());
 
         moveDistanceSlider = GameObject.Find("MoveDistanceSlider").GetComponent<Slider>();
         scaleSlider = GameObject.Find("ScaleSlider").GetComponent<Slider>();
@@ -824,8 +826,8 @@ public class ComputeHookup : MonoBehaviour
         GameObject uiBox = GameObject.Find("CubeUI");
         GameObject drawingCanvas = GameObject.Find("DrawingCanvas");
         float pixelWidthDrawingCanvas = drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * pixelWidth;
-        
 
+        
         if (Input.GetMouseButton(0) && Vector3.Distance(previousMousePosition, Input.mousePosition) > 20.0f)
         {
             RaycastHit hit;
@@ -835,15 +837,27 @@ public class ComputeHookup : MonoBehaviour
             {
                 if (hit.transform.name == "DrawingCanvas")
                 {
-                    float drawingCanvasWidth= drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width;
+                    drawing = true;
+                    float drawingCanvasWidth = drawingCanvas.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width;
                     float uiBoxWidth = uiBox.transform.lossyScale.x / (drawingCanvas.transform.lossyScale.x + uiBox.transform.lossyScale.x) * Screen.width;
                     float fraction = (Camera.main.WorldToScreenPoint(hit.point).x /*+ uiBoxWidth * 1.2f*/) / drawingCanvasWidth;// - 0.5f;
                     float newX = Camera.main.WorldToScreenPoint(hit.point).x + uiBoxWidth * (1.2f + -1.0f * (fraction - 0.5f)/2.0f);
                     draw(newX, Camera.main.WorldToScreenPoint(hit.point).y);
 
-
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        Debug.Log("get mouse button down");
+                        userClickData["DrawMouseDown"].Add(new UIClickData(Time.time, "x", newX, "y", Camera.main.WorldToScreenPoint(hit.point).y));
+                    }
                 }
             }
+        }
+
+        if (Input.GetMouseButtonUp(0) && drawing)
+        {
+            Debug.Log("get mouse button up");
+            userClickData["DrawMouseUp"].Add(new UIClickData(Time.time, "mouse up", 0.0f));
+            drawing = false;
         }
 
 
@@ -858,7 +872,30 @@ public class ComputeHookup : MonoBehaviour
 
         if (File.Exists(destination)) file = File.OpenWrite(destination);
         else file = File.Create(destination);
-        AddText(file, "testing add text method,hello");
+        string csvLineToAdd = "total time using application," + Time.time + "\n";
+        AddText(file, csvLineToAdd);
+        AddText(file, "UI Component,Time,Value 1 Name,Value 1, Value 2 Name, Value 2, Value 3 Name, Value 3\n");
+        float previousTime = -2.0f;
+
+        foreach (KeyValuePair<string, List<UIClickData>> pair in userClickData)
+        {
+            previousTime = -2.0f;
+            foreach (UIClickData uiClick in pair.Value)
+            {
+                if (uiClick.time < previousTime - 0.2f || uiClick.time > previousTime + 0.2f)
+                {
+                    csvLineToAdd = pair.Key + "," + uiClick.time + ","
+                    + uiClick.value1Name + "," + uiClick.value1 + ","
+                    + uiClick.value2Name + "," + uiClick.value2 + ","
+                    + uiClick.value3Name + "," + uiClick.value3 + "\n";
+                    AddText(file, csvLineToAdd);
+                    previousTime = uiClick.time;
+                }
+                
+
+            }
+        }
+
         file.Close();
     }
 
