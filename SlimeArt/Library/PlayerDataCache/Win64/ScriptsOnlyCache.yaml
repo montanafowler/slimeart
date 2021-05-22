@@ -1607,4 +1607,4 @@ ScriptsOnlyBuild:
   scenePathNames:
   - Assets/Scenes/MenuScene.unity
   - Assets/Scenes/CanvasScene.unity
-  playerPath: D:/slime_art_executables/5.10.21.809AM_874x492/SlimeArt.exe
+  playerPath: D:/slime_art_executables/5.19.21.637pm_874x492/SlimeArt.exe
