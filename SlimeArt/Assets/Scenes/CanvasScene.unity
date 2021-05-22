@@ -17466,15 +17466,6 @@ MonoBehaviour:
   tex_trace_in: {fileID: 0}
   tex_trace_out: {fileID: 0}
   mat: {fileID: 2100000, guid: 99889b06f4239cf44bf93a82f2c9e373, type: 2}
-  half_sense_spread: 0
-  sense_distance: 0
-  sense_distance_divisor: 0
-  turn_angle: 0
-  move_distance: 0
-  agent_deposit: 0
-  world_width: 0
-  world_height: 0
-  world_depth: 0
   move_sense_coef: 0
   normalization_factor: 0
   deposit_strength: 0
@@ -17482,11 +17473,6 @@ MonoBehaviour:
   pixelWidth: 0
   pixelHeight: 0
   swap: 0
-  linePositions: []
-  LOW_QUALITY_GRAPHICS: 0
-  MED_QUALITY_GRAPHICS: 1
-  HIGH_QUALITY_GRAPHICS: 2
-  ULTRA_QUALITY_GRAPHICS: 3
   SAVED_QUALITY: 0
 --- !u!224 &1373533178
 RectTransform:
@@ -28041,7 +28027,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 22448498, guid: 916ee089a0d7b63419075f91e1c657ec, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 1273.2399
+      value: 1272.8977
       objectReference: {fileID: 0}
     - target: {fileID: 22448498, guid: 916ee089a0d7b63419075f91e1c657ec, type: 3}
       propertyPath: m_AnchoredPosition.y

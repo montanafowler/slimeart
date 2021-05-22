@@ -1,4 +1,4 @@
-﻿// Each #kernel tells which function to compile; you can have many kernels
+// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
 
 // Create a RenderTexture with enableRandomWrite flag and set it
@@ -34,36 +34,17 @@ void CSMain (uint3 id : SV_DispatchThreadID)
             txcoord.x = txcoord.x % pixelWidth;
             txcoord.y = txcoord.y % pixelHeight;
             v += weight * deposit_in[txcoord];
-           // t += weight * tex_trace_in[txcoord];
             w += weight;
-            //t.x += weight * tex_trace_in[txcoord].x;
-            //t.y += weight * tex_trace_in[txcoord].y;
-            //t.z += weight * tex_trace_in[txcoord].z;
-           // t.w += weight * tex_trace_in[txcoord].w;
         }
     }
     v /= w;
-    //t /= w;
 
     // Decay the deposit by a constant factor
     v *= 0.9;
-    deposit_out[p] = v;//deposit_in[p];
+    deposit_out[p] = v;
 
     // Decay the trace a little
-    //tex_trace[p] *= 0.995;
-  //  t *= 0.999;
-    //tex_trace_out[p] = t;
     tex_trace_out[p] = float4(0.0, 0.0, 0.0, 1.0);
-    if (trace_decay_value < 0.98) {
-     //   trace_decay_value = 0.8;
-    }
-    if (trace_decay_value >= 0.98 && trace_decay_value < 0.99) {
-       // trace_decay_value = 0.9;
-    }
-    if (trace_decay_value >= 0.99 && trace_decay_value < 1.0) {
-        //trace_decay_value = 1.0;
-    }
-
     float x = tex_trace_in[p].x - trace_decay_value;
     if (x < 0.0)
         x = 0.0;
@@ -75,15 +56,4 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         z = 0.0;
 
     tex_trace_out[p] = float4(x, y, z, 1.0);
-
-    //tex_trace_out[p].x = tex_trace_in[p].x - 0.01;
-    //tex_trace_out[p].y = max(tex_trace_in[p].y - 0.01, 0.0);
-    //tex_trace_out[p].z = max(tex_trace_in[p].z - 0.01, 0.0);
-    
-    //* trace_decay_value;
-    //if (tex_trace_out[p].x < 0.2) {
-      //  tex_trace_out[p] = float4(0.0, 0.0, 0.0, 1.0);
-    //}
-    //tex_trace_out[p] = tex_trace_in[p];
-   // tex_trace_out[p] = float4(0.0, 1.0, 0.0, 1.0);
 }

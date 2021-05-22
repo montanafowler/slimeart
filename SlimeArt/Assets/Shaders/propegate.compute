@@ -5,34 +5,13 @@
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 RWTexture2D<float4> particle_render_texture;
-
-//RWStructuredBuffer<float> particles_x; //x positons of every particle normalized
-//RWStructuredBuffer<float> particles_y; // y positions of every particle normalized
-//RWStructuredBuffer<float> particles_theta; // direction of movement for every particle
-//RWStructuredBuffer<float> data_types; // how strong a deposit
 RWStructuredBuffer<float> x_y_theta_dataType;
 RWStructuredBuffer<float> moveDist_SenseDist_particleDepositStrength_lifetime;
 RWStructuredBuffer<float> red_green_blue_alpha;
 RWStructuredBuffer<float> turn_sense_angles;
-//RWStructuredBuffer<string> particle_id_buffer;
-//RWStructuredBuffer<float4> moveDist_SenseDist_particleDepositStrength_lifetime;
-//RWTexture2D<float4> moveDist_SenseDist_particleDepositStrength_lifetime;
-//RWStructuredBuffer<float> sense_distance_buffer;
-//RWStructuredBuffer<float> particle_deposit_strength_buffer;
-//RWStructuredBuffer<float> lifetime_buffer;
-//RWStructuredBuffer<float> particle_red_channel_buffer;
-//RWStructuredBuffer<float> particle_green_channel_buffer;
-//RWStructuredBuffer<float> particle_blue_channel_buffer;
-//RWStructuredBuffer<string> attracted_to_buffer; TODO
-//RWStructuredBuffer<string> repelled_by_buffer; TODO
 RWTexture2D<float4> tex_deposit;
 RWTexture2D<float4> tex_trace;
 
-//float half_sense_spread; // default = 15-30 degrees
-//float sense_distance; // in world-space units; default = about 1/100 of the world 'cube' size
-//float turn_angle; // default = 15 degrees
-//float move_distance; // in world-space units; default = about 1/5--1/3 of sense_distance
-//float agent_deposit; // 0 for data-driven fitting, >0 for self-reinforcing behavior
 float world_width; //
 float world_height; // grid dimensions - note that the particle positions are also stored in the grid coordinates, but continuous
 int world_depth; //
@@ -137,7 +116,7 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
     float turn_angle = turn_sense_angles[idx];
     float half_sense_spread = turn_sense_angles[idx + 1];
     //float tex_trace_decay = turn_sense_angles[idx + 2];
-    
+
     //return;
     if (data_type == DEPOSIT_EMITTER) {
         tex_deposit[uint2(x_normalized * world_width,
@@ -163,91 +142,84 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
     );
     tex_trace[uint2(x, y)] = float4(red, green, blue, alpha);
 
-    //if (playingOrPausing == PLAY) {
-        // Get vector which points in the current particle's direction
-        float2 center_axis = float2(cos(theta), sin(theta));
+    // Get vector which points in the current particle's direction
+    float2 center_axis = float2(cos(theta), sin(theta));
 
-        // Get base vector which points away from the current particle's direction and will be used to sample environment in other directions
-        float sense_theta = theta - half_sense_spread; // sense spread is the difference between the cone's center and the side of it
-        float2 cone_edge_direction = float2(cos(sense_theta), sin(sense_theta)); //RIGHT? 7/3/20 float3(sin(sense_theta) * cos(ph), cos(sense_theta), sin(sense_theta) * sin(ph));
+    // Get base vector which points away from the current particle's direction and will be used to sample environment in other directions
+    float sense_theta = theta - half_sense_spread; // sense spread is the difference between the cone's center and the side of it
+    float2 cone_edge_direction = float2(cos(sense_theta), sin(sense_theta)); //RIGHT? 7/3/20 float3(sin(sense_theta) * cos(ph), cos(sense_theta), sin(sense_theta) * sin(ph));
 
-        // Probabilistic sensing,  how far out you sense is random
-        float sense_distance_prob = sense_distance;
-        float xi = clamp(rng.random_float(), 0.001, 0.999); // random for each particle and timestep
-        float distance_scaling_factor = -0.3033 * log((pow(xi + 0.005, -0.4) - 0.9974) / 7.326); // using Maxwell-Boltzmann distribution
-        sense_distance_prob *= distance_scaling_factor;
+    // Probabilistic sensing,  how far out you sense is random
+    float sense_distance_prob = sense_distance;
+    float xi = clamp(rng.random_float(), 0.001, 0.999); // random for each particle and timestep
+    float distance_scaling_factor = -0.3033 * log((pow(xi + 0.005, -0.4) - 0.9974) / 7.326); // using Maxwell-Boltzmann distribution
+    sense_distance_prob *= distance_scaling_factor;
 
-        // Sample environment along the movement axis
-        int2 p = int2(x, y); // current location of particle
-        float current_deposit = tex_deposit[p].x; // deposit at current location
-        float2 center_sense_pos = center_axis * sense_distance_prob; // the random point along the direction the particle is traveling
-        float deposit_ahead = tex_deposit[p + int2(center_sense_pos)].x; // sample from that random point to get the deposit
+    // Sample environment along the movement axis
+    int2 p = int2(x, y); // current location of particle
+    float current_deposit = tex_deposit[p].x; // deposit at current location
+    float2 center_sense_pos = center_axis * sense_distance_prob; // the random point along the direction the particle is traveling
+    float deposit_ahead = tex_deposit[p + int2(center_sense_pos)].x; // sample from that random point to get the deposit
 
-        // Stochastic MC direction sampling
-        float random_angle = rng.random_float() * half_sense_spread * 2.0 + sense_theta; //TWOPI - PI; // random angle between -pi and +pi, random azimuth
-        // I think off_center_base_dir/cone_edge_direction is the direction of theta - sense spread
-        // so then I think this rotation is picking a vector at the random angle between these two vectors in another plane
-        float2 sense_offset = float2(cos(random_angle), sin(random_angle)) * sense_distance_prob; //rotate(off_center_base_dir, center_axis, random_angle) * sense_distance_prob; // is this gonna work? 7/3/20
-        float sense_deposit = tex_deposit[p + int2(sense_offset)].x;
+    // Stochastic MC direction sampling
+    float random_angle = rng.random_float() * half_sense_spread * 2.0 + sense_theta; //TWOPI - PI; // random angle between -pi and +pi, random azimuth
+    // I think off_center_base_dir/cone_edge_direction is the direction of theta - sense spread
+    // so then I think this rotation is picking a vector at the random angle between these two vectors in another plane
+    float2 sense_offset = float2(cos(random_angle), sin(random_angle)) * sense_distance_prob; //rotate(off_center_base_dir, center_axis, random_angle) * sense_distance_prob; // is this gonna work? 7/3/20
+    float sense_deposit = tex_deposit[p + int2(sense_offset)].x;
 
-        float sharpness = move_sense_coef;
-        float p_straight = pow(max(deposit_ahead, 0.0), sharpness);
-        float p_turn = pow(max(sense_deposit, 0.0), sharpness);
-        float xiDir = rng.random_float();
+    float sharpness = move_sense_coef;
+    float p_straight = pow(max(deposit_ahead, 0.0), sharpness);
+    float p_turn = pow(max(sense_deposit, 0.0), sharpness);
+    float xiDir = rng.random_float();
 
-        // if there is nonzero deposit in either the random sample or the sample ahead
-        if (p_straight + p_turn > 1.0e-5) {
+    // if there is nonzero deposit in either the random sample or the sample ahead
+    if (p_straight + p_turn > 1.0e-5) {
 
-            // if there is more deposit towards random angle
-            if (p_turn > p_straight) {
-                float theta_turn = theta - turn_angle;
-                float2 cone_edge_direction_turn = float2(cos(theta_turn), sin(theta_turn));
-                float2 new_direction = float2(cos(random_angle), sin(random_angle)); //rotate( cone_edge_direction_turn, center_axis, random_angle);
-                theta = atan2(new_direction.y, new_direction.x); //atan2(new_direction.z, new_direction.x); // not sure which it should be
-                //th = acos(new_direction.y / length(new_direction));
-            }
+        // if there is more deposit towards random angle
+        if (p_turn > p_straight) {
+            float theta_turn = theta - turn_angle;
+            float2 cone_edge_direction_turn = float2(cos(theta_turn), sin(theta_turn));
+            float2 new_direction = float2(cos(random_angle), sin(random_angle)); //rotate( cone_edge_direction_turn, center_axis, random_angle);
+            theta = atan2(new_direction.y, new_direction.x); //atan2(new_direction.z, new_direction.x); // not sure which it should be
+            //th = acos(new_direction.y / length(new_direction));
         }
+    }
 
-        // Make a step
-        if (playingOrPausing == PLAY) {
-            float2 dp = float2(cos(theta), sin(theta)) * move_distance * (0.1 + 0.9 * distance_scaling_factor);
-            x += dp.x;
-            y += dp.y;
-        }
+    // Make a step
+    if (playingOrPausing == PLAY) {
+        float2 dp = float2(cos(theta), sin(theta)) * move_distance * (0.1 + 0.9 * distance_scaling_factor);
+        x += dp.x;
+        y += dp.y;
+    }
 
-        // Keep the particle inside environment
-        x = fmod(x, world_width); // problem 7/28
-        y = fmod(y, world_height);
+    // Keep the particle inside environment
+    x = fmod(x, world_width); // problem 7/28
+    y = fmod(y, world_height);
 
-        // Update particle state
-        x_y_theta_dataType[idx] = x; //particles_x[idx];
-        x_y_theta_dataType[idx + 1] = y;// particles_y[idx];
-        x_y_theta_dataType[idx + 2] = theta;//particles_theta[idx];
-        x_y_theta_dataType[idx + 3] = data_type;//data_types[idx];
-        moveDist_SenseDist_particleDepositStrength_lifetime[idx] = move_distance;//move_distance_buffer[idx];
-        moveDist_SenseDist_particleDepositStrength_lifetime[idx + 1] = sense_distance;//sense_distance_buffer[idx];
-        moveDist_SenseDist_particleDepositStrength_lifetime[idx + 2] = agent_deposit; //particle_deposit_strength_buffer[idx];
-        moveDist_SenseDist_particleDepositStrength_lifetime[idx + 3] = lifetime;
-        red_green_blue_alpha[idx] = red;
-        red_green_blue_alpha[idx + 1] = green;
-        red_green_blue_alpha[idx + 2] = blue;
-        red_green_blue_alpha[idx + 3] = alpha;
-    //}
-    
+    // Update particle state
+    x_y_theta_dataType[idx] = x; //particles_x[idx];
+    x_y_theta_dataType[idx + 1] = y;// particles_y[idx];
+    x_y_theta_dataType[idx + 2] = theta;//particles_theta[idx];
+    x_y_theta_dataType[idx + 3] = data_type;//data_types[idx];
+    moveDist_SenseDist_particleDepositStrength_lifetime[idx] = move_distance;//move_distance_buffer[idx];
+    moveDist_SenseDist_particleDepositStrength_lifetime[idx + 1] = sense_distance;//sense_distance_buffer[idx];
+    moveDist_SenseDist_particleDepositStrength_lifetime[idx + 2] = agent_deposit; //particle_deposit_strength_buffer[idx];
+    moveDist_SenseDist_particleDepositStrength_lifetime[idx + 3] = lifetime;
+    red_green_blue_alpha[idx] = red;
+    red_green_blue_alpha[idx + 1] = green;
+    red_green_blue_alpha[idx + 2] = blue;
+    red_green_blue_alpha[idx + 3] = alpha;
+
+
 
     // Update deposit and trace grids
     tex_deposit[uint2(x, y)] += float4(agent_deposit, agent_deposit, agent_deposit, 1.0); // NOT ATOMIC! // the trace is not blurred, trace is not food, but agents also leave deposit
-    
+
     float trace_calc = 1.0 - exp(3.0 * distance_scaling_factor);
     tex_trace[uint2(x, y)] = //float4(trace_calc, trace_calc, trace_calc, 1.0);
         float4(red, green, blue, alpha);
-                              
-        //float4(distance_scaling_factor * red, distance_scaling_factor * green, distance_scaling_factor * blue, 1.0);
-        //float4(distance_scaling_factor, abs(center_axis.x), abs(center_axis.y), 1.0); // NOT ATOMIC!
-   //float4(distance_scaling_factor/*actualtrace*/, abs(center_axis.x), abs(center_axis.y), abs(center_axis.z)/*direction of agents*/); // NOT ATOMIC!
 
-
-    //particle_render_texture[id.xy] = float4(0.0, 1.0, 0.0, 1.0);//float4(id.x / 512.0, id.y / 512.0, 0.3, 1.0);
     particle_render_texture[uint2(x_normalized * world_width,
         y_normalized * world_height)] = float4(red, green, blue, alpha);//float4(x / 512.0, y / 512.0, 0.8, 1.0);
 
