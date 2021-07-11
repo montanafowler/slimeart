@@ -42,7 +42,7 @@ public class ComputeHookup : MonoBehaviour
 
     //Sliders
     private Slider moveDistanceSlider;
-    private Slider scaleSlider;
+   // private Slider scaleSlider;
     private Slider depositStrengthSlider;
    // private Slider agentDepositStrengthSlider;
     private Slider brushSizeSlider;
@@ -53,7 +53,7 @@ public class ComputeHookup : MonoBehaviour
 
     // text for labels
     private TextMeshProUGUI moveDistanceSliderText;
-    private TextMeshProUGUI scaleSliderText;
+  //  private TextMeshProUGUI scaleSliderText;
     private TextMeshProUGUI depositStrengthSliderText;
    // private TextMeshProUGUI agentDepositStrengthSliderText;
     private TextMeshProUGUI brushSizeSliderText;
@@ -65,6 +65,7 @@ public class ComputeHookup : MonoBehaviour
     private ColorPicker colorPicker;
     private TextMeshProUGUI depositSettingsTitle;
     private TextMeshProUGUI particleSettingsTitle;
+    private TextMeshProUGUI globalSettingsTitle;
     private Button particleBrushButton;
     private Button depositBrushButton;
     private Button pauseButton;
@@ -74,8 +75,8 @@ public class ComputeHookup : MonoBehaviour
     private TMP_Dropdown viewDropdown;
 
     private float OBSERVE_MODE = 2.0f;
-    private float PARTICLE_VIEW = 1.0f;
-    private float DEPOSIT_VIEW = 2.0f;
+    private float PARTICLE_VIEW = 2.0f;
+    private float DEPOSIT_VIEW = 1.0f;
     private float TRACE_VIEW = 0.0f;
 
     public const float LOW_QUALITY_GRAPHICS = 0.0f;
@@ -124,8 +125,8 @@ public class ComputeHookup : MonoBehaviour
         SAVED_QUALITY = GraphicsQualityMenu.CHOSEN_QUALITY_LEVEL;
 
         // set label where csv click data will be saved when app quits
-        TextMeshProUGUI label = GameObject.Find("FileLocation").GetComponent<TextMeshProUGUI>();
-        label.SetText(Application.persistentDataPath);
+        //TextMeshProUGUI label = GameObject.Find("FileLocation").GetComponent<TextMeshProUGUI>();
+        //label.SetText(Application.persistentDataPath);
 
         propagateKernel = propagate.FindKernel("CSMain");
         GameObject uiBox = GameObject.Find("CubeUI");
@@ -236,7 +237,7 @@ public class ComputeHookup : MonoBehaviour
         userClickData.Add("BrushSizeSlider", new List<UIClickData>());
         userClickData.Add("BrushDensitySlider", new List<UIClickData>());
         userClickData.Add("MoveDistanceSlider", new List<UIClickData>());
-        userClickData.Add("ScaleSlider", new List<UIClickData>());
+        //userClickData.Add("ScaleSlider", new List<UIClickData>());
         userClickData.Add("DepositStrengthSlider", new List<UIClickData>());
        // userClickData.Add("AgentDepositStrengthSlider", new List<UIClickData>());
         userClickData.Add("Picker", new List<UIClickData>());
@@ -252,7 +253,7 @@ public class ComputeHookup : MonoBehaviour
     private void initializeSliders()
     {
         moveDistanceSlider = GameObject.Find("MoveDistanceSlider").GetComponent<Slider>();
-        scaleSlider = GameObject.Find("ScaleSlider").GetComponent<Slider>();
+      //  scaleSlider = GameObject.Find("ScaleSlider").GetComponent<Slider>();
         depositStrengthSlider = GameObject.Find("DepositStrengthSlider").GetComponent<Slider>();
        // agentDepositStrengthSlider = GameObject.Find("AgentDepositStrengthSlider").GetComponent<Slider>();
         brushSizeSlider = GameObject.Find("BrushSizeSlider").GetComponent<Slider>();
@@ -270,14 +271,15 @@ public class ComputeHookup : MonoBehaviour
     {
         particleSettingsTitle = GameObject.Find("ParticleSettingsTitle").GetComponent<TextMeshProUGUI>();
         depositSettingsTitle = GameObject.Find("DepositSettingsTitle0").GetComponent<TextMeshProUGUI>();
+        globalSettingsTitle = GameObject.Find("GlobalSettingsTitle").GetComponent<TextMeshProUGUI>();
 
         moveDistanceSliderText = GameObject.Find("MoveDistanceSliderText").GetComponent<TextMeshProUGUI>();
         moveDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(moveDistanceSliderText, "speed: ", moveDistanceSlider.value); userClickData["MoveDistanceSlider"].Add(new UIClickData(Time.time, "speed", moveDistanceSlider.value)); });
         updateSliderLabel(moveDistanceSliderText, "speed: ", moveDistanceSlider.value);
 
-        scaleSliderText = GameObject.Find("ScaleSliderText").GetComponent<TextMeshProUGUI>();
-        scaleSlider.onValueChanged.AddListener(delegate { updateSliderLabel(scaleSliderText, "field of view: ", scaleSlider.value); userClickData["ScaleSlider"].Add(new UIClickData(Time.time, "field of view", scaleSlider.value)); });
-        updateSliderLabel(scaleSliderText, "field of view: ", scaleSlider.value);
+       // scaleSliderText = GameObject.Find("ScaleSliderText").GetComponent<TextMeshProUGUI>();
+       // scaleSlider.onValueChanged.AddListener(delegate { updateSliderLabel(scaleSliderText, "field of view: ", scaleSlider.value); userClickData["ScaleSlider"].Add(new UIClickData(Time.time, "field of view", scaleSlider.value)); });
+       // updateSliderLabel(scaleSliderText, "field of view: ", scaleSlider.value);
 
         depositStrengthSliderText = GameObject.Find("DepositStrengthSliderText").GetComponent<TextMeshProUGUI>();
         depositStrengthSlider.onValueChanged.AddListener(delegate {  updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value * Screen.width); userClickData["DepositStrengthSlider"].Add(new UIClickData(Time.time, "deposit strength", depositStrengthSlider.value * Screen.width)); });
@@ -364,9 +366,9 @@ public class ComputeHookup : MonoBehaviour
             moveDistanceSlider.interactable = true;
             moveDistanceSlider.gameObject.SetActive(true);
 
-            scaleSlider.enabled = true;
-            scaleSlider.interactable = true;
-            scaleSlider.gameObject.SetActive(true);
+          //  scaleSlider.enabled = true;
+          //  scaleSlider.interactable = true;
+          //  scaleSlider.gameObject.SetActive(true);
 
             traceDecaySlider.enabled = true;
             traceDecaySlider.interactable = true;
@@ -383,7 +385,7 @@ public class ComputeHookup : MonoBehaviour
             colorPicker.gameObject.SetActive(true);
 
             particleSettingsTitle.gameObject.SetActive(true);
-
+            globalSettingsTitle.gameObject.SetActive(true);
             depositStrengthSlider.enabled = false;
             depositStrengthSlider.interactable = false;
             depositStrengthSlider.gameObject.SetActive(false);
@@ -399,15 +401,16 @@ public class ComputeHookup : MonoBehaviour
             // deposit brush button clicked
             particleSettingsTitle.GetComponent<TextMeshProUGUI>().gameObject.SetActive(false);
             depositSettingsTitle.GetComponent<TextMeshProUGUI>().gameObject.SetActive(true);
+            globalSettingsTitle.gameObject.SetActive(false);
             colorPicker.gameObject.SetActive(false);
             particleBrushButton.interactable = true;
             depositBrushButton.interactable = false;
             moveDistanceSlider.enabled = false;
             moveDistanceSlider.interactable = false;
             moveDistanceSlider.gameObject.SetActive(false);
-            scaleSlider.enabled = false;
-            scaleSlider.interactable = false;
-            scaleSlider.gameObject.SetActive(false);
+          //  scaleSlider.enabled = false;
+          //  scaleSlider.interactable = false;
+          //  scaleSlider.gameObject.SetActive(false);
             traceDecaySlider.enabled = false;
             traceDecaySlider.interactable = false;
             traceDecaySlider.gameObject.SetActive(false);
@@ -611,8 +614,8 @@ public class ComputeHookup : MonoBehaviour
                     red_green_blue_alpha_array[nextAvailableIndex + 2] = colorPicker.CurrentColor.b;//particleBlueChannelSlider.value;
                     red_green_blue_alpha_array[nextAvailableIndex + 3] = colorPicker.CurrentColor.a;//particleAlphaChannelSlider.value;
 
-                    turn_sense_angles_array[nextAvailableIndex] = scaleSlider.value; //turnAngleSlider.value;
-                    turn_sense_angles_array[nextAvailableIndex + 1] = scaleSlider.value * 2.0f; //senseAngleSlider.value;
+                    turn_sense_angles_array[nextAvailableIndex] = 1.0f;//scaleSlider.value; //turnAngleSlider.value;
+                    turn_sense_angles_array[nextAvailableIndex + 1] = 2.0f;//scaleSlider.value * 2.0f; //senseAngleSlider.value;
                     turn_sense_angles_array[nextAvailableIndex + 2] = 0.0f;//traceDecaySlider.value;
                     turn_sense_angles_array[nextAvailableIndex + 3] = 0.0f;
 
@@ -777,7 +780,7 @@ public class ComputeHookup : MonoBehaviour
         userClickData["BrushSizeSlider"].Add(new UIClickData(Time.time, "drawing brush size", brushSizeSlider.value));
         userClickData["BrushDensitySlider"].Add(new UIClickData(Time.time, "drawing brush density", brushDensitySlider.value + 50));
         userClickData["MoveDistanceSlider"].Add(new UIClickData(Time.time, "drawing speed", moveDistanceSlider.value));
-        userClickData["ScaleSlider"].Add(new UIClickData(Time.time, "drawing turn angle", scaleSlider.value));
+       // userClickData["ScaleSlider"].Add(new UIClickData(Time.time, "drawing turn angle", scaleSlider.value));
         userClickData["DepositStrengthSlider"].Add(new UIClickData(Time.time, "drawing deposit strength", depositStrengthSlider.value * Screen.width));
        // userClickData["AgentDepositStrengthSlider"].Add(new UIClickData(Time.time, "drawing particle deposit strength", agentDepositStrengthSlider.value));
         userClickData["Picker"].Add(new UIClickData(Time.time, "drawing red", colorPicker.CurrentColor.r, "drawing green", colorPicker.CurrentColor.g, "drawing blue", colorPicker.CurrentColor.b));

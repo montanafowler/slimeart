@@ -639,7 +639,7 @@ ScriptsOnlyBuild:
     className: AnimationTrack
   - hash:
       serializedVersion: 2
-      Hash: 61e8dc50896c185300daf0d7d62c3f61
+      Hash: 903f29fe8aca4a39e5a31830ed99ea9c
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: ComputeHookup
@@ -1607,4 +1607,4 @@ ScriptsOnlyBuild:
   scenePathNames:
   - Assets/Scenes/MenuScene.unity
   - Assets/Scenes/CanvasScene.unity
-  playerPath: D:/slime_art_executables/5.19.21.637pm_874x492/SlimeArt.exe
+  playerPath: D:/slime_art_executables/7.10.21.402pm_2799X1575/SlimeArt.exe

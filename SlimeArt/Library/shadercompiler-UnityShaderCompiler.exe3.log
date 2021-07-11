@@ -1,7 +1,4 @@
 Base path: 'C:/Program Files/Unity/Hub/Editor/2020.1.1f1/Editor/Data', plugins path 'C:/Program Files/Unity/Hub/Editor/2020.1.1f1/Editor/Data/PlaybackEngines'
 Cmd: initializeCompiler
-Cmd: compileComputeKernel
-  error: 1 plat 4 at propegate.compute(84): implicit truncation of vector type
-  api=4 insize=9843 outsize=6080 ok=1
 
 Quitting shader compiler process
