@@ -324,7 +324,16 @@ public class ComputeHookup : MonoBehaviour
         depositBrushButton = GameObject.Find("DepositBrushButton").GetComponent<Button>();
         particleBrushButton.onClick.AddListener(delegate {  brushSwitch(true); userClickData["ParticleBrushButton"].Add(new UIClickData(Time.time, "particle brush button click", 1.0f)); });
         depositBrushButton.onClick.AddListener(delegate { brushSwitch(false); userClickData["DepositBrushButton"].Add(new UIClickData(Time.time, "deposit brush button click", 1.0f)); });
+        
+        // lead follow setup
+        leaderButton = GameObject.Find("LeaderButton").GetComponent<Button>();
+        followerButton = GameObject.Find("FollowerButton").GetComponent<Button>();
+        leaderButton.onClick.AddListener(delegate { leaderFollowerSwitch(true); userClickData["Leader"].Add(new UIClickData(Time.time, "leader button click", 1.0f)); });
+        followerButton.onClick.AddListener(delegate { leaderFollowerSwitch(false); userClickData["Follower"].Add(new UIClickData(Time.time, "follower button click", 1.0f)); });
+        
+
         brushSwitch(true); // set particle brush to be selected first
+        leaderFollowerSwitch(true);
 
         // play pause setup
         playButton = GameObject.Find("Play").GetComponent<Button>();
@@ -332,13 +341,6 @@ public class ComputeHookup : MonoBehaviour
         playButton.onClick.AddListener(delegate {  pausePlaySwitch(true); userClickData["Play"].Add(new UIClickData(Time.time, "play button click", 1.0f)); });
         pauseButton.onClick.AddListener(delegate {  pausePlaySwitch(false); userClickData["Pause"].Add(new UIClickData(Time.time, "pause button click", 1.0f)); });
         pausePlaySwitch(true);
-
-        // lead follow setup
-        leaderButton = GameObject.Find("LeaderButton").GetComponent<Button>();
-        followerButton = GameObject.Find("FollowerButton").GetComponent<Button>();
-        leaderButton.onClick.AddListener(delegate { leaderFollowerSwitch(true); userClickData["Leader"].Add(new UIClickData(Time.time, "leader button click", 1.0f)); });
-        followerButton.onClick.AddListener(delegate { leaderFollowerSwitch(false); userClickData["Follower"].Add(new UIClickData(Time.time, "follower button click", 1.0f)); });
-        leaderFollowerSwitch(true);
 
         // color picker on change
         colorPicker.onValueChanged.AddListener(color => {
@@ -361,6 +363,19 @@ public class ComputeHookup : MonoBehaviour
         {
             particleBrushButton.interactable = false; // grey out particle button
             depositBrushButton.interactable = true; // activate deposit button
+                                                    // followerButton.gameObject.SetActive(true);
+                                                    // leaderButton.gameObject.SetActive(true);
+            //if (leaderButton != null && followerButton != null)
+           // {
+                bool leading = leadingOrFollowing > 0.0f;
+            Debug.Log("leading");
+                followerButton.enabled = leading;
+                followerButton.interactable = true;
+                followerButton.gameObject.SetActive(true);
+                leaderButton.enabled = leading;
+                leaderButton.interactable = true;
+                leaderButton.gameObject.SetActive(true);
+           // }
 
             moveDistanceSlider.enabled = true;
             moveDistanceSlider.interactable = true;
@@ -402,6 +417,16 @@ public class ComputeHookup : MonoBehaviour
             particleSettingsTitle.GetComponent<TextMeshProUGUI>().gameObject.SetActive(false);
             depositSettingsTitle.GetComponent<TextMeshProUGUI>().gameObject.SetActive(true);
             globalSettingsTitle.gameObject.SetActive(false);
+
+        //    if (leaderButton != null && followerButton != null)
+          //  {
+                followerButton.enabled = false;
+                followerButton.interactable = false;
+                followerButton.gameObject.SetActive(false);
+                leaderButton.enabled = false;
+                leaderButton.interactable = false;
+                leaderButton.gameObject.SetActive(false);
+         //   }
             colorPicker.gameObject.SetActive(false);
             particleBrushButton.interactable = true;
             depositBrushButton.interactable = false;
