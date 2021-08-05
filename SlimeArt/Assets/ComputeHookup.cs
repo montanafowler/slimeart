@@ -42,25 +42,17 @@ public class ComputeHookup : MonoBehaviour
 
     //Sliders
     private Slider moveDistanceSlider;
-   // private Slider scaleSlider;
     private Slider depositStrengthSlider;
-   // private Slider agentDepositStrengthSlider;
     private Slider brushSizeSlider;
     private Slider brushDensitySlider;
-    //private Slider lifetimeSlider;
     private Slider traceDecaySlider;
-    //private Slider senseDistanceSlider;
 
     // text for labels
     private TextMeshProUGUI moveDistanceSliderText;
-  //  private TextMeshProUGUI scaleSliderText;
     private TextMeshProUGUI depositStrengthSliderText;
-   // private TextMeshProUGUI agentDepositStrengthSliderText;
     private TextMeshProUGUI brushSizeSliderText;
     private TextMeshProUGUI brushDensitySliderText;
-    //private TextMeshProUGUI lifetimeSliderText;
     private TextMeshProUGUI traceDecaySliderText;
-    //private TextMeshProUGUI senseDistanceSliderText;
 
     private ColorPicker colorPicker;
     private TextMeshProUGUI depositSettingsTitle;
@@ -111,7 +103,7 @@ public class ComputeHookup : MonoBehaviour
 
     private Vector3 previousMousePosition;
     private int playingOrPausing; // 0 if playing 1 if paused
-    private float leadingOrFollowing; // 0.001 if leading, 0 if following
+    private float leadingOrFollowing = 0.01f; // 0.01 if leading, 0 if following
     private bool drawing = false;
     private Dictionary<string, List<UIClickData>> userClickData
         = new Dictionary<string, List<UIClickData>>();
@@ -177,19 +169,16 @@ public class ComputeHookup : MonoBehaviour
         float[] turn_sense_angles_array = new float[MAX_SPACE];
 
         //x,y,theta,data
-        //x_y_theta_dataType_buffer.Release();
         x_y_theta_dataType_buffer = initializeComputeBuffer(x_y_theta_dataType_array, "x_y_theta_dataType", propagateKernel);
 
         //moveDist,senseDist,particleDepositStrength,lifetime
-        //moveDist_SenseDist_particleDepositStrength_lifetime_buffer.Release();
         moveDist_SenseDist_particleDepositStrength_lifetime_buffer = initializeComputeBuffer(moveDist_SenseDist_particleDepositStrength_lifetime_array,
             "moveDist_SenseDist_particleDepositStrength_lifetime", propagateKernel);
 
         //red,green,blue,alpha
-        //red_green_blue_alpha_buffer.Release();
         red_green_blue_alpha_buffer = initializeComputeBuffer(red_green_blue_alpha_array, "red_green_blue_alpha", propagateKernel);
 
-        //turn_sense_angles_buffer.Release();
+        //turn_sense_angles_buffer
         turn_sense_angles_buffer = initializeComputeBuffer(turn_sense_angles_array, "turn_sense_angles", propagateKernel);
 
         //blank_canvas.Release();
@@ -237,11 +226,8 @@ public class ComputeHookup : MonoBehaviour
         userClickData.Add("BrushSizeSlider", new List<UIClickData>());
         userClickData.Add("BrushDensitySlider", new List<UIClickData>());
         userClickData.Add("MoveDistanceSlider", new List<UIClickData>());
-        //userClickData.Add("ScaleSlider", new List<UIClickData>());
         userClickData.Add("DepositStrengthSlider", new List<UIClickData>());
-       // userClickData.Add("AgentDepositStrengthSlider", new List<UIClickData>());
         userClickData.Add("Picker", new List<UIClickData>());
-      //  userClickData.Add("SenseDistanceSlider", new List<UIClickData>());
         userClickData.Add("TraceDecaySlider", new List<UIClickData>());
         userClickData.Add("DrawMouseDown", new List<UIClickData>());
         userClickData.Add("DrawMouseUp", new List<UIClickData>());
@@ -253,14 +239,10 @@ public class ComputeHookup : MonoBehaviour
     private void initializeSliders()
     {
         moveDistanceSlider = GameObject.Find("MoveDistanceSlider").GetComponent<Slider>();
-      //  scaleSlider = GameObject.Find("ScaleSlider").GetComponent<Slider>();
         depositStrengthSlider = GameObject.Find("DepositStrengthSlider").GetComponent<Slider>();
-       // agentDepositStrengthSlider = GameObject.Find("AgentDepositStrengthSlider").GetComponent<Slider>();
         brushSizeSlider = GameObject.Find("BrushSizeSlider").GetComponent<Slider>();
         brushDensitySlider = GameObject.Find("BrushDensitySlider").GetComponent<Slider>();
-        //lifetimeSlider = GameObject.Find("ParticleLifetimeSlider").GetComponent<Slider>();
         colorPicker = GameObject.Find("Picker").GetComponent<ColorPicker>();
-       // senseDistanceSlider = GameObject.Find("SenseDistanceSlider").GetComponent<Slider>();
         traceDecaySlider = GameObject.Find("TraceDecaySlider").GetComponent<Slider>();
     }
 
@@ -277,17 +259,9 @@ public class ComputeHookup : MonoBehaviour
         moveDistanceSlider.onValueChanged.AddListener(delegate { updateSliderLabel(moveDistanceSliderText, "speed: ", moveDistanceSlider.value); userClickData["MoveDistanceSlider"].Add(new UIClickData(Time.time, "speed", moveDistanceSlider.value)); });
         updateSliderLabel(moveDistanceSliderText, "speed: ", moveDistanceSlider.value);
 
-       // scaleSliderText = GameObject.Find("ScaleSliderText").GetComponent<TextMeshProUGUI>();
-       // scaleSlider.onValueChanged.AddListener(delegate { updateSliderLabel(scaleSliderText, "field of view: ", scaleSlider.value); userClickData["ScaleSlider"].Add(new UIClickData(Time.time, "field of view", scaleSlider.value)); });
-       // updateSliderLabel(scaleSliderText, "field of view: ", scaleSlider.value);
-
         depositStrengthSliderText = GameObject.Find("DepositStrengthSliderText").GetComponent<TextMeshProUGUI>();
         depositStrengthSlider.onValueChanged.AddListener(delegate {  updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value * Screen.width); userClickData["DepositStrengthSlider"].Add(new UIClickData(Time.time, "deposit strength", depositStrengthSlider.value * Screen.width)); });
         updateSliderLabel(depositStrengthSliderText, "deposit strength: ", depositStrengthSlider.value * Screen.width);
-
-      //  agentDepositStrengthSliderText = GameObject.Find("AgentDepositStrengthSliderText").GetComponent<TextMeshProUGUI>();
-       // agentDepositStrengthSlider.onValueChanged.AddListener(delegate {  updateSliderLabel(agentDepositStrengthSliderText, "particle deposit strength: ", agentDepositStrengthSlider.value); userClickData["AgentDepositStrengthSlider"].Add(new UIClickData(Time.time, "particle deposit strength", agentDepositStrengthSlider.value)); });
-       // updateSliderLabel(agentDepositStrengthSliderText, "particle deposit strength: ", agentDepositStrengthSlider.value);
 
         brushSizeSliderText = GameObject.Find("BrushSizeSliderText").GetComponent<TextMeshProUGUI>();
         brushSizeSlider.onValueChanged.AddListener(delegate {  updateSliderLabel(brushSizeSliderText, "brush size: ", brushSizeSlider.value); userClickData["BrushSizeSlider"].Add(new UIClickData(Time.time, "brush size", brushSizeSlider.value)); });
@@ -300,15 +274,6 @@ public class ComputeHookup : MonoBehaviour
         traceDecaySliderText = GameObject.Find("TraceDecaySliderText").GetComponent<TextMeshProUGUI>();
         traceDecaySlider.onValueChanged.AddListener(delegate {  updateSliderLabel(traceDecaySliderText, "trace decay: ", traceDecaySlider.value); userClickData["TraceDecaySlider"].Add(new UIClickData(Time.time, "trace decay", traceDecaySlider.value)); });
         updateSliderLabel(traceDecaySliderText, "trace decay: ", traceDecaySlider.value);
-
-        //lifetimeSliderText = GameObject.Find("ParticleLifetimeSliderText").GetComponent<TextMeshProUGUI>();
-        //lifetimeSlider.onValueChanged.AddListener(delegate { updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value); });
-        //updateSliderLabel(lifetimeSliderText, "Particle Lifetime: ", lifetimeSlider.value);
-
-       // senseDistanceSliderText = GameObject.Find("SenseDistanceSliderText").GetComponent<TextMeshProUGUI>();
-       // senseDistanceSlider.onValueChanged.AddListener(delegate {  updateSliderLabel(senseDistanceSliderText, "visibility distance: ", senseDistanceSlider.value); userClickData["SenseDistanceSlider"].Add(new UIClickData(Time.time, "visibility distance", senseDistanceSlider.value)); });
-       // updateSliderLabel(senseDistanceSliderText, "visibility distance: ", senseDistanceSlider.value);
-
     }
 
     /*
@@ -363,42 +328,22 @@ public class ComputeHookup : MonoBehaviour
         {
             particleBrushButton.interactable = false; // grey out particle button
             depositBrushButton.interactable = true; // activate deposit button
-                                                    // followerButton.gameObject.SetActive(true);
-                                                    // leaderButton.gameObject.SetActive(true);
-            //if (leaderButton != null && followerButton != null)
-           // {
-                bool leading = leadingOrFollowing > 0.0f;
-            Debug.Log("leading");
-                followerButton.enabled = leading;
-                followerButton.interactable = true;
-                followerButton.gameObject.SetActive(true);
-                leaderButton.enabled = leading;
-                leaderButton.interactable = true;
-                leaderButton.gameObject.SetActive(true);
-           // }
+
+            bool leading = leadingOrFollowing > 0.0f;
+            followerButton.enabled = true;
+            followerButton.interactable = leading;
+            followerButton.gameObject.SetActive(true);
+            leaderButton.enabled = true;
+            leaderButton.interactable = !leading;
+            leaderButton.gameObject.SetActive(true);
 
             moveDistanceSlider.enabled = true;
             moveDistanceSlider.interactable = true;
             moveDistanceSlider.gameObject.SetActive(true);
-
-          //  scaleSlider.enabled = true;
-          //  scaleSlider.interactable = true;
-          //  scaleSlider.gameObject.SetActive(true);
-
             traceDecaySlider.enabled = true;
             traceDecaySlider.interactable = true;
             traceDecaySlider.gameObject.SetActive(true);
-
-          //  agentDepositStrengthSlider.enabled = true;
-           // agentDepositStrengthSlider.interactable = true;
-          //  agentDepositStrengthSlider.gameObject.SetActive(true);
-
-            //senseDistanceSlider.enabled = true;
-            //senseDistanceSlider.interactable = true;
-           // senseDistanceSlider.gameObject.SetActive(true);
-
             colorPicker.gameObject.SetActive(true);
-
             particleSettingsTitle.gameObject.SetActive(true);
             globalSettingsTitle.gameObject.SetActive(true);
             depositStrengthSlider.enabled = false;
@@ -417,34 +362,19 @@ public class ComputeHookup : MonoBehaviour
             particleSettingsTitle.GetComponent<TextMeshProUGUI>().gameObject.SetActive(false);
             depositSettingsTitle.GetComponent<TextMeshProUGUI>().gameObject.SetActive(true);
             globalSettingsTitle.gameObject.SetActive(false);
-
-        //    if (leaderButton != null && followerButton != null)
-          //  {
-                followerButton.enabled = false;
-                followerButton.interactable = false;
-                followerButton.gameObject.SetActive(false);
-                leaderButton.enabled = false;
-                leaderButton.interactable = false;
-                leaderButton.gameObject.SetActive(false);
-         //   }
+            followerButton.enabled = false;
+            followerButton.gameObject.SetActive(false);
+            leaderButton.enabled = false;
+            leaderButton.gameObject.SetActive(false);
             colorPicker.gameObject.SetActive(false);
             particleBrushButton.interactable = true;
             depositBrushButton.interactable = false;
             moveDistanceSlider.enabled = false;
             moveDistanceSlider.interactable = false;
             moveDistanceSlider.gameObject.SetActive(false);
-          //  scaleSlider.enabled = false;
-          //  scaleSlider.interactable = false;
-          //  scaleSlider.gameObject.SetActive(false);
             traceDecaySlider.enabled = false;
             traceDecaySlider.interactable = false;
             traceDecaySlider.gameObject.SetActive(false);
-           // agentDepositStrengthSlider.enabled = false;
-          //  agentDepositStrengthSlider.interactable = false;
-           // agentDepositStrengthSlider.gameObject.SetActive(false);
-           // senseDistanceSlider.enabled = false;
-           // senseDistanceSlider.interactable = false;
-          //  senseDistanceSlider.gameObject.SetActive(false);
             depositStrengthSlider.enabled = true;
             depositStrengthSlider.interactable = true;
             depositStrengthSlider.gameObject.SetActive(true);
@@ -474,16 +404,20 @@ public class ComputeHookup : MonoBehaviour
      */
     void leaderFollowerSwitch(bool leader)
     {
-        leaderButton.interactable = !leader; //false if play button was pushed
-        followerButton.interactable = leader; //true of play button was pushed
-        if (leader)
+        if (particleBrushButton.interactable == false)
         {
-            leadingOrFollowing = 0.01f; //leading
+            leaderButton.interactable = !leader; //false if play button was pushed
+            followerButton.interactable = leader; //true of play button was pushed
+            if (leader)
+            {
+                leadingOrFollowing = 0.01f; //leading
+            }
+            else
+            {
+                leadingOrFollowing = 0.0f; //following
+            }
         }
-        else
-        {
-            leadingOrFollowing = 0.0f; //following
-        }
+        
     }
 
     /*
@@ -805,11 +739,8 @@ public class ComputeHookup : MonoBehaviour
         userClickData["BrushSizeSlider"].Add(new UIClickData(Time.time, "drawing brush size", brushSizeSlider.value));
         userClickData["BrushDensitySlider"].Add(new UIClickData(Time.time, "drawing brush density", brushDensitySlider.value + 50));
         userClickData["MoveDistanceSlider"].Add(new UIClickData(Time.time, "drawing speed", moveDistanceSlider.value));
-       // userClickData["ScaleSlider"].Add(new UIClickData(Time.time, "drawing turn angle", scaleSlider.value));
         userClickData["DepositStrengthSlider"].Add(new UIClickData(Time.time, "drawing deposit strength", depositStrengthSlider.value * Screen.width));
-       // userClickData["AgentDepositStrengthSlider"].Add(new UIClickData(Time.time, "drawing particle deposit strength", agentDepositStrengthSlider.value));
         userClickData["Picker"].Add(new UIClickData(Time.time, "drawing red", colorPicker.CurrentColor.r, "drawing green", colorPicker.CurrentColor.g, "drawing blue", colorPicker.CurrentColor.b));
-       // userClickData["SenseDistanceSlider"].Add(new UIClickData(Time.time, "drawing sense distance ", senseDistanceSlider.value));
         userClickData["TraceDecaySlider"].Add(new UIClickData(Time.time, "drawing trace decay ", traceDecaySlider.value));
 
     }
